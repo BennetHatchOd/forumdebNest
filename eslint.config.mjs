@@ -25,17 +25,18 @@ export default [
       },
       plugins: {
         '@typescript-eslint': tseslint,
-        prettier: prettierPlugin,
+      //  prettier: prettierPlugin,
       },
       rules: {
-        'prettier/prettier': ['error', { singleQuote: true, endOfLine: 'auto' }],
+         "prettier/prettier": "off",
+        //'prettier/prettier': ['error', { singleQuote: true, endOfLine: 'auto' }],
         '@typescript-eslint/no-unused-vars': 'warn',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         'no-console': 'warn',
         'no-debugger': 'error',
         "indent": ["error", 4], // Требуем 4 пробела
-        "prettier/prettier": ["error", { tabWidth: 4 }],  
+        //"prettier/prettier": ["error", { tabWidth: 4 }],  
         "no-multiple-empty-lines": "off", // Игнорирует пустые строки   
         "indent": "off", // Игнорирует отступы и табуляцию  
       },
