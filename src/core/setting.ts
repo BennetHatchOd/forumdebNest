@@ -17,17 +17,17 @@ export const SESSION_COLLECTION_NAME = 'sessions';
 export const LIKE_COMMENT_COLLECTION_NAME = 'likescomments';
 export const LIKE_POST_COLLECTION_NAME = 'likesposts';
 
-export const HTTP_STATUSES = {
-    OK_200:                 200,
-    CREATED_201:            201,
-    NO_CONTENT_204:         204,
-    BAD_REQUEST_400:        400,
-    NO_AUTHOR_401:          401,
-    FORBIDDEN:              403,
-    NOT_FOUND_404:          404,
-    ERROR_500:              500,
-    TOO_MANY_REQUESTS_429:  429,
-};
+// export const HTTP_STATUSES = {
+//     OK_200:                 200,
+//     CREATED_201:            201,
+//     NO_CONTENT_204:         204,
+//     BAD_REQUEST_400:        400,
+//     NO_AUTHOR_401:          401,
+//     FORBIDDEN:              403,
+//     NOT_FOUND_404:          404,
+//     ERROR_500:              500,
+//     TOO_MANY_REQUESTS_429:  429,
+// };
 
 export const URL_PATH = {
     base:       '/',
