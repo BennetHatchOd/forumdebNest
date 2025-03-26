@@ -1,0 +1,48 @@
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Blog, BlogSchema } from './domain/blog.entity';
+import { BlogControllers } from './api/blog.controller';
+import { BlogService } from './apllication/blog.service';
+import { BlogQueryRepository } from './infrastucture/query/blog.query.repository';
+import { BlogRepository } from './infrastucture/blog.repository';
+import { Post, PostSchema } from './domain/post.entity';
+import { PostService } from './apllication/post.service';
+import { PostControllers } from './api/post.controller';
+import { PostRepository } from './infrastucture/post.repository';
+import { PostQueryRepository } from './infrastucture/query/post.query.repository';
+import { Comment, CommentSchema } from './domain/comment.entity';
+import { CommentControllers } from './api/comment.controller';
+import { CommentService } from './apllication/comment.service';
+import { CommentQueryRepository } from './infrastucture/query/comment.query.repository';
+import { CommentRepository } from './infrastucture/comment.repository';
+
+@Module({
+    imports: [
+        MongooseModule.forFeature([
+            { name: Blog.name, schema: BlogSchema },
+            { name: Comment.name, schema: CommentSchema },
+            { name: Post.name, schema: PostSchema },
+        ]),
+    ],
+    controllers: [
+        BlogControllers,
+        PostControllers,
+        CommentControllers],
+    providers: [
+        BlogService,
+        PostService,
+        CommentService,
+        BlogQueryRepository,
+        PostQueryRepository,
+        CommentQueryRepository,
+        BlogRepository,
+        PostRepository,
+        CommentRepository,
+    ],
+    // exports: [
+    //     BlogService,
+    //     PostService,
+    //     CommentService,
+    // ]
+})
+export class BloggingPlatformModule {}
