@@ -11,5 +11,8 @@ export class AppController {
         return this.appService.getVersion();
     }
 
+    @Delete("/testing/all-data")
+    async deleteAllData(): Promise<void>    {
 
+    }
 }
