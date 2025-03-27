@@ -21,7 +21,9 @@ export class Blog {
 
     createdAt: Date;
 
-    @Prop({ required: true,})
+    @Prop({
+        default: false,
+    })
     isMembership: boolean;
 
     @Prop({
