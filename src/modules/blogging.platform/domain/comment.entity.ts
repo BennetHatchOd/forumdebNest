@@ -2,38 +2,41 @@ import { COMMENT_COLLECTION_NAME } from 'src/core/setting';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
+import { LikesInfo, LikesInfoSchema } from './likes.info';
 
 
 
 @Schema({timestamps: true,
     collection: COMMENT_COLLECTION_NAME })
 export class Comment {
-    @Prop({ required: true,})
+    @Prop({
+        required: true,
+    })
     content: string;
 
-    @Prop({ required: true,})
+    @Prop({
+        required: true,
+    })
     parentPostId: string;
 
     createdAt: Date;
 
-    @Prop({ required: true,})
-    likesInfo: string;
-
-
-    @Prop({type: CommentatorInfoSchema,
+    @Prop({
+        type: LikesInfoSchema,
         required: true,})
+    likesInfo: LikesInfo;
+
+    @Prop({
+        type: CommentatorInfoSchema,
+        required: true,
+    })
     commentatorInfo: CommentatorInfo;
 
-     @Prop({ type: Date, default: null, })
+     @Prop({
+         type: Date,
+         default: null,
+     })
     deletedAt:  Date | null;
-
-    // :     string,
-    // :	        string,
-    // commentatorInfo:	CommentatorInfoType,
-    // :	      Date,
-    // :        LikesRecipientType
-    //
-    //
 
     // delete() {
     //     if (this.deletedAt !== null) {
