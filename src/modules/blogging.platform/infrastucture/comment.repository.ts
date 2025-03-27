@@ -22,12 +22,6 @@ export class CommentRepository {
     //     await changedItem.save();
     // }
 
-    async clear(): Promise<void> {
-        await this.CommentModel.deleteMany();
 
-        if ((await this.CommentModel.countDocuments({})) != 0)
-            throw new Error("the server can\'t clear blogCollection");
-        return;
-    }
 
 }

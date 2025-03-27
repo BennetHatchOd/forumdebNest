@@ -7,7 +7,4 @@ export class CommentService {
         private commentRepository: CommentRepository,
     ) {}
 
-    async clear(): Promise<void> {
-        await this.commentRepository.clear();
-    }
 }
