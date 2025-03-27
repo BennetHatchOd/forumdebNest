@@ -84,7 +84,7 @@ export class BlogControllers {
             
     }
 
-    @Get('id/post')
+    @Get(':id/posts')
     async getPostByBlog(@Param('id') id: string,
                         @Query() query: GetPostQueryParams)
         : Promise<PaginatedViewDto<PostViewDto[]>> {
@@ -97,7 +97,7 @@ export class BlogControllers {
 
     }
 
-    @Post('id/post')
+    @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
     async createPostByBlog(@Param('id') id: string, @Body() createPartDto:PostByBlogInputType)
         : Promise<PostViewDto>{
