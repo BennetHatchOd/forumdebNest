@@ -1,4 +1,4 @@
-export class PostByBlogInputType {
+export class PostByBlogInputType{
     constructor(
         public title: string, // length 1-30
         public shortDescription: string, // length 1-100
