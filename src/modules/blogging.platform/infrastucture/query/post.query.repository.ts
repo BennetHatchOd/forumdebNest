@@ -6,9 +6,6 @@ import { FilterQuery, Types } from 'mongoose';
 import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
 import { Rating } from '../../../../core/Rating.enum';
-import { GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
-import { BlogViewDto } from '../../dto/view/blog.view.dto';
-import { Blog, BlogDocument } from '../../domain/blog.entity';
 
 @Injectable()
 export class PostQueryRepository {

@@ -3,8 +3,6 @@ import { POST_COLLECTION_NAME } from 'src/core/setting';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
-import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
-import { BlogViewDto } from '../dto/view/blog.view.dto';
 import { ExtendedLikesInfo, ExtendedLikesInfoSchema } from './extended.likes.info';
 
 @Schema({timestamps: true,
