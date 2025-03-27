@@ -1,12 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import { URL_PATH } from '../../../core/setting';
-import { BlogInputDto } from '../dto/input/blog.input.dto';
-import { BlogViewDto } from '../dto/view/blog.view.dto';
-import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
-import { PostByBlogInputType } from '../dto/input/post.by.blog.input.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { GetCommentQueryParams } from '../dto/input/get.comment.query.params.input.dto';
 import { CommentViewDto } from '../dto/view/comment.view.dto';
@@ -15,7 +11,7 @@ import { PostQueryRepository } from '../infrastucture/query/post.query.repositor
 import { PostService } from '../apllication/post.service';
 
 @Controller(URL_PATH.posts)
-export class PostControllers {
+export class PostController {
     constructor(
         private postService: PostService,
         private postQueryRepository: PostQueryRepository,

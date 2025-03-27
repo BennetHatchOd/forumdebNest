@@ -25,7 +25,7 @@ import { PostByBlogInputType } from '../dto/input/post.by.blog.input.dto';
 import { PostService } from '../apllication/post.service';
 
 @Controller(URL_PATH.blogs)
-export class BlogControllers {
+export class BlogController {
     constructor(
         private blogService: BlogService,
         private postService: PostService,

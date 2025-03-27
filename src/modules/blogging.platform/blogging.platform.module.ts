@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './domain/blog.entity';
-import { BlogControllers } from './api/blog.controller';
+import { BlogController } from './api/blog.controller';
 import { BlogService } from './apllication/blog.service';
 import { BlogQueryRepository } from './infrastucture/query/blog.query.repository';
 import { BlogRepository } from './infrastucture/blog.repository';
@@ -10,11 +10,11 @@ import { PostService } from './apllication/post.service';
 import { PostRepository } from './infrastucture/post.repository';
 import { PostQueryRepository } from './infrastucture/query/post.query.repository';
 import { Comment, CommentSchema } from './domain/comment.entity';
-import { CommentControllers } from './api/comment.controller';
+import { CommentController } from './api/comment.controller';
 import { CommentService } from './apllication/comment.service';
 import { CommentQueryRepository } from './infrastucture/query/comment.query.repository';
 import { CommentRepository } from './infrastucture/comment.repository';
-import { PostControllers } from './api/post.controler';
+import { PostController } from './api/post.controler';
 
 @Module({
     imports: [
@@ -25,9 +25,9 @@ import { PostControllers } from './api/post.controler';
         ]),
     ],
     controllers: [
-        BlogControllers,
-        PostControllers,
-        CommentControllers],
+        BlogController,
+        PostController,
+        CommentController],
     providers: [
         BlogService,
         PostService,

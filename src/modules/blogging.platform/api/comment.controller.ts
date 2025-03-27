@@ -8,7 +8,7 @@ import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentQueryRepository } from '../infrastucture/query/comment.query.repository';
 
 @Controller(URL_PATH.comments)
-export class CommentControllers {
+export class CommentController {
     constructor(
         private commentQueryRepository: CommentQueryRepository,
     ) {}
