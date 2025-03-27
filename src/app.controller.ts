@@ -1,6 +1,5 @@
-import { Controller, Delete, Get } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { URL_PATH } from './core/setting';
 
 @Controller()
 export class AppController {
@@ -10,6 +9,4 @@ export class AppController {
     getStartPage(): string {
         return this.appService.getVersion();
     }
-
-
 }
