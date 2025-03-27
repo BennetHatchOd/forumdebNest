@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument, CommentModelType } from '../../domain/comment.entity';
 import { CommentViewDto } from '../../dto/view/comment.view.dto';
+import { Rating } from '../../../../core/Rating.enum';
+import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
+import { GetCommentQueryParams } from '../../dto/input/get.comment.query.params.input.dto';
 
 @Injectable()
 export class CommentQueryRepository {
@@ -11,7 +14,7 @@ export class CommentQueryRepository {
         @InjectModel(Comment.name) private CommentModel: CommentModelType,
     ){}
     
-    async  findById(id: string): Promise<CommentViewDto> {
+    async  findByIdWithCheck(id: string, userId: string|null = null): Promise<CommentViewDto> {
         if (!Types.ObjectId.isValid(id)) 
             throw new NotFoundException('comment not found');
         
@@ -20,8 +23,40 @@ export class CommentQueryRepository {
                                                 _id: new Types.ObjectId(id),
                                                 deletedAt: null,
                                             });
-        if(searchItem)
-            return CommentViewDto.mapToView(searchItem);
-        throw new NotFoundException('comment not found');
+        if(!searchItem)
+            throw new NotFoundException('comment not found');
+
+        let likeStatus: Rating = Rating.None
+        if(userId){
+        }
+        return CommentViewDto.mapToView(searchItem, likeStatus);
+    }
+
+    async find(queryReq: GetCommentQueryParams, userId: string|null = null): Promise<PaginatedViewDto<CommentViewDto[]>> {
+
+        const parentPostIdSearch = queryReq.searchParentPostId
+            ? { name: { $regex: queryReq.searchParentPostId, $options: 'i' } }
+            : {};
+        const queryFilter: FilterQuery<Comment> = { ...parentPostIdSearch, deletedAt: null };
+        const totalCount: number = await this.CommentModel.countDocuments(queryFilter);
+
+        const comments: CommentDocument[] = await this.CommentModel.find(queryFilter)
+            .limit(queryReq.pageSize)
+            .skip((queryReq.pageNumber - 1) * queryReq.pageSize)
+            .sort({ [queryReq.sortBy]: queryReq.sortDirection });
+
+        let likeStatus: Rating
+        if(!userId)
+            likeStatus = Rating.None
+
+        const items : CommentViewDto[]
+            = comments.map(item  => CommentViewDto.mapToView(item, likeStatus));
+
+        return PaginatedViewDto.mapToView({
+            items: items,
+            page: queryReq.pageNumber,
+            size: queryReq.pageSize,
+            totalCount: totalCount
+        })
     }
 }
