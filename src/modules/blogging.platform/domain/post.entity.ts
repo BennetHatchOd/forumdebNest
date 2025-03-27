@@ -51,32 +51,23 @@ export class Post {
     }
 
     async update(change: PostInputDto,
-           blogQueryRepository: BlogQueryRepository,) {
+           blogName: string,) {
         this.title = change.title;
         this.shortDescription = change.shortDescription;
         this.content = change.content;
-        // проверяем ид на существование и находим имя
         this.blogId = change.blogId;
-        const blogParent: BlogViewDto|null
-            = await blogQueryRepository.findByIdWitoutCheck(change.blogId);
-        if(!blogParent)
-            throw new Error('No blog found with this id');
-        this.blogName = blogParent.name;
+        this.blogName = blogName;
     }
 
     static async createInstance(createDto: PostInputDto,
-          blogQueryRepository: BlogQueryRepository,): Promise<PostDocument> {
+                                blogName: string,): Promise<PostDocument> {
 
         const post = new this();
         post.title = createDto.title;
         post.shortDescription = createDto.shortDescription;
         post.content = createDto.content;
         post.blogId = createDto.blogId;
-        const blogParent: BlogViewDto|null
-            = await blogQueryRepository.findByIdWitoutCheck(createDto.blogId);
-        if(!blogParent)
-            throw new Error('No blog found with this id');
-        post.blogName = blogParent.name;
+        post.blogName = blogName;
         post.extendedLikesInfo = ExtendedLikesInfo.createInstance()
 
         return post as PostDocument;

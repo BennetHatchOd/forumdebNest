@@ -5,7 +5,10 @@ import { PostViewDto } from '../../dto/view/post.view.dto';
 import { FilterQuery, Types } from 'mongoose';
 import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
-import { Rating } from '../../dto/rating.enum';
+import { Rating } from '../../../../core/Rating.enum';
+import { GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
+import { BlogViewDto } from '../../dto/view/blog.view.dto';
+import { Blog, BlogDocument } from '../../domain/blog.entity';
 
 @Injectable()
 export class PostQueryRepository {
@@ -14,19 +17,11 @@ export class PostQueryRepository {
         @InjectModel(Post.name) private PostModel: PostModelType,
     ){}
 
-    async  findById(id: string, userId: string|null = null): Promise<PostViewDto> {
+    async  findByIdWithCheck(id: string, userId: string|null = null): Promise<PostViewDto> {
         // если пост не найден, выкидываем ошибку 404 в репозитории
 
-        const postView: PostViewDto|null = await this.findByIdWitoutCheck(id, userId);
-        if(!postView){
-            throw new NotFoundException('post not found');
-        }
-        return postView;
-    }
-
-    async findByIdWitoutCheck(id: string, userId: string|null = null): Promise<PostViewDto|null> {
         if (!Types.ObjectId.isValid(id))
-            return null;
+            throw new NotFoundException('post not found');
 
         const searchItem: PostDocument | null
             = await this.PostModel.findOne({
@@ -34,7 +29,7 @@ export class PostQueryRepository {
                                             deletedAt: null
                                         });
         if(!searchItem)
-            return null;
+            throw new NotFoundException('post not found');
 
         // если юзер не авторизирован, то статус лайка отсутствует
         let likeStatus: Rating = Rating.None
@@ -45,20 +40,16 @@ export class PostQueryRepository {
 
     async find(queryReq: GetPostQueryParams, userId: string|null = null): Promise<PaginatedViewDto<PostViewDto[]>> {
 
-
         const blogIdSearch = queryReq.searchBlogId
             ? { name: { $regex: queryReq.searchBlogId, $options: 'i' } }
             : {};
         const queryFilter: FilterQuery<Post> = { ...blogIdSearch, deletedAt: null };
         const totalCount: number = await this.PostModel.countDocuments(queryFilter);
 
-        //if (totalCount == 0) return emptyPaginator;
-
         const posts: PostDocument[] = await this.PostModel.find(queryFilter)
             .limit(queryReq.pageSize)
             .skip((queryReq.pageNumber - 1) * queryReq.pageSize)
             .sort({ [queryReq.sortBy]: queryReq.sortDirection });
-
 
         // формируем массив ид всех постов
         // делаем запрос в базу, получаем для нашего пользователя, массив объектов
@@ -73,9 +64,13 @@ export class PostQueryRepository {
         //         = lastLikes.find(el => el.postId === post._id.toString())!.newestLikes
         //         return this.mapDbToView(post, Rating.None, newestLikes)})
 
+        // если юзер не авторизирован, то статус лайка отсутствует
+        let likeStatus: Rating
+        if(!userId)
+            likeStatus = Rating.None
 
-
-        const items = posts.map(item => PostViewDto.mapToView(item, Rating.None));
+        const items : PostViewDto[]
+            = posts.map(item => PostViewDto.mapToView(item, likeStatus));
 
         return PaginatedViewDto.mapToView({
             items: items,
@@ -83,8 +78,8 @@ export class PostQueryRepository {
             size: queryReq.pageSize,
             totalCount: totalCount
         })
-
     }
+
     // async findById(
     //     entityId: string,
     //     userId: string | undefined,
@@ -181,28 +176,6 @@ export class PostQueryRepository {
     //         pageSize: queryReq.pageSize,
     //         totalCount: totalCount,
     //         items,
-    //     };
-    // }
-
-    // mapDbToView(
-    //     item: PostDocument,
-    //     myStatus: Rating,
-    //     lastLikes: Array<LastLikesViewType>,
-    // ): PostViewType {
-    //     return {
-    //         id: item._id.toString(),
-    //         title: item.title,
-    //         shortDescription: item.shortDescription,
-    //         content: item.content,
-    //         createdAt: item.createdAt.toISOString(),
-    //         blogId: item.blogId.toString(),
-    //         blogName: item.blogName,
-    //         extendedLikesInfo: {
-    //             likesCount: item.likesInfo.likesCount,
-    //             dislikesCount: item.likesInfo.dislikesCount,
-    //             myStatus: myStatus,
-    //             newestLikes: lastLikes,
-    //         },
     //     };
     // }
 }
