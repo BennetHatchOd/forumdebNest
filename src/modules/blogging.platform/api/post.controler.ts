@@ -15,7 +15,7 @@ import { PostQueryRepository } from '../infrastucture/query/post.query.repositor
 import { PostService } from '../apllication/post.service';
 
 @Controller(URL_PATH.posts)
-export class PostController {
+export class PostControllers {
     constructor(
         private postService: PostService,
         private postQueryRepository: PostQueryRepository,

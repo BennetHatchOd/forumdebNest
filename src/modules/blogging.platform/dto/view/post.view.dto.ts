@@ -1,5 +1,5 @@
 import { PostDocument } from '../../domain/post.entity';
-import { Rating } from '../rating.enum';
+import { Rating } from '../../../../core/Rating.enum';
 
 export class PostViewDto {
     id: string;

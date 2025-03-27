@@ -7,7 +7,6 @@ import { BlogQueryRepository } from './infrastucture/query/blog.query.repository
 import { BlogRepository } from './infrastucture/blog.repository';
 import { Post, PostSchema } from './domain/post.entity';
 import { PostService } from './apllication/post.service';
-import { PostControllers } from './api/post.controller';
 import { PostRepository } from './infrastucture/post.repository';
 import { PostQueryRepository } from './infrastucture/query/post.query.repository';
 import { Comment, CommentSchema } from './domain/comment.entity';
@@ -15,6 +14,7 @@ import { CommentControllers } from './api/comment.controller';
 import { CommentService } from './apllication/comment.service';
 import { CommentQueryRepository } from './infrastucture/query/comment.query.repository';
 import { CommentRepository } from './infrastucture/comment.repository';
+import { PostControllers } from './api/post.controler';
 
 @Module({
     imports: [
@@ -39,10 +39,5 @@ import { CommentRepository } from './infrastucture/comment.repository';
         PostRepository,
         CommentRepository,
     ],
-    // exports: [
-    //     BlogService,
-    //     PostService,
-    //     CommentService,
-    // ]
 })
 export class BloggingPlatformModule {}
