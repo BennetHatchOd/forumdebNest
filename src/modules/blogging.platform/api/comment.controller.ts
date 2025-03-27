@@ -18,7 +18,7 @@ export class CommentControllers {
     // 
     // Returns comment by id
         
-        const foundComment: CommentViewDto = await this.commentQueryRepository.findById(id);
+        const foundComment: CommentViewDto = await this.commentQueryRepository.findByIdWithCheck(id);
         return foundComment;
     }
 
