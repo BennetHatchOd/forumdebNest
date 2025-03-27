@@ -1,7 +1,6 @@
-import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema({ id: false })
+@Schema({ _id: false })
 export class LikesInfo {
     @Prop({ default: 0,
         min: 0,
@@ -14,7 +13,7 @@ export class LikesInfo {
     dislikesCount: number;
 
     static createInstance(): LikesInfo {
-        const like = new this();
+        const like = new LikesInfo();
         return like;
     }
     //

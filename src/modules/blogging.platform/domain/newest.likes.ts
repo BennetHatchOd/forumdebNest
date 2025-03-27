@@ -1,9 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Post, PostDocument } from './post.entity';
-import { PostInputDto } from '../dto/input/post.input.dto';
-import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 
-@Schema({id: false,
+@Schema({_id: false,
 })
 export class LikeDetails {
     @Prop({ required: true, })
