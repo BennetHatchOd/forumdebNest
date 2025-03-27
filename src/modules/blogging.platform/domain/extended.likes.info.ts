@@ -1,17 +1,9 @@
 import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { LikesInfo } from './likes.info';
 
 @Schema({ id: false })
-export class ExtendedLikesInfo {
-    @Prop({ default: 0,
-        min: 0,
-        isInteger: true })
-    likesCount: number;
-
-    @Prop({ default: 0,
-        min: 0,
-        isInteger: true })
-    dislikesCount: number;
+export class ExtendedLikesInfo extends LikesInfo{
 
     @Prop({ type: NewestLikesSchema,
         required: true })
