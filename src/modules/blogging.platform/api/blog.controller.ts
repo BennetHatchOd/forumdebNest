@@ -40,7 +40,7 @@ export class BlogControllers {
     // Create new blog
 
         const createId: string = await this.blogService.create(blog);
-        const blogView: BlogViewDto = await this.blogQueryRepository.findById(createId);
+        const blogView: BlogViewDto = await this.blogQueryRepository.findByIdWithCheck(createId);
         return blogView;
     }
 
@@ -60,7 +60,7 @@ export class BlogControllers {
     // 
     // Returns blog by id
         
-        const foundBlog: BlogViewDto = await this.blogQueryRepository.findById(id);
+        const foundBlog: BlogViewDto = await this.blogQueryRepository.findByIdWithCheck(id);
         return foundBlog;
     }
 
@@ -105,7 +105,7 @@ export class BlogControllers {
         const createDto: PostInputDto = {...createPartDto,
                                             blogId: id};
         const createId: string = await this.postService.create(createDto);
-        const postView: PostViewDto = await this.postQueryRepository.findById(createId);
+        const postView: PostViewDto = await this.postQueryRepository.findByIdWithCheck(createId);
         return postView;
     }
 }

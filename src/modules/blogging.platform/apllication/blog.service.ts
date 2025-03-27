@@ -36,10 +36,5 @@ export class BlogService {
         blog.delete();
         this.blogRepository.save(blog);
         return;
-
-    }
-
-    async clear(): Promise<void> {
-        await this.blogRepository.clear();
     }
 }

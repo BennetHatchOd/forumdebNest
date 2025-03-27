@@ -13,7 +13,7 @@ export class BlogQueryRepository {
         @InjectModel(Blog.name) private BlogModel: BlogModelType, 
     ){}
     
-    async  findById(id: string): Promise<BlogViewDto> {
+    async  findByIdWithCheck(id: string): Promise<BlogViewDto> {
         if (!Types.ObjectId.isValid(id)) 
             throw new NotFoundException('blog not found');
         
@@ -21,34 +21,19 @@ export class BlogQueryRepository {
                                                     _id: new Types.ObjectId(id),
                                                     deletedAt: null
                                                 });
-        if(searchItem)
-            return BlogViewDto.mapToView(searchItem);
-        throw new NotFoundException('blog not found');
-    }
+        if(!searchItem)
+            throw new NotFoundException('blog not found');
 
-    async findByIdWitoutCheck(id: string): Promise<BlogViewDto|null> {
-        if (!Types.ObjectId.isValid(id))
-            return null;
-
-        const searchItem: BlogDocument | null = await this.BlogModel.findOne({
-            _id: new Types.ObjectId(id),
-            deletedAt: null
-        });
-        if(searchItem)
-            return BlogViewDto.mapToView(searchItem);
-        return null;
+        return BlogViewDto.mapToView(searchItem);
     }
 
     async find(queryReq: GetBlogQueryParams): Promise<PaginatedViewDto<BlogViewDto[]>> {
-
 
         const nameSearch = queryReq.searchNameTerm
             ? { name: { $regex: queryReq.searchNameTerm, $options: 'i' } }
             : {};
         const queryFilter: FilterQuery<Blog> = { ...nameSearch, deletedAt: null };
         const totalCount: number = await this.BlogModel.countDocuments(queryFilter);
-
-        //if (totalCount == 0) return emptyPaginator;
 
         const blogs: Array<BlogDocument> = await this.BlogModel.find(queryFilter)
             .limit(queryReq.pageSize)
@@ -63,6 +48,5 @@ export class BlogQueryRepository {
             size: queryReq.pageSize,
             totalCount: totalCount
         })
-
     }
 }
