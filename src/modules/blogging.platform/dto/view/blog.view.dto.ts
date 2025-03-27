@@ -7,17 +7,15 @@ export class BlogViewDto {
         createdAt:       string;
         isMembership:    boolean;
         websiteUrl:      string;
-
+        constructor(item: BlogDocument) {
+            this.id = item._id.toString();
+            this.name = item.name;
+            this.description = item.description;
+            this.createdAt = item.createdAt.toISOString();
+            this.isMembership = item.isMembership;
+            this.websiteUrl = item.websiteUrl;
+        }
     static   mapToView(item: BlogDocument): BlogViewDto {
-        const mappedBlog = new this();
-
-        mappedBlog.id = item._id.toString();
-        mappedBlog.name = item.name;
-        mappedBlog.description = item.description;
-        mappedBlog.createdAt = item.createdAt.toISOString();
-        mappedBlog.isMembership = item.isMembership;
-        mappedBlog.websiteUrl = item.websiteUrl;
-
-        return mappedBlog;
+        return  new BlogViewDto(item);
     }
 }
