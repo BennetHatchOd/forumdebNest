@@ -6,11 +6,12 @@ import { LikesInfo } from './likes.info';
 export class ExtendedLikesInfo extends LikesInfo{
 
     @Prop({ type: NewestLikesSchema,
-        required: true })
+        // required: true,
+    })
     newestLikes: NewestLikesArray;
 
     static createInstance(): ExtendedLikesInfo {
-        const like = new this();
+        const like = new ExtendedLikesInfo();
         like.newestLikes = new NewestLikesArray()
 
         return like;

@@ -1,5 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
 import { Rating } from '../../../../core/Rating.enum';
+import { LikeDetailsView, NewestLikesDTO } from './newest.likes.dto';
 
 export class PostViewDto {
     id: string;
@@ -13,38 +14,30 @@ export class PostViewDto {
         likesCount: number
         dislikesCount: number;
         myStatus: Rating;
-        newestLikes: {
-            addedAt: string;
-            userId: string;
-            login: string;
-        }[];
+        newestLikes: NewestLikesDTO;
     }
 
-    static   mapToView(item: PostDocument, likeStatus: Rating):PostViewDto {
-        const mappedPost = new this()
-        mappedPost.id = item._id.toString();
-        mappedPost.title = item.title;
-        mappedPost.shortDescription = item.shortDescription;
-        mappedPost.createdAt = item.createdAt.toISOString();
-        mappedPost.content = item.content;
-        mappedPost.blogId = item.blogId;
-        mappedPost.blogName = item.blogName;
-        mappedPost.extendedLikesInfo = {
+    constructor(item: PostDocument, likeStatus: Rating) {
+        this.id = item._id.toString();
+        this.title = item.title;
+        this.shortDescription = item.shortDescription;
+        this.createdAt = item.createdAt.toISOString();
+        this.content = item.content;
+        this.blogId = item.blogId;
+        this.blogName = item.blogName;
+        this.extendedLikesInfo = {
             likesCount: item.extendedLikesInfo.likesCount,
             dislikesCount: item.extendedLikesInfo.dislikesCount,
             myStatus: likeStatus,
-            newestLikes: [],
+            newestLikes: new NewestLikesDTO(item.extendedLikesInfo.newestLikes),
         }
-        for(let i in item.extendedLikesInfo.newestLikes)
-            mappedPost.extendedLikesInfo.newestLikes.push({...item.extendedLikesInfo.newestLikes[i]})
-        return mappedPost;
+    }
+
+    static   mapToView(item: PostDocument, likeStatus: Rating):PostViewDto {
+        return  new PostViewDto(item, likeStatus);
     }
 }
 
-type LikeDetailsView = {
-    addedAt: string;
-    userId: string;
-    login: string;
-}
+
 
 

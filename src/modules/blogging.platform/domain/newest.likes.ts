@@ -15,7 +15,7 @@ export class LikeDetails {
 
 const LikeDetailsSchema = SchemaFactory.createForClass(LikeDetails);
 
-@Schema({id: false,
+@Schema({_id: false,
      })
 export class NewestLikesArray {
     @Prop({ type: [LikeDetailsSchema], default: [], })

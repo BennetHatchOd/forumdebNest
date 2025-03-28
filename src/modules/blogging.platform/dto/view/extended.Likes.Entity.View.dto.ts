@@ -1,4 +1,5 @@
 import { Rating } from '../../../../core/Rating.enum';
+import { LikeDetailsView } from './newest.likes.dto';
 
 export type ExtendedLikesEntityView = {
     likesCount: number;
@@ -7,8 +8,3 @@ export type ExtendedLikesEntityView = {
     newestLikes: Array<LikeDetailsView>;
 };
 
-export type LikeDetailsView = {
-    addedAt: string;
-    userId: string;
-    login: string;
-}
