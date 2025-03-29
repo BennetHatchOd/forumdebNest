@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { URL_PATH } from 'src/core/setting';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
@@ -29,20 +29,20 @@ export class UserControllers {
     async getAll(@Query() query: GetUserQueryParams,)
         : Promise<PaginatedViewDto<UserViewDto[]>> {
 
-        const blogPaginator: PaginatedViewDto<UserViewDto[]>
+        const userPaginator: PaginatedViewDto<UserViewDto[]>
             = await this.userQueryRepository.find(query);
 
-        return blogPaginator;
+        return userPaginator;
 
     }
+
+    @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteBlog(@Param('id') id: string): Promise<void>{
     //
-    // @Delete(':id')
-    // @HttpCode(HttpStatus.NO_CONTENT)
-    // async deleteBlog(@Param('id') id: string): Promise<void>{
-    // //
-    // // Delete blog specified by id
-    //
-    //     return await this.blogService.delete(id)
-    // }
+    // Delete blog specified by id
+
+        return await this.userService.delete(id)
+    }
 
 }
