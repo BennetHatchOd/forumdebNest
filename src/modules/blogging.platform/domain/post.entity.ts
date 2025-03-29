@@ -3,7 +3,7 @@ import { POST_COLLECTION_NAME } from 'src/core/setting';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
-import { ExtendedLikesInfo, ExtendedLikesInfoSchema } from './extended.likes.info';
+import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
 
 @Schema({timestamps: true,
     collection: POST_COLLECTION_NAME })
@@ -34,12 +34,30 @@ export class Post {
     @Prop({ required: true,})
     blogName: string;
 
-    @Prop({ type: Date, default: null, })
+    @Prop({
+        type: Date,
+        default: null,
+    })
     deletedAt:  Date | null;
 
-    @Prop({ type: ExtendedLikesInfoSchema, required: true,})
-    extendedLikesInfo:  ExtendedLikesInfo;
+    @Prop({
+        default: 0,
+        min: 0,
+        isInteger: true,
+    })
+    likesCount: number;
 
+    @Prop({
+        default: 0,
+        min: 0,
+        isInteger: true,
+    })
+    dislikesCount: number;
+
+    @Prop({ type: NewestLikesSchema,
+        required: true,
+    })
+    newestLikes: NewestLikesArray;
 
     delete() {
         if (this.deletedAt !== null) {
@@ -66,7 +84,7 @@ export class Post {
         post.content = createDto.content;
         post.blogId = createDto.blogId;
         post.blogName = blogName;
-        post.extendedLikesInfo = ExtendedLikesInfo.createInstance()
+        post.newestLikes = new NewestLikesArray()
 
         return post as PostDocument;
     }

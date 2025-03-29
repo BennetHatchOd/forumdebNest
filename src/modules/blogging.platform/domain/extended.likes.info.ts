@@ -6,7 +6,7 @@ import { LikesInfo } from './likes.info';
 export class ExtendedLikesInfo extends LikesInfo{
 
     @Prop({ type: NewestLikesSchema,
-        // required: true,
+         required: true,
     })
     newestLikes: NewestLikesArray;
 

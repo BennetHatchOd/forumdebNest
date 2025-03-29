@@ -1,6 +1,5 @@
 import { PostDocument } from '../../domain/post.entity';
 import { Rating } from '../../../../core/Rating.enum';
-import { LikeDetailsView, NewestLikesDTO } from './newest.likes.dto';
 
 export class PostViewDto {
     id: string;
@@ -14,7 +13,7 @@ export class PostViewDto {
         likesCount: number
         dislikesCount: number;
         myStatus: Rating;
-        newestLikes: NewestLikesDTO;
+        newestLikes: string[]//NewestLikesDTO;
     }
 
     constructor(item: PostDocument, likeStatus: Rating) {
@@ -26,10 +25,10 @@ export class PostViewDto {
         this.blogId = item.blogId;
         this.blogName = item.blogName;
         this.extendedLikesInfo = {
-            likesCount: item.extendedLikesInfo.likesCount,
-            dislikesCount: item.extendedLikesInfo.dislikesCount,
+            likesCount: item.likesCount,
+            dislikesCount: item.dislikesCount,
             myStatus: likeStatus,
-            newestLikes: new NewestLikesDTO(item.extendedLikesInfo.newestLikes),
+            newestLikes: [] //new NewestLikesDTO(item.extendedLikesInfo.newestLikes),
         }
     }
 
