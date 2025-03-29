@@ -91,6 +91,9 @@ export class BlogController {
     //
     // Returns all posts for specified blog
         query.setBlogIdSearchParams(id)
+        // проверка существования блога
+        await this.blogQueryRepository.findByIdWithCheck(id)
+
         const postPaginator: PaginatedViewDto<PostViewDto[]>
             = await this.postQueryRepository.find(query);
         return postPaginator;
