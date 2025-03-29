@@ -1,5 +1,5 @@
 export enum Rating {
-    Like = 'like',
-    Dislike = 'dislike',
-    None = 'none',
+    Like = 'Like',
+    Dislike = 'Dislike',
+    None = 'None',
 }
