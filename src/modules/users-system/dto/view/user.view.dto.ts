@@ -5,15 +5,14 @@ export class UserViewDto {
         login:           string;
         email:           string;
         createdAt:       string;
+    constructor(user: UserDocument) {
+        this.id = user._id.toString();
+        this.login = user.login;
+        this.email = user.email;
+        this.createdAt = user.createdAt.toISOString();
+    }
 
-    static   mapToView(item: UserDocument): UserViewDto {
-        const mappedUser = new this();
-
-        mappedUser.id = item._id.toString();
-        mappedUser.login = item.login;
-        mappedUser.email = item.email;
-        mappedUser.createdAt = item.createdAt.toISOString();
-
-        return mappedUser;
+    static   mapToView(inputUser: UserDocument): UserViewDto {
+        return  new UserViewDto(inputUser);
     }
 }

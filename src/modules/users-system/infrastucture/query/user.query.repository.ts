@@ -50,7 +50,7 @@ export class UserQueryRepository {
 
         if (queryReq.searchEmailTerm){
             queryFilter.$or = queryFilter.$or || [];
-            queryFilter.$or.push({login: {$regex: queryReq.searchEmailTerm, $options: 'i' }});
+            queryFilter.$or.push({email: {$regex: queryReq.searchEmailTerm, $options: 'i' }});
         }
 
         const totalCount: number = await this.UserModel.countDocuments(queryFilter);
