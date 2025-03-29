@@ -68,7 +68,7 @@ export class PostController {
 
     }
 
-    @Get('id/comments')
+    @Get(':id/comments')
     async getCommentByPost(@Param('id') id: string,
                         @Query() query: GetCommentQueryParams)
         : Promise<PaginatedViewDto<CommentViewDto[]>> {
@@ -76,6 +76,9 @@ export class PostController {
         // Returns all comments for specified post
 
         query.setParentPostIdSearchParams(id)
+        // проверка существования поста
+        await this.postQueryRepository.findByIdWithCheck(id)
+
         const commentPaginator: PaginatedViewDto<CommentViewDto[]>
             = await this.commentQueryRepository.find(query);
         return commentPaginator;
