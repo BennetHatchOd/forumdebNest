@@ -38,7 +38,7 @@ export class PostQueryRepository {
     async find(queryReq: GetPostQueryParams, userId: string|null = null): Promise<PaginatedViewDto<PostViewDto[]>> {
 
         const blogIdSearch = queryReq.searchBlogId
-            ? { name: { $regex: queryReq.searchBlogId, $options: 'i' } }
+            ? { blogId: { $regex: queryReq.searchBlogId, $options: 'i' } }
             : {};
         const queryFilter: FilterQuery<Post> = { ...blogIdSearch, deletedAt: null };
         const totalCount: number = await this.PostModel.countDocuments(queryFilter);
