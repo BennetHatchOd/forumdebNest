@@ -6,28 +6,17 @@ export const MONGO_URL =
 export const mongoURI = MONGO_URL_LOCAL || 'mongodb://0.0.0.0:27017'
 
 export const DB_NAME = 'forumDebol';
-
 export const BLOG_COLLECTION_NAME = 'blogs';
 export const POST_COLLECTION_NAME = 'posts';
 export const USER_COLLECTION_NAME = 'users';
 export const COMMENT_COLLECTION_NAME = 'comments';
-export const REQUEST_COLLECTION_NAME = 'requests';
-export const NEWPASSWORD_COLLECTION_NAME = 'askpasswords';
-export const SESSION_COLLECTION_NAME = 'sessions';
-export const LIKE_COMMENT_COLLECTION_NAME = 'likescomments';
-export const LIKE_POST_COLLECTION_NAME = 'likesposts';
+// export const REQUEST_COLLECTION_NAME = 'requests';
+// export const NEWPASSWORD_COLLECTION_NAME = 'askpasswords';
+// export const SESSION_COLLECTION_NAME = 'sessions';
+// export const LIKE_COMMENT_COLLECTION_NAME = 'likescomments';
+// export const LIKE_POST_COLLECTION_NAME = 'likesposts';
 
-// export const HTTP_STATUSES = {
-//     OK_200:                 200,
-//     CREATED_201:            201,
-//     NO_CONTENT_204:         204,
-//     BAD_REQUEST_400:        400,
-//     NO_AUTHOR_401:          401,
-//     FORBIDDEN:              403,
-//     NOT_FOUND_404:          404,
-//     ERROR_500:              500,
-//     TOO_MANY_REQUESTS_429:  429,
-// };
+export const saltRounds = 10;
 
 export const URL_PATH = {
     base:       '/',
@@ -37,16 +26,17 @@ export const URL_PATH = {
     auth:       '/auth',
     devices:    '/security/devices',
     comments:   '/comments',
+    testing:    '/testing',
 };
 
-export const AUTH_PATH = {
-    login:           '/login',
-    logout:          '/logout',
-    registration:    '/registration',
-    confirm:         '/registration-confirmation',
-    resent:          '/registration-email-resending',
-    askNewPassword:   '/password-recovery',    
-    resentPassword:  '/new-password',
-    refresh:         '/refresh-token',
-    me:              '/me',
-};
+ export const AUTH_PATH = {
+     login:                 '/login',
+//     logout:          '/logout',
+     registration:          '/registration',
+     confirmation:          '/registration-confirmation',
+     resentEmail:           '/registration-email-resending',
+     askNewPassword:        '/password-recovery',
+     confirmNewPassword:    '/new-password',
+//     refresh:         '/refresh-token',
+     aboutMe:               '/me',
+ };

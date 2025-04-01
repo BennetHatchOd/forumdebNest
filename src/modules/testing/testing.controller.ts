@@ -1,8 +1,9 @@
 import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { URL_PATH } from '../../core/setting';
 
-@Controller('testing')
+@Controller(URL_PATH.testing)
 export class TestingController {
     constructor(
         @InjectConnection() private readonly databaseConnection: Connection,
