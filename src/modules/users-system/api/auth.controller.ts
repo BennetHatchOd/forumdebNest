@@ -55,7 +55,7 @@ export class AuthController {
     @Get(AUTH_PATH.aboutMe)
     async getMe(@Param() accessToken: string): Promise<UserAboutViewDto>{
 
-            const answer: UserAboutViewDto = await this.authService.aboutMe(accessToken))
+            const answer: UserAboutViewDto = await this.authService.aboutMe(accessToken)
             return answer;
     }
 
