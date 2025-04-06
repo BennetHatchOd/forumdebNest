@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { saltRounds } from '../../../core/setting';
 
 
-export class PasswordService {
+export class PasswordHashService {
 
     async createHash(password: string):Promise<string>{
         const salt: string = await bcrypt.genSalt(saltRounds)
