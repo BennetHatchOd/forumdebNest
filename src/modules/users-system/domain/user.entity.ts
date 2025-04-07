@@ -46,15 +46,15 @@ export class User {
         this.deletedAt = new Date();
     }
 
-    edit(editData: UserInputDto) {
-        // при обновлении емаил, требуется его подтвердить
-        if(this.email != editData.email)
-            this.isConfirmEmail = false;
-        this.login = editData.login;
-        this.email = editData.email;
-        this.passwordHash = editData.password;
+    // edit(editData: UserInputDto) {
+    //     // при обновлении емаил, требуется его подтвердить
+    //     if(this.email != editData.email)
+    //         this.isConfirmEmail = false;
+    //     this.login = editData.login;
+    //     this.email = editData.email;
+    //     this.passwordHash = editData.password;
+    // }
 
-    }
     static createInstance(dto: UserInputDto): UserDocument {
         const user = new this();
         user.login = dto.login;
