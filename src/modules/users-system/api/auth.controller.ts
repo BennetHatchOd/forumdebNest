@@ -1,20 +1,23 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
-import { AUTH_PATH } from '../../../core/setting';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards , Request} from '@nestjs/common';
+import { AUTH_PATH, URL_PATH } from '../../../core/setting';
+import { AuthService } from '../apllication/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
-import { LoginInputDto } from '../dto/input/login.input.dto';
-import { AuthService } from '../apllication/auth.service';
 
-@Controller('auth')
+@Controller(URL_PATH.auth)
 export class AuthController {
     constructor(private authService: AuthService) {
     }
+
     @Post(AUTH_PATH.login)
-    async authorization(@Body() loginDto: LoginInputDto){
+    @UseGuards(AuthGuard('local'))
+    async authorization(@Request() userId: string):Promise<{accessToken: string}>{
 
-         const userTokens: string = await this.authService.authorization(loginDto)
+         const userTokens: string = await this.authService.authorization(userId)
 
-          return userTokens;
+          return {
+              accessToken: userTokens};
     }
 
     @Post(AUTH_PATH.registration)
@@ -53,9 +56,10 @@ export class AuthController {
     }
 
     @Get(AUTH_PATH.aboutMe)
-    async getMe(@Param() accessToken: string): Promise<UserAboutViewDto>{
+    @UseGuards(AuthGuard('jwt'))
+    async getMe(@Request() userId: string): Promise<UserAboutViewDto>{
 
-            const answer: UserAboutViewDto = await this.authService.aboutMe(accessToken)
+            const answer: UserAboutViewDto = await this.authService.aboutMe(userId)
             return answer;
     }
 

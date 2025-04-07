@@ -1,9 +1,26 @@
-export const PORT = 3014;
-export const MONGO_URL_LOCAL =
-    'mongodb://admin:adminPSWtest@0.0.0.0/?retryWrites=true&w=majority';
-export const MONGO_URL =
-    'mongodb+srv://vng114:LjYtxxLzoFJUI12K@cluster0.4c5ql.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-export const mongoURI = MONGO_URL_LOCAL || 'mongodb://0.0.0.0:27017'
+import dotenv from 'dotenv'
+import * as process from 'node:process';
+
+dotenv.config()
+
+export const PORT = process.env.PORT || 3014
+export const SECRET_KEY = process.env.SECRET_KEY || '114'
+export const PASSCODE_ADMIN_NAME = process.env.PASSCODE_ADMIN || 'admin'
+export const PASSCODE_ADMIN_PASSWORD = process.env.PASSCODE_ADMIN || 'qwerty'
+
+ export const PASSWORD_MAIL: string = process.env.PASSWORD_MAIL || "don't work"
+
+ export const TIME_LIFE_ACCESS_TOKEN = 600    // sec
+ export const TIME_LIFE_REFRESH_TOKEN = 24*60*60   //sec
+
+ export const TIME_RATE_LIMITED = 10         // sec
+ export const COUNT_RATE_LIMITED = 5
+
+ export const LENGTH_VERSION_ID = 7          // for version refresh-token and deviceId
+ export const TIME_LIFE_EMAIL_CODE = 2       // hours
+ export const TIME_LIFE_PASSWORD_CODE = 2       // hours
+
+export const mongoURI = process.env.MONGO_URL_LOCAL || 'mongodb://0.0.0.0:27017'
 
 export const DB_NAME = 'forumDebol';
 export const BLOG_COLLECTION_NAME = 'blogs';
@@ -11,7 +28,7 @@ export const POST_COLLECTION_NAME = 'posts';
 export const USER_COLLECTION_NAME = 'users';
 export const COMMENT_COLLECTION_NAME = 'comments';
 // export const REQUEST_COLLECTION_NAME = 'requests';
-// export const NEWPASSWORD_COLLECTION_NAME = 'askpasswords';
+ export const NEWPASSWORD_COLLECTION_NAME = 'askpasswords';
 // export const SESSION_COLLECTION_NAME = 'sessions';
 // export const LIKE_COMMENT_COLLECTION_NAME = 'likescomments';
 // export const LIKE_POST_COLLECTION_NAME = 'likesposts';
