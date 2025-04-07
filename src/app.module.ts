@@ -14,7 +14,7 @@ import { TestingModule } from './modules/testing/testing.module';
         UserSystemModule,
         TestingModule,
     ],
-    controllers: [AppController],
+    controllers: [AppController, ],
     providers: [AppService],
 })
 export class AppModule {}
