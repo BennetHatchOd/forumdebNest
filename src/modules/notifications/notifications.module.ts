@@ -14,7 +14,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         },
       },
       defaults: {
-        from: '"No Reply" <from: vng114.work@gmail.com>',
+        from: '"No Reply" <vng114.work@gmail.com>',
       },
     }),
   ],
