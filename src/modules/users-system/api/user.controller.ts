@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query
 import { URL_PATH } from 'src/core/setting';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
-import { UserService } from '../apllication/user.service';
+import { UserService } from '../application/user.service';
 import { UserQueryRepository } from '../infrastucture/query/user.query.repository';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../dto/input/get.user.query.params.input.dto';

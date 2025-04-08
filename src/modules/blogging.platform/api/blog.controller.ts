@@ -10,7 +10,7 @@ import {
     Put,
     Query,
 } from '@nestjs/common';
-import { BlogService } from '../apllication/blog.service';
+import { BlogService } from '../application/blog.service';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 import { URL_PATH } from 'src/core/setting';
 import { BlogViewDto } from '../dto/view/blog.view.dto';
@@ -22,7 +22,7 @@ import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostByBlogInputType } from '../dto/input/post.by.blog.input.dto';
-import { PostService } from '../apllication/post.service';
+import { PostService } from '../application/post.service';
 
 @Controller(URL_PATH.blogs)
 export class BlogController {

@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '../domain/new.password';
 import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
+import { MailService } from '../../notifications/application/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
         private readonly userRepository: UserRepository,
         private readonly jwtService: JwtService,
         private readonly passwordHashService: PasswordHashService,
+        private readonly mailService: MailService,
         @InjectModel(User.name) private UserModel: UserModelType,
         @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
     ) {}
@@ -56,7 +58,7 @@ export class AuthService {
            //
            //   Create and sent an error message
            //
-            error;
+            return false;
         }
         const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password)
 
@@ -68,7 +70,7 @@ export class AuthService {
                 expirationTime: add(new Date(), { hours: TIME_LIFE_EMAIL_CODE}),
         }
 
-        this.mailManager.createConfirmEmail(inputUserDto.email, createdUser.confirmEmail.code)
+        await this.mailService.createConfirmEmail(inputUserDto.email, createdUser.confirmEmail.code)
 
         await this.authRepository.save(createdUser);
         return;
@@ -91,7 +93,7 @@ export class AuthService {
     }
 
     async reSendEmail(email: string): Promise<void> {
-        let userWithOutMail: UserDocument | null = await this.authRepository.foundUserWithOutEmail(mail)
+        let userWithOutMail: UserDocument | null = await this.authRepository.foundUserWithOutEmail(email)
 
         if(!userWithOutMail) {
             //
@@ -104,7 +106,7 @@ export class AuthService {
             expirationTime: add(new Date(), { hours: TIME_LIFE_EMAIL_CODE}),
         }
 
-        this.mailManager.createConfirmEmail(email, userWithOutMail.confirmEmail.code)
+        await this.mailService.createConfirmEmail(email, userWithOutMail.confirmEmail.code)
 
         await this.authRepository.save(userWithOutMail);
         return;
@@ -123,10 +125,10 @@ export class AuthService {
             return false;
         }
 
-        const newPassword: NewPasswordDocument = await this.NewPasswordModel.createInstance(foundedUser)
-        this.authRepository.save(newPassword);
+        const newPassword: NewPasswordDocument = this.NewPasswordModel.createInstance(foundedUser)
+        await this.authRepository.save(newPassword);
 
-        await this.mailManager.createPasswordRecovery(email, newPassword.code)
+        await this.mailService.createPasswordRecovery(email, newPassword.code)
 
         return;
     }
@@ -148,7 +150,7 @@ export class AuthService {
         user.passwordHash = hash;
         await this.authRepository.save(user);
 
-        this.authRepository.deletePasswordRecovery(newPasswordObj.userId)
+        await this.authRepository.deletePasswordRecovery(newPasswordObj.userId)
 
         return;
     }

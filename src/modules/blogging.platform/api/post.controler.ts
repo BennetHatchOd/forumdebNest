@@ -8,7 +8,7 @@ import { GetCommentQueryParams } from '../dto/input/get.comment.query.params.inp
 import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentQueryRepository } from '../infrastucture/query/comment.query.repository';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
-import { PostService } from '../apllication/post.service';
+import { PostService } from '../application/post.service';
 
 @Controller(URL_PATH.posts)
 export class PostController {
