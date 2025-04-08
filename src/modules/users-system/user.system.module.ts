@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './domain/user.entity';
 import { UserControllers } from './api/user.controller';
-import { UserService } from './apllication/user.service';
+import { UserService } from './application/user.service';
 import { UserQueryRepository } from './infrastucture/query/user.query.repository';
 import { UserRepository } from './infrastucture/user.repository';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
-import { PasswordHashService } from './apllication/password.hash.service';
-import { AuthService } from './apllication/auth.service';
+import { PasswordHashService } from './application/password.hash.service';
+import { AuthService } from './application/auth.service';
 import { AuthRepository } from './infrastucture/auth.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { SECRET_KEY } from '../../core/setting';
@@ -23,6 +23,7 @@ import { SECRET_KEY } from '../../core/setting';
             secret: SECRET_KEY,
             signOptions: { expiresIn: '5m' },
         }),
+        NotificationsModule,
     ],
     controllers: [
         UserControllers,

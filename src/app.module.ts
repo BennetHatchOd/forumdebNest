@@ -6,6 +6,9 @@ import { BloggingPlatformModule } from './modules/blogging.platform/blogging.pla
 import { DB_NAME, mongoURI } from './core/setting';
 import { UserSystemModule } from './modules/users-system/user.system.module';
 import { TestingModule } from './modules/testing/testing.module';
+import { NotificationModuleModule } from './notification-module/notification-module.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
     imports: [
@@ -13,6 +16,9 @@ import { TestingModule } from './modules/testing/testing.module';
         BloggingPlatformModule,
         UserSystemModule,
         TestingModule,
+        NotificationModuleModule,
+        NotificationModule,
+        NotificationsModule,
     ],
     controllers: [AppController, ],
     providers: [AppService],
