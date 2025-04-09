@@ -1,4 +1,4 @@
-import { Injectable} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
 import { JwtService } from '@nestjs/jwt';
@@ -55,10 +55,7 @@ export class AuthService {
             = await this.authRepository.checkUniq(inputUserDto.login, inputUserDto.email)
 
         if(checkUniq) {
-           //
-           //   Create and sent an error message
-           //
-            return false;
+            throw new BadRequestException("user's email or login must be uniq");
         }
         const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password)
 
@@ -80,10 +77,7 @@ export class AuthService {
         const foundUser: UserDocument|null = await this.authRepository.findByConfirmCode(code)
 
         if (!foundUser || isBefore(foundUser.confirmEmail.expirationTime, new Date())){
-            //
-            //   Create and sent an error message
-            //
-            return false;
+            throw new BadRequestException("the confirmation code is incorrect, expired or already been applied");
         }
         foundUser.isConfirmEmail = true;
 
@@ -93,13 +87,13 @@ export class AuthService {
     }
 
     async reSendEmail(email: string): Promise<void> {
+        // for a user with an unconfirmed email,
+        // sends a letter with a new confirmation code
+
         let userWithOutMail: UserDocument | null = await this.authRepository.foundUserWithOutEmail(email)
 
         if(!userWithOutMail) {
-            //
-            //   Create and sent an error message
-            //
-            return false;
+            throw new BadRequestException("user with not verifed email not found")
         }
         userWithOutMail.confirmEmail = {
             code: uuidv4(),
@@ -114,15 +108,12 @@ export class AuthService {
 
     async askNewPassword(email: string): Promise<void> {
         // Only for verified users!
-        // We create new recovery codes without deleting the previous ones.
-        // We will delete the old codes after any of the codes are triggered.
+        // Generates a new recovery code and sends it via email without deleting the previous ones.
+        // Delete the old codes ONLY after any of the codes are triggered.
 
         let foundedUser: string | null = await this.authRepository.foundUserIdByEmail(email)
         if(!foundedUser) {
-            //
-            //   Create and sent an error message
-            //
-            return false;
+            throw new BadRequestException("user with not verifed email not found")
         }
 
         const newPassword: NewPasswordDocument = this.NewPasswordModel.createInstance(foundedUser)
@@ -134,15 +125,13 @@ export class AuthService {
     }
 
     async setNewPassword(newPassword: string, recoveryCode: string):Promise<void> {
+        // Sets a new password if a valid recovery code was received
 
         const newPasswordObj:NewPasswordDocument|null
             = await this.authRepository.findPasswordRecovery(recoveryCode)
 
         if(!newPasswordObj || isBefore(newPasswordObj.expirationTime, new Date())){
-            //
-            //   Create and sent an error message
-            //
-            return false;
+            throw new BadRequestException("a valid recovery code wasn't received")
         }
 
         const hash: string = await this.passwordHashService.createHash(newPassword);
