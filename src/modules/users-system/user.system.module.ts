@@ -13,11 +13,17 @@ import { AuthService } from './application/auth.service';
 import { AuthRepository } from './infrastucture/auth.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { SECRET_KEY } from '../../core/setting';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { myBasicStrategy } from './strategy/basic.strategy';
+import { NewPassword, NewPasswordSchema } from './domain/new.password';
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema }, ]),
+            { name: User.name, schema: UserSchema },
+            { name: NewPassword.name, schema: NewPasswordSchema },
+        ]),
         PassportModule,
         JwtModule.register({
             secret: SECRET_KEY,
@@ -37,8 +43,8 @@ import { SECRET_KEY } from '../../core/setting';
         AuthRepository,
         PasswordHashService,
         LocalStrategy,
-        // JwtStrategy,
-        // BasicStrategy
+        JwtStrategy,
+        myBasicStrategy
     ],
 })
 export class UserSystemModule {}
