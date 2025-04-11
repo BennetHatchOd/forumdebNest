@@ -1,9 +1,18 @@
-export class PostByBlogInputType{
-    constructor(
-        public title: string, // length 1-30
-        public shortDescription: string, // length 1-100
-        public content: string, // length 1-1000
-    ) {}
+import { IsString, Length } from 'class-validator';
+import { PostFieldRestrict } from '../../field.restrictions';
+
+export class PostByBlogInputDto {
+    @IsString()
+    @Length(PostFieldRestrict.titleMin, PostFieldRestrict.titleMax)
+    public title: string;
+
+    @IsString()
+    @Length(PostFieldRestrict.shortDescriptionMin, PostFieldRestrict.shortDescriptionMax)
+    public shortDescription: string;
+
+    @IsString()
+    @Length(PostFieldRestrict.contentMin, PostFieldRestrict.contentMax)
+    public content: string;
 }
 
 

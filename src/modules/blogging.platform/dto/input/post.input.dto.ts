@@ -1,8 +1,7 @@
-export class PostInputDto {
-    constructor(
-        public title: string, // length 1-30
-        public shortDescription: string, // length 1-100
-        public content: string, // length 1-1000
-        public blogId: string,
-    ) {}
-}
+import { PostByBlogInputDto } from './post.by.blog.input.dto';
+import { IsString } from 'class-validator';
+
+export class PostInputDto extends PostByBlogInputDto{
+    @IsString()
+    public blogId: string;
+    }

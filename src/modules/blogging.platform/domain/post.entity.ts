@@ -4,25 +4,27 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
+import { BlogFieldRestrict, PostFieldRestrict } from '../field.restrictions';
 
 @Schema({timestamps: true,
     collection: POST_COLLECTION_NAME })
 export class Post {
     @Prop({
         required: true,
-        maxlength: 30,
+        maxlength: PostFieldRestrict.titleMax,
+        minlength: PostFieldRestrict.titleMin,
     })
     title: string;
 
     @Prop({
         required: true,
-        maxlength: 100,
+        maxlength: PostFieldRestrict.shortDescriptionMax,
     })
     shortDescription: string;
 
     @Prop({
         required: true,
-        maxlength: 1000,
+        maxlength: PostFieldRestrict.contentMax,
     })
     content: string;
 
