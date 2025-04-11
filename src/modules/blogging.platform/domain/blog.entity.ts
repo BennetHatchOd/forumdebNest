@@ -2,20 +2,22 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { BLOG_COLLECTION_NAME } from 'src/core/setting';
 import { BlogInputDto } from '../dto/input/blog.input.dto';
+import { BlogFieldRestrict } from '../field.restrictions';
 
 @Schema({ timestamps: true,
     collection: BLOG_COLLECTION_NAME })
 export class Blog {
     @Prop({
         required: true,
-        minlength: 1,
-        maxlength: 10,
+        minlength: BlogFieldRestrict.nameMin,
+        maxlength: BlogFieldRestrict.nameMax,
     })
     name: string;
 
     @Prop({
         required: true,
-        maxlength: 500,
+        maxlength: BlogFieldRestrict.descriptionMax,
+        minlength: BlogFieldRestrict.descriptionMin,
     })
     description: string;
 
@@ -28,7 +30,8 @@ export class Blog {
 
     @Prop({
         required: true,
-        maxlength: 100,
+        maxlength: BlogFieldRestrict.websiteUrlMax,
+        minlength: BlogFieldRestrict.websiteUrlMin,
     })
     websiteUrl: string;
 
