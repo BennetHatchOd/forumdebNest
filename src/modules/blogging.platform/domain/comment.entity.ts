@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
 import { LikesInfo, LikesInfoSchema } from './likes.info';
+import { CommentFieldRestrict } from '../field.restrictions';
 
 
 
@@ -11,6 +12,8 @@ import { LikesInfo, LikesInfoSchema } from './likes.info';
 export class Comment {
     @Prop({
         required: true,
+        maxlength: CommentFieldRestrict.contentMax,
+        minlength: CommentFieldRestrict.contentMin,
     })
     content: string;
 

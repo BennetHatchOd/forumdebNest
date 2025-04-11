@@ -1,5 +1,8 @@
+import { IsString, Length } from 'class-validator';
+import { CommentFieldRestrict } from '../../field.restrictions';
+
 export class CommentInputType {
-    constructor(
-        public content: string, // minLength: 20, maxLength: 300
-    ) {}
+    @IsString()
+    @Length(CommentFieldRestrict.contentMin, CommentFieldRestrict.contentMax)
+    public content: string;
 }
