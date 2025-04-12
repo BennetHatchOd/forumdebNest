@@ -35,6 +35,7 @@ export const COMMENT_COLLECTION_NAME = 'comments';
 
 export const saltRounds = 10;
 
+export const GLOBAL_PREFIX = 'api';
 export const URL_PATH = {
     base:       '/',
     blogs:      '/blogs',
