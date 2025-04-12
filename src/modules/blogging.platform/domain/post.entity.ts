@@ -4,7 +4,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
-import { BlogFieldRestrict, PostFieldRestrict } from '../field.restrictions';
+import { PostFieldRestrict } from '../field.restrictions';
 
 @Schema({timestamps: true,
     collection: POST_COLLECTION_NAME })
