@@ -1,9 +1,5 @@
 import { BaseSortablePaginationParams } from '../../../../core/dto/base.query.params.input.dto';
-
-export class GetBlogQueryParams extends BaseSortablePaginationParams<BlogSortBy> {
-    sortBy = BlogSortBy.CreatedAt;
-    searchNameTerm: string | null = null;
-}
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum BlogSortBy {
     CreatedAt = 'createdAt',
@@ -11,3 +7,13 @@ export enum BlogSortBy {
     WebsiteUrl = 'websiteUrl',
     Name = 'name',
 }
+
+export class GetBlogQueryParams extends BaseSortablePaginationParams<BlogSortBy> {
+    @IsEnum(BlogSortBy)
+    sortBy = BlogSortBy.CreatedAt;
+
+    @IsString()
+    @IsOptional()
+    searchNameTerm: string | null = null;
+}
+

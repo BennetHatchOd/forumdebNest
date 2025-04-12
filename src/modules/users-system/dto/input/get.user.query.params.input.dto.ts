@@ -1,13 +1,22 @@
 import { BaseSortablePaginationParams } from '../../../../core/dto/base.query.params.input.dto';
-
-export class GetUserQueryParams extends BaseSortablePaginationParams<UserSortBy> {
-    sortBy = UserSortBy.CreatedAt;
-    searchLoginTerm: string | null = null;
-    searchEmailTerm: string | null = null;
-}
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum UserSortBy {
     CreatedAt = 'createdAt',
     login = 'login',
     email = 'email',
 }
+
+export class GetUserQueryParams extends BaseSortablePaginationParams<UserSortBy> {
+    @IsEnum(UserSortBy)
+    sortBy = UserSortBy.CreatedAt;
+
+    @IsString()
+    @IsOptional()
+    searchLoginTerm: string | null = null;
+
+    @IsString()
+    @IsOptional()
+    searchEmailTerm: string | null = null;
+}
+

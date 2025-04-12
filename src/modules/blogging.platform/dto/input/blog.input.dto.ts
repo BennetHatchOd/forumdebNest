@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, IsUrl, Length } from 'class-validator';
 import { BlogFieldRestrict } from '../../field.restrictions';
 
 export class BlogInputDto {
@@ -10,7 +10,7 @@ export class BlogInputDto {
     @Length(BlogFieldRestrict.descriptionMin, BlogFieldRestrict.descriptionMax)
     public description: string;
 
-    @IsString()
+    @IsUrl()
     @Length(BlogFieldRestrict.websiteUrlMin, BlogFieldRestrict.websiteUrlMax)
     public websiteUrl:  string;
 }

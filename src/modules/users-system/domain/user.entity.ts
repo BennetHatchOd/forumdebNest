@@ -3,13 +3,14 @@ import { HydratedDocument, Model } from 'mongoose';
 import { USER_COLLECTION_NAME } from 'src/core/setting';
 import { ConfirmEmail, ConfirmEmailSchema } from './confirm.email.entity';
 import { UserInputDto } from '../dto/input/user.input.dto';
+import { UserFieldRestrict } from '../field.restrictions';
 
 @Schema({ timestamps: true, collection: USER_COLLECTION_NAME })
 export class User {
     @Prop({
         required: true,
-        minlength: 3,
-        maxlength: 10,
+        minlength: UserFieldRestrict.loginMin,
+        maxlength: UserFieldRestrict.loginMax,
     })
     login: string;
 

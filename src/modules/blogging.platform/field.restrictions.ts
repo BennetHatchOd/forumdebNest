@@ -4,7 +4,7 @@ export const BlogFieldRestrict = {
     descriptionMax: 500,
     descriptionMin: 3,
     websiteUrlMax: 100,
-    websiteUrlMin: 13,
+    websiteUrlMin: 10,
 }
 
 export const PostFieldRestrict = {
