@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { NEWPASSWORD_COLLECTION_NAME, TIME_LIFE_PASSWORD_CODE } from '../../../core/setting';
+import { TIME_LIFE_PASSWORD_CODE } from '../../../core/setting';
 import { HydratedDocument, Model } from 'mongoose';
 import {v4 as uuidv4} from 'uuid'
 import { add } from 'date-fns';
 import { UserFieldRestrict } from '../field.restrictions';
 
-@Schema({ collection: NEWPASSWORD_COLLECTION_NAME })
+@Schema({})
 export class NewPassword {
     @Prop({
         required: true,

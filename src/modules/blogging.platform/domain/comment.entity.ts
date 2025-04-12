@@ -1,4 +1,3 @@
-import { COMMENT_COLLECTION_NAME } from 'src/core/setting';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
@@ -7,8 +6,7 @@ import { CommentFieldRestrict } from '../field.restrictions';
 
 
 
-@Schema({timestamps: true,
-    collection: COMMENT_COLLECTION_NAME })
+@Schema({timestamps: true })
 export class Comment {
     @Prop({
         required: true,

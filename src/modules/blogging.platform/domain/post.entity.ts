@@ -1,13 +1,10 @@
-import { POST_COLLECTION_NAME } from 'src/core/setting';
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
 import { PostFieldRestrict } from '../field.restrictions';
 
-@Schema({timestamps: true,
-    collection: POST_COLLECTION_NAME })
+@Schema({timestamps: true})
 export class Post {
     @Prop({
         required: true,

@@ -1,11 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { USER_COLLECTION_NAME } from 'src/core/setting';
 import { ConfirmEmail, ConfirmEmailSchema } from './confirm.email.entity';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserFieldRestrict } from '../field.restrictions';
 
-@Schema({ timestamps: true, collection: USER_COLLECTION_NAME })
+@Schema({ timestamps: true })
 export class User {
     @Prop({
         required: true,

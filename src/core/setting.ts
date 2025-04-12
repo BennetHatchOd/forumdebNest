@@ -23,15 +23,6 @@ export const PASSCODE_ADMIN_PASSWORD = process.env.PASSCODE_ADMIN || 'qwerty'
 export const mongoURI = process.env.MONGO_URL_LOCAL || 'mongodb://0.0.0.0:27017'
 
 export const DB_NAME = 'forumDebol';
-export const BLOG_COLLECTION_NAME = 'blogs';
-export const POST_COLLECTION_NAME = 'posts';
-export const USER_COLLECTION_NAME = 'users';
-export const COMMENT_COLLECTION_NAME = 'comments';
-// export const REQUEST_COLLECTION_NAME = 'requests';
- export const NEWPASSWORD_COLLECTION_NAME = 'askpasswords';
-// export const SESSION_COLLECTION_NAME = 'sessions';
-// export const LIKE_COMMENT_COLLECTION_NAME = 'likescomments';
-// export const LIKE_POST_COLLECTION_NAME = 'likesposts';
 
 export const saltRounds = 10;
 
