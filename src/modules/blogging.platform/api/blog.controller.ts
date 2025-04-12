@@ -21,7 +21,7 @@ import { PostQueryRepository } from '../infrastucture/query/post.query.repositor
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
-import { PostByBlogInputType } from '../dto/input/post.by.blog.input.dto';
+import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
 import { PostService } from '../application/post.service';
 
 @Controller(URL_PATH.blogs)
@@ -102,7 +102,7 @@ export class BlogController {
 
     @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
-    async createPostByBlog(@Param('id') id: string, @Body() createPartDto:PostByBlogInputType)
+    async createPostByBlog(@Param('id') id: string, @Body() createPartDto:PostByBlogInputDto)
         : Promise<PostViewDto>{
     // Create new post for specific blog
         const createDto: PostInputDto = {...createPartDto,
