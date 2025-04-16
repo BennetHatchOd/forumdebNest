@@ -1,7 +1,7 @@
 import { PostByBlogInputDto } from './post.by.blog.input.dto';
-import { IsString } from 'class-validator';
+import { IsMongoId } from 'class-validator';
 
 export class PostInputDto extends PostByBlogInputDto{
-    @IsString()
+    @IsMongoId()
     public blogId: string;
     }
