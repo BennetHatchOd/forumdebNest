@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
-import { URL_PATH } from '../../../core/setting';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
@@ -9,6 +8,8 @@ import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentQueryRepository } from '../infrastucture/query/comment.query.repository';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
 import { PostService } from '../application/post.service';
+import { URL_PATH } from '../../../core/url.path.setting';
+import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
 
 @Controller(URL_PATH.posts)
 export class PostController {
@@ -40,44 +41,48 @@ export class PostController {
     }
 
     @Get(':id')
-    async getById(@Param('id') id: string):Promise<PostViewDto>{
+    async getById(@Param('id') inputId: IdInputDto):Promise<PostViewDto>{
         //
         // Returns post by id
 
-        const foundPost: PostViewDto = await this.postQueryRepository.findByIdWithCheck(id);
+        const foundPost: PostViewDto = await this.postQueryRepository.findByIdWithCheck(inputId.id);
         return foundPost;
     }
 
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async correctPost(@Param('id') id: string, @Body() post: PostInputDto): Promise<void>{
+    async correctPost(
+        @Param('id') inputId: IdInputDto,
+        @Body() post: PostInputDto
+    ): Promise<void>{
         //
         // Update existing Post by id with InputModel
 
-        return await this.postService.edit(id, post)
+        return await this.postService.edit(inputId.id, post)
 
     }
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePost(@Param('id') id: string): Promise<void>{
+    async deletePost(@Param('id') inputId: IdInputDto): Promise<void>{
         //
         // Delete post specified by id
 
-        return await this.postService.delete(id)
+        return await this.postService.delete(inputId.id)
 
     }
 
     @Get(':id/comments')
-    async getCommentByPost(@Param('id') id: string,
-                        @Query() query: GetCommentQueryParams)
-        : Promise<PaginatedViewDto<CommentViewDto[]>> {
+    async getCommentByPost(
+        @Param('id') inputId: IdInputDto,
+        @Query() query: GetCommentQueryParams
+    ): Promise<PaginatedViewDto<CommentViewDto[]>> {
         //
         // Returns all comments for specified post
 
-        query.setParentPostIdSearchParams(id)
+        query.setParentPostIdSearchParams(inputId.id)
         // проверка существования поста
-        await this.postQueryRepository.findByIdWithCheck(id)
+        await this.postQueryRepository.findByIdWithCheck(inputId.id)
 
         const commentPaginator: PaginatedViewDto<CommentViewDto[]>
             = await this.commentQueryRepository.find(query);
