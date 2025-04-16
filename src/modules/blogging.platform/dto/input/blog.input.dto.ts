@@ -1,16 +1,15 @@
-import { IsString, IsUrl, Length } from 'class-validator';
+import { IsUrl } from 'class-validator';
 import { BlogFieldRestrict } from '../../field.restrictions';
+import { TrimLength } from '../../../../core/decorators/trim.string.length';
 
 export class BlogInputDto {
-    @IsString()
-    @Length(BlogFieldRestrict.nameMin, BlogFieldRestrict.nameMax)
+    @TrimLength(BlogFieldRestrict.nameMin, BlogFieldRestrict.nameMax)
     public name:        string;
 
-    @IsString()
-    @Length(BlogFieldRestrict.descriptionMin, BlogFieldRestrict.descriptionMax)
+    @TrimLength(BlogFieldRestrict.descriptionMin, BlogFieldRestrict.descriptionMax)
     public description: string;
 
     @IsUrl()
-    @Length(BlogFieldRestrict.websiteUrlMin, BlogFieldRestrict.websiteUrlMax)
+    @TrimLength(BlogFieldRestrict.websiteUrlMin, BlogFieldRestrict.websiteUrlMax)
     public websiteUrl:  string;
 }
