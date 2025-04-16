@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { URL_PATH } from 'src/core/setting';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
 import { UserService } from '../application/user.service';
@@ -7,8 +6,12 @@ import { UserQueryRepository } from '../infrastucture/query/user.query.repositor
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../dto/input/get.user.query.params.input.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { URL_PATH } from '../../../core/url.path.setting';
+import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
+import { ApiBasicAuth } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard('basic'))
+@ApiBasicAuth()
 @Controller(URL_PATH.users)
 export class UserControllers {
     constructor(
@@ -38,9 +41,9 @@ export class UserControllers {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteUser(@Param('id') id: string): Promise<void>{
+    async deleteUser(@Param('id') inputId: IdInputDto): Promise<void>{
 
-        return await this.userService.delete(id)
+        return await this.userService.delete(inputId.id)
     }
 
 }

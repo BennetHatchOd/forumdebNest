@@ -3,6 +3,9 @@ import { HydratedDocument, Model } from 'mongoose';
 import { ConfirmEmail, ConfirmEmailSchema } from './confirm.email.entity';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserFieldRestrict } from '../field.restrictions';
+import { add, isBefore } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
+import { TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
 
 @Schema({ timestamps: true })
 export class User {
@@ -44,6 +47,28 @@ export class User {
             throw new Error('User already deleted');
         }
         this.deletedAt = new Date();
+    }
+
+    confirmationEmail(code: string):boolean {
+        if (this.confirmEmail.code === code
+            && isBefore(new Date(), this.confirmEmail.expirationTime)
+            && this.isConfirmEmail === false
+            && this.deletedAt === null) {
+            this.isConfirmEmail = true;
+            this.confirmEmail.code = '';
+            return true;
+        }
+        return false;
+    }
+
+    createConfirmCode(): string | null  {
+        if (!this.isConfirmEmail && this.deletedAt === null) {
+            this.confirmEmail.code = uuidv4();
+            this.confirmEmail.expirationTime = add(new Date(), { hours: TIME_LIFE_EMAIL_CODE });
+            return this.confirmEmail.code;
+        }
+        return null;
+
     }
 
     // edit(editData: UserInputDto) {
