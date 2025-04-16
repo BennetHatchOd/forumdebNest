@@ -4,7 +4,7 @@ import { PasswordHashService } from './password.hash.service';
 import { JwtService } from '@nestjs/jwt';
 import {v4 as uuidv4} from 'uuid';
 import {add, isBefore} from 'date-fns';
-import { PASSCODE_ADMIN_NAME, PASSCODE_ADMIN_PASSWORD, TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
+import { ADMIN_NAME_BASIC_AUTH, ADMIN_PASSWORD_BASIC_AUTH, TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
@@ -46,7 +46,7 @@ export class AuthService {
     async validateUserForBasic(login: string, password: string):Promise<boolean> {
         // проверяет по authHeader поля логин и пароль пользователя,
 
-        return (login === PASSCODE_ADMIN_NAME && password === PASSCODE_ADMIN_PASSWORD);
+        return (login === ADMIN_NAME_BASIC_AUTH && password === ADMIN_PASSWORD_BASIC_AUTH);
     }
 
     async registrationUser(inputUserDto: UserInputDto): Promise<void> {
@@ -76,13 +76,10 @@ export class AuthService {
     async confirmationUser(code: string):Promise<void> {
         const foundUser: UserDocument|null = await this.authRepository.findByConfirmCode(code)
 
-        if (!foundUser || isBefore(foundUser.confirmEmail.expirationTime, new Date())){
+        if (!foundUser || !foundUser.confirmationEmail(code)){
             throw new BadRequestException("the confirmation code is incorrect, expired or already been applied");
         }
-        foundUser.isConfirmEmail = true;
-
         await this.authRepository.save(foundUser)
-
         return ;
     }
 
@@ -95,12 +92,9 @@ export class AuthService {
         if(!userWithOutMail) {
             throw new BadRequestException("user with not verifed email not found")
         }
-        userWithOutMail.confirmEmail = {
-            code: uuidv4(),
-            expirationTime: add(new Date(), { hours: TIME_LIFE_EMAIL_CODE}),
-        }
+        const code: string | null = userWithOutMail.createConfirmCode();
 
-        await this.mailService.createConfirmEmail(email, userWithOutMail.confirmEmail.code)
+        await this.mailService.createConfirmEmail(email, code!)
 
         await this.authRepository.save(userWithOutMail);
         return;

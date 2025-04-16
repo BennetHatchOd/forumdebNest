@@ -5,8 +5,8 @@ dotenv.config()
 
 export const PORT = process.env.PORT || 3014
 export const SECRET_KEY = process.env.SECRET_KEY || '114'
-export const PASSCODE_ADMIN_NAME = process.env.PASSCODE_ADMIN || 'admin'
-export const PASSCODE_ADMIN_PASSWORD = process.env.PASSCODE_ADMIN || 'qwerty'
+export const ADMIN_NAME_BASIC_AUTH = process.env.ADMIN_NAME_BASIC_AUTH || 'admin'
+export const ADMIN_PASSWORD_BASIC_AUTH = process.env.ADMIN_BASIC_AUTH || 'qwerty'
 
  export const PASSWORD_MAIL: string = process.env.PASSWORD_MAIL || "don't work"
 
@@ -26,26 +26,4 @@ export const DB_NAME = 'forumDebol';
 
 export const saltRounds = 10;
 
-export const GLOBAL_PREFIX = 'api';
-export const URL_PATH = {
-    base:       '/',
-    blogs:      '/blogs',
-    posts:      '/posts',
-    users:      '/users',
-    auth:       '/auth',
-    devices:    '/security/devices',
-    comments:   '/comments',
-    testing:    '/testing',
-};
-
- export const AUTH_PATH = {
-     login:                 '/login',
-//     logout:          '/logout',
-     registration:          '/registration',
-     confirmation:          '/registration-confirmation',
-     resentEmail:           '/registration-email-resending',
-     askNewPassword:        '/password-recovery',
-     confirmNewPassword:    '/new-password',
-//     refresh:         '/refresh-token',
-     aboutMe:               '/me',
- };
+export const VERSION_APP=process.env.VERSION_APP || '';

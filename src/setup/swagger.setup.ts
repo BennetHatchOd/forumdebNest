@@ -1,11 +1,12 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { GLOBAL_PREFIX } from '../core/setting';
+import { GLOBAL_PREFIX } from '../core/url.path.setting';
 
 export function swaggerSetup(app: INestApplication) {
     const config = new DocumentBuilder()
         .setTitle('BLOGGER API')
         .addBearerAuth()
+        .addBasicAuth()
         .setVersion('1.0')
         .build();
 
