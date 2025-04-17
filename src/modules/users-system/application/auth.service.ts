@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
-import { JwtService } from '@nestjs/jwt';
 import {v4 as uuidv4} from 'uuid';
 import {add, isBefore} from 'date-fns';
 import { ADMIN_NAME_BASIC_AUTH, ADMIN_PASSWORD_BASIC_AUTH, TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
@@ -12,13 +11,14 @@ import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '../domai
 import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { MailService } from '../../notifications/application/mail.service';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
-        private readonly jwtService: JwtService,
+        private readonly tokenService: TokenService,
         private readonly passwordHashService: PasswordHashService,
         private readonly mailService: MailService,
         @InjectModel(User.name) private UserModel: UserModelType,
@@ -26,11 +26,10 @@ export class AuthService {
     ) {}
 
     async authorization(userId: string) {
-        const payload = { sub: userId };
-        return this.jwtService.sign(payload)
+        return this.tokenService.createAccessToken(userId)
     }
 
-    async validateUserForLocal(loginOrEmail: string, passHash: string):Promise<string|null> {
+    async validateUserForLocalAuth(loginOrEmail: string, passHash: string):Promise<string|null> {
         // проверяет по полям логин И емайл пользователя, если он найден,
         // проверяет совпадение хеша пароля и
         // возвращает ид найденного пользователя
@@ -43,7 +42,7 @@ export class AuthService {
         return null;
     }
 
-    async validateUserForBasic(login: string, password: string):Promise<boolean> {
+    async validateUserForBasicAuth(login: string, password: string):Promise<boolean> {
         // проверяет по authHeader поля логин и пароль пользователя,
 
         return (login === ADMIN_NAME_BASIC_AUTH && password === ADMIN_PASSWORD_BASIC_AUTH);

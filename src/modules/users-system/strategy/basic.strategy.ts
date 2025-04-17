@@ -11,7 +11,7 @@ export class myBasicStrategy extends PassportStrategy(BasicStrategy) {
     }
 
     async validate(login: string, password: string): Promise<boolean> {
-        const isValideUser: boolean = await this.authService.validateUserForBasic(login, password);
+        const isValideUser: boolean = await this.authService.validateUserForBasicAuth(login, password);
         if (!isValideUser) {
             throw new UnauthorizedException();
         }

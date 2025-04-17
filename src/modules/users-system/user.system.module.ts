@@ -17,6 +17,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { myBasicStrategy } from './strategy/basic.strategy';
 import { NewPassword, NewPasswordSchema } from './domain/new.password';
+import { TokenService } from './application/token.service';
 
 @Module({
     imports: [
@@ -25,10 +26,7 @@ import { NewPassword, NewPasswordSchema } from './domain/new.password';
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
         PassportModule,
-        JwtModule.register({
-            secret: SECRET_KEY,
-            signOptions: { expiresIn: '5m' },
-        }),
+        JwtModule.register({}),
         NotificationsModule,
     ],
     controllers: [
@@ -44,7 +42,8 @@ import { NewPassword, NewPasswordSchema } from './domain/new.password';
         PasswordHashService,
         LocalStrategy,
         JwtStrategy,
-        myBasicStrategy
+        myBasicStrategy,
+        TokenService
     ],
 })
 export class UserSystemModule {}
