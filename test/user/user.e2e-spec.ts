@@ -5,12 +5,14 @@ import { AppModule } from '../../src/app.module';
 import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { URL_PATH } from '../../src/core/url.path.setting';
+import { TestDataBuiler } from '../helper/test.data.builder';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
     let connection: Connection;
+    let testData: TestDataBuiler
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const testingModuleBuilder = Test.createTestingModule({
             imports: [AppModule],
         });
@@ -18,6 +20,7 @@ describe('UserAppController (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
+        testData = await TestDataBuiler.createTestData(app);
 
         connection = moduleFixture.get<Connection>(getConnectionToken());
     });
@@ -29,6 +32,7 @@ describe('UserAppController (e2e)', () => {
     it('/ (POST)', async () => {
         const response = await request(app.getHttpServer())
             .post(URL_PATH.users)
+            .set("Authorization", "Basic YWRtaW46cXdlcnR5")
             .send({ login: 'hjuh',
                     email: 'hjuh@hjuh.com',
                     password: 'gtghhTgg'})

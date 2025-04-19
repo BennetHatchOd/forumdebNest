@@ -20,9 +20,9 @@ export const ADMIN_PASSWORD_BASIC_AUTH = process.env.ADMIN_BASIC_AUTH || 'qwerty
  export const TIME_LIFE_EMAIL_CODE = 2       // hours
  export const TIME_LIFE_PASSWORD_CODE = 2       // hours
 
-export const mongoURI = process.env.MONGO_URL_LOCAL || 'mongodb://0.0.0.0:27017'
+export const mongoURI = 'mongodb://admin:versus@localhost:27014/?retryWrites=true&w=majority'
 
-export const DB_NAME = 'forumDebol';
+export const DB_NAME = 'forumDebolTest';
 
 export const saltRounds = 10;
 
