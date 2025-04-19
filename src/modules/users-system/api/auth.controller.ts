@@ -7,6 +7,7 @@ import { AUTH_PATH, URL_PATH } from '../../../core/url.path.setting';
 import { EmailInputDto } from '../../../core/dto/input/email.input.dto';
 import { ConfirmCodeInputDto } from '../../../core/dto/input/confirm.code.input.dto';
 import { NewPasswordInputDto } from '../../../core/dto/input/new.password.input.dto';
+import { CurrentUserId } from '../../../core/decorators/current.user';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
@@ -15,12 +16,11 @@ export class AuthController {
 
     @Post(AUTH_PATH.login)
     @UseGuards(AuthGuard('local'))
-    async authorization(@Request() userId: string):Promise<{accessToken: string}>{
+    async authorization(@CurrentUserId() userId: string):Promise<{accessToken: string}>{
 
-         const userTokens: string = await this.authService.authorization(userId)
-
-          return {
-              accessToken: userTokens};
+        const userTokens: string = await this.authService.authorization(userId)
+        return {
+            accessToken: userTokens};
     }
 
     @Post(AUTH_PATH.registration)
