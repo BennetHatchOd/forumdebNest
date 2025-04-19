@@ -18,17 +18,10 @@ export class TestDataBuiler {
     commentIds: string[] = [];
     posts: PostInputDto[] = [];
     AuthPassword = "Basic YWRtaW46cXdlcnR5";
+    // to-do create a method to get the password from env
 
-    constructor(private app:INestApplication) {
-        this.createManyBlogs(2);
-        // создаем блоги и сохраняем их ИД в массив
-        this.createManyPosts(4);
-        // создаем посты для 0 блога и сохраняем их ИД в массив
-        this.createManyUsers(8);
-        // создаем юзеров и сохраняем в массив для каждого из них аксесс токен
-        this.createManyComment(8);
-        // создаем комменты для 0 поста и сохраняем их ИД в массив
-    }
+
+    constructor(private app:INestApplication) {}
 
     private prepareManyBlogs(numberBlogs: number = 1){
 
@@ -61,6 +54,7 @@ export class TestDataBuiler {
     }
 
     async createManyPosts(numberPosts: number = 1){
+        // create many posts for blog with id in this.blogIds[0]
         this.prepareManyPosts(this.blogIds[0], numberPosts);
 
         for(let i = 0; i < numberPosts; i++){
@@ -86,13 +80,13 @@ export class TestDataBuiler {
         this.prepareManyUsers(numberUsers);
 
         for(let i =0; i < numberUsers; i++){
-            await request(this.app.getHttpServer())
+            const f = await request(this.app.getHttpServer())
                 .post(`${URL_PATH.users}`)
                 .set("Authorization", this.AuthPassword)
                 .send(this.users[i])
                 .expect(HttpStatus.CREATED);
 
-            // userLikes.push({userId: userCreate.body.id,
+             // userLikes.push({userId: userCreate.body.id,
             //     login:  userCreate.body.login,
             //     addedAt:  expect.any(String)})
 
@@ -102,7 +96,7 @@ export class TestDataBuiler {
                     "loginOrEmail": this.users[i].login,
                     "password":     this.users[i].password
                 })
-                expect(typeof token).toBe('string');
+                expect(typeof token.body.accessToken).toBe('string');
             // await new Promise((resolve) => {setTimeout(resolve, 2000)})
             // задержка если есть ограничения на обращения к ендпоинту с одного IP
             this.accessTokens.push(token.body.accessToken)
@@ -114,11 +108,14 @@ export class TestDataBuiler {
     }
 
     async createManyComment(numberComments: number = 1){
+        // create many posts by user[0] and user[1] for blog with id in this.postIds[0]
+        //
         this.prepareManyComment(numberComments);
         for(let i =0; i < numberComments; i++){
+            const s = `${URL_PATH.posts}/${this.postIds[0]}/comments`;
             const commentCreate = await request(this.app.getHttpServer())
-                .post(`${URL_PATH.posts}/${this.postIds[0]}/comments`)
-                .set("Authorization", 'Bearer ' + this.accessTokens[i])
+                .post(s)
+                .set("Authorization", 'Bearer ' + this.accessTokens[i % 2])
                 .send(this.comments[i])
                 .expect(HttpStatus.CREATED);
 
@@ -136,4 +133,16 @@ export class TestDataBuiler {
     //         password: 'paSS'
     //     }
     // }
+    static async createTestData(app: INestApplication, ):Promise<TestDataBuiler>{
+        const testData = new this(app);
+        await testData.createManyBlogs(2);
+        // создаем блоги и сохраняем их ИД в массив
+        await testData.createManyPosts(4);
+        // создаем посты для 0 блога и сохраняем их ИД в массив
+        await testData.createManyUsers(8);
+        // создаем юзеров и сохраняем в массив для каждого из них аксесс токен
+        await testData.createManyComment(8);
+        // создаем комменты для 0 поста и сохраняем их ИД в массив
+        return testData;
+    }
 }
