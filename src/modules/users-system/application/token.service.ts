@@ -8,15 +8,18 @@ export class TokenService {
                 private userConfig: UserConfig,
     ){ }
 
-    async createAccessToken(id: string): Promise<string>{
-        return this.jwtService.signAsync(
-            {userId: id},
-            {secret: this.userConfig.refreshTokenSecret,
-            expiresIn: this.userConfig.timeLifeAccessToken});
+    async createAccessToken(id: string): Promise<string> {
+
+        const stringPromise = await this.jwtService.signAsync(
+            {userId: id.toString()},
+            {secret: this.userConfig.accessTokenSecret,
+            expiresIn: this.userConfig.timeLifeAccessToken
+        });
+        return stringPromise;
     }
 
     async createRefreshToken(id: string): Promise<string>{
-        return this.jwtService.signAsync(
+        return await this.jwtService.signAsync(
             {userId: id},
             {secret: this.userConfig.refreshTokenSecret,
              expiresIn: this.userConfig.timeLifeRefreshToken});
