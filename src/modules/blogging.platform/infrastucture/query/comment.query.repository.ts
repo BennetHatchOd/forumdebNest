@@ -15,7 +15,9 @@ export class CommentQueryRepository {
     ){}
     
     async  findByIdWithCheck(id: string, userId: string|null = null): Promise<CommentViewDto> {
-        if (!Types.ObjectId.isValid(id)) 
+        // returns a comment by id, if comment isn't found throws an exception
+
+        if (!Types.ObjectId.isValid(id))
             throw new NotFoundException('comment not found');
         
         const searchItem: CommentDocument | null
