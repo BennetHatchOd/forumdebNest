@@ -15,6 +15,8 @@ import { CommentService } from './application/comment.service';
 import { CommentQueryRepository } from './infrastucture/query/comment.query.repository';
 import { CommentRepository } from './infrastucture/comment.repository';
 import { PostController } from './api/post.controler';
+import { UserQueryExternalRepository } from '../users-system/infrastucture/query/user.query.external.repository';
+import { User, UserSchema } from '../users-system/domain/user.entity';
 
 @Module({
     imports: [
@@ -22,6 +24,7 @@ import { PostController } from './api/post.controler';
             { name: Blog.name, schema: BlogSchema },
             { name: Comment.name, schema: CommentSchema },
             { name: Post.name, schema: PostSchema },
+            { name: User.name, schema: UserSchema },
         ]),
     ],
     controllers: [
@@ -30,14 +33,15 @@ import { PostController } from './api/post.controler';
         CommentController],
     providers: [
         BlogService,
-        PostService,
-        CommentService,
         BlogQueryRepository,
-        PostQueryRepository,
-        CommentQueryRepository,
         BlogRepository,
+        PostService,
+        PostQueryRepository,
         PostRepository,
+        CommentService,
+        CommentQueryRepository,
         CommentRepository,
+        UserQueryExternalRepository,
     ],
 })
 export class BloggingPlatformModule {}

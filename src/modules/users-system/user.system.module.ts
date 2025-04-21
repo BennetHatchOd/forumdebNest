@@ -7,17 +7,19 @@ import { UserQueryRepository } from './infrastucture/query/user.query.repository
 import { UserRepository } from './infrastucture/user.repository';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './strategy/local.strategy';
+import { LocalStrategy } from '../../core/strategy/local.strategy';
 import { PasswordHashService } from './application/password.hash.service';
 import { AuthService } from './application/auth.service';
 import { AuthRepository } from './infrastucture/auth.repository';
-import { JwtModule } from '@nestjs/jwt';
-import { SECRET_KEY } from '../../core/setting';
-import { NotificationsModule } from '../notifications/notifications.module';
-import { JwtStrategy } from './strategy/jwt.strategy';
-import { myBasicStrategy } from './strategy/basic.strategy';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtStrategy } from '../../core/strategy/jwt.strategy';
+import { myBasicStrategy } from '../../core/strategy/basic.strategy';
 import { NewPassword, NewPasswordSchema } from './domain/new.password';
 import { TokenService } from './application/token.service';
+import { UserConfig } from './config/user.config';
+import { MailService } from '../notifications/application/mail.service';
+import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
@@ -27,7 +29,6 @@ import { TokenService } from './application/token.service';
         ]),
         PassportModule,
         JwtModule.register({}),
-        NotificationsModule,
     ],
     controllers: [
         UserControllers,
@@ -35,15 +36,23 @@ import { TokenService } from './application/token.service';
     ],
     providers: [
         UserService,
-        AuthService,
+        UserConfig,
         UserQueryRepository,
+        UserQueryExternalRepository,
         UserRepository,
+        AuthService,
         AuthRepository,
         PasswordHashService,
+        MailService,
+        TokenService,
         LocalStrategy,
         JwtStrategy,
         myBasicStrategy,
-        TokenService
+        JwtService,
+        ConfigService,
     ],
+    exports:[
+        UserQueryExternalRepository,
+    ]
 })
 export class UserSystemModule {}
