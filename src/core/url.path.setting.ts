@@ -11,13 +11,13 @@ export const URL_PATH = {
 };
 
 export const AUTH_PATH = {
-    login: '/login',
-    //     logout:          '/logout',
-    registration: '/registration',
-    confirmation: '/registration-confirmation',
-    resentEmail: '/registration-email-resending',
-    askNewPassword: '/password-recovery',
+    login:              '/login',
+    logout:             '/logout',
+    registration:       '/registration',
+    confirmation:       '/registration-confirmation',
+    resentEmail:        '/registration-email-resending',
+    askNewPassword:     '/password-recovery',
     confirmNewPassword: '/new-password',
-    //     refresh:         '/refresh-token',
-    aboutMe: '/me',
+    refresh:            '/refresh-token',
+    aboutMe:            '/me',
 };
