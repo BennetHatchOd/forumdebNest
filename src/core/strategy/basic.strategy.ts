@@ -2,7 +2,7 @@
 import { BasicStrategy} from 'passport-http';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../application/auth.service';
+import { AuthService } from '../../modules/users-system/application/auth.service';
 
 @Injectable()
 export class myBasicStrategy extends PassportStrategy(BasicStrategy) {
