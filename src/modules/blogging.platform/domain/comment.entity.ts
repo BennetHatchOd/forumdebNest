@@ -3,6 +3,9 @@ import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
 import { LikesInfo, LikesInfoSchema } from './likes.info';
 import { CommentFieldRestrict } from '../field.restrictions';
+import { CommentInputDto } from '../dto/input/comment.input.dto';
+import { CommentatorInfoViewDto } from '../../users-system/dto/view/commentator.info.view.dto';
+import { CreateCommentDto } from '../dto/create.comment.dto';
 
 
 
@@ -39,12 +42,12 @@ export class Comment {
      })
     deletedAt:  Date | null;
 
-    // delete() {
-    //     if (this.deletedAt !== null) {
-    //         throw new Error('Comment already deleted');
-    //     }
-    //     this.deletedAt = new Date();
-    // }
+    delete() {
+        if (this.deletedAt !== null) {
+            throw new Error('Comment already deleted');
+        }
+        this.deletedAt = new Date();
+    }
     //
     // async update(change: PostInputDto,
     //              blogQueryRepository: BlogQueryRepository,) {
@@ -60,22 +63,17 @@ export class Comment {
     //     this.blogName = blogParent.name;
     // }
     //
-    // static async createInstance(createDto: PostInputDto,
-    //                             blogQueryRepository: BlogQueryRepository,): Promise<PostDocument> {
-    //
-    //     const post = new this();
-    //     post.title = createDto.title;
-    //     post.shortDescription = createDto.shortDescription;
-    //     post.content = createDto.content;
-    //     post.blogId = createDto.blogId;
-    //     const blogParent: BlogViewDto|null
-    //         = await blogQueryRepository.findByIdWitoutCheck(createDto.blogId);
-    //     if(!blogParent)
-    //         throw new Error('No blog found with this id');
-    //     post.blogName = blogParent.name;
-    //
-    //     return post as PostDocument;
-    // }
+    static createInstance(createDto: CreateCommentDto): CommentDocument {
+
+        const comment = new this();
+        comment.content = createDto.content;
+        comment.parentPostId = createDto.postId;
+        comment.likesInfo = LikesInfo.createInstance()
+        comment.commentatorInfo.userId = createDto.userId;
+        comment.commentatorInfo.userLogin = createDto.login;
+
+        return comment as CommentDocument;
+    }
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
