@@ -8,7 +8,7 @@ import {
     Param,
     Post,
     Put,
-    Query,
+    Query, UseGuards,
 } from '@nestjs/common';
 import { BlogService } from '../application/blog.service';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
@@ -24,6 +24,10 @@ import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
 import { PostService } from '../application/post.service';
 import { URL_PATH } from '../../../core/url.path.setting';
 import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
+import { CurrentUserId } from '../../../core/decorators/current.user';
+import { AuthGuard } from '@nestjs/passport';
+import * as process from 'node:process';
+
 
 @Controller(URL_PATH.blogs)
 export class BlogController {
@@ -36,7 +40,10 @@ export class BlogController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    async createBlog(@Body() blog: BlogInputDto): Promise<BlogViewDto> {
+//    @UseGuards(AuthGuard('jwt'))
+    async createBlog(
+        @CurrentUserId() userId: string,
+        @Body() blog: BlogInputDto): Promise<BlogViewDto> {
         //
         // Create new blog
 
@@ -68,7 +75,9 @@ export class BlogController {
 
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
+//    @UseGuards(AuthGuard('jwt'))
     async correctBlog(
+        @CurrentUserId() userId: string,
         @Param('id') inputId: IdInputDto,
         @Body() blog: BlogInputDto,
     ): Promise<void> {
@@ -80,7 +89,10 @@ export class BlogController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteBlog(@Param('id') inputId: IdInputDto, ): Promise<void> {
+//    @UseGuards(AuthGuard('jwt'))
+    async deleteBlog(
+        @CurrentUserId() userId: string,
+        @Param('id') inputId: IdInputDto, ): Promise<void> {
         //
         // Delete blog specified by id
 
@@ -88,7 +100,6 @@ export class BlogController {
     }
 
     @Get(':id/posts')
-    // async getPostByBlog(@Param('id') id: string,
     async getPostByBlog(
         @Param('id') inputId: IdInputDto,
         @Query() query: GetPostQueryParams,
@@ -106,7 +117,9 @@ export class BlogController {
 
     @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
+//    @UseGuards(AuthGuard('jwt'))
     async createPostByBlog(
+        @CurrentUserId() userId: string,
         @Param('id') inputId: IdInputDto,
         @Body() createPartDto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
