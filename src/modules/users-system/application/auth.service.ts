@@ -12,6 +12,8 @@ import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { MailService } from '../../notifications/application/mail.service';
 import { TokenService } from './token.service';
+import { UserConfig } from '../config/user.config';
+import { CoreConfig } from '../../../core/core.config';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +23,7 @@ export class AuthService {
         private readonly tokenService: TokenService,
         private readonly passwordHashService: PasswordHashService,
         private readonly mailService: MailService,
+        private readonly coreConfig: CoreConfig,
         @InjectModel(User.name) private UserModel: UserModelType,
         @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
     ) {}
@@ -45,7 +48,7 @@ export class AuthService {
     async validateUserForBasicAuth(login: string, password: string):Promise<boolean> {
         // проверяет по authHeader поля логин и пароль пользователя,
 
-        return (login === ADMIN_NAME_BASIC_AUTH && password === ADMIN_PASSWORD_BASIC_AUTH);
+        return (login === this.coreConfig.adminNameBasicAuth  && password === this.coreConfig.adminPasswordBasicAuth);
     }
 
     async registrationUser(inputUserDto: UserInputDto): Promise<void> {
