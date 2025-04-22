@@ -1,5 +1,5 @@
 import {
-    Controller,
+    Controller, Delete,
     Get,
     Param,
 } from '@nestjs/common';
@@ -8,6 +8,8 @@ import { CommentQueryRepository } from '../infrastucture/query/comment.query.rep
 import { URL_PATH } from '../../../core/url.path.setting';
 import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
 
+// @UseGuards(AuthGuard('jwt'))
+// @CurrentUserId() userId: string,
 @Controller(URL_PATH.comments)
 export class CommentController {
     constructor(
@@ -23,4 +25,15 @@ export class CommentController {
         return foundComment;
     }
 
+    // @Put(':id/like-status')
+    // @UseGuards(AuthGuard('jwt'))
+    // async f(@CurrentUserId() userId: string,)
+
+    // @Put(':id')
+    // @UseGuards(AuthGuard('jwt'))
+    // async d(@CurrentUserId() userId: string,)
+
+    // @Delete(':id')
+    // @UseGuards(AuthGuard('jwt'))
+    // async sd(@CurrentUserId() userId: string,)
 }

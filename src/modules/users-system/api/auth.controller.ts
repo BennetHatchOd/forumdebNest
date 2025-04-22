@@ -1,8 +1,7 @@
-import { Body, Controller, Post, UseGuards, Request, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
-import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { AUTH_PATH, URL_PATH } from '../../../core/url.path.setting';
 import { EmailInputDto } from '../../../core/dto/input/email.input.dto';
 import { ConfirmCodeInputDto } from '../../../core/dto/input/confirm.code.input.dto';
