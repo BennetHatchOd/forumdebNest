@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { Comment, CommentModelType } from '../domain/comment.entity';
+import { Comment, CommentDocument, CommentModelType } from '../domain/comment.entity';
 
 @Injectable()
 export class CommentRepository {
@@ -23,5 +23,7 @@ export class CommentRepository {
     // }
 
 
-
+    async save(newComment: CommentDocument) {
+        await newComment.save();
+    }
 }
