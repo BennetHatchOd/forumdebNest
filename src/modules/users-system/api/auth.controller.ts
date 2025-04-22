@@ -58,12 +58,21 @@ export class AuthController {
             return await this.authService.setNewPassword(recoveryPassport.newPassword, recoveryPassport.recoveryCode)
     }
 
-    @Get(AUTH_PATH.aboutMe)
-    @UseGuards(AuthGuard('jwt'))
-    async getMe(@Request() userId: string): Promise<UserAboutViewDto>{
+    // @Get(AUTH_PATH.aboutMe)
+    // @UseGuards(AuthGuard('jwt'))
+    // async getMe(@CurrentUserId() userId: string): Promise<UserAboutViewDto>{
+    //
+    //         const answer: UserAboutViewDto = await this.authService.aboutMe(userId)
+    //         return answer;
+    // }
 
-            const answer: UserAboutViewDto = await this.authService.aboutMe(userId)
-            return answer;
-    }
+    // @Get(AUTH_PATH.logout)
+    // @UseGuards(AuthGuard(?))
+    // async logOut(@CurrentUserId() userId: string): Promise<>{}
 
+    // @Get(AUTH_PATH.refresh)
+    // @UseGuards(AuthGuard(?))
+    // async newRefreshToken(@CurrentUserId() userId: string): Promise<>{
+    // }
 }
+
