@@ -10,6 +10,7 @@ import { TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
 @Schema({ timestamps: true })
 export class User {
     @Prop({
+        unique: true,
         required: true,
         minlength: UserFieldRestrict.loginMin,
         maxlength: UserFieldRestrict.loginMax,
@@ -17,6 +18,7 @@ export class User {
     login: string;
 
     @Prop({
+        unique: true,
         required: true,
     })
     email: string;
