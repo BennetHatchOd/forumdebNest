@@ -10,11 +10,15 @@ import { PostQueryRepository } from '../infrastucture/query/post.query.repositor
 import { PostService } from '../application/post.service';
 import { URL_PATH } from '../../../core/url.path.setting';
 import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
+import { CommentInputDto } from '../dto/input/comment.input.dto';
+import { CommentService } from '../application/comment.service';
+import { CurrentUserId } from '../../../core/decorators/current.user';
 
 @Controller(URL_PATH.posts)
 export class PostController {
     constructor(
         private postService: PostService,
+        private commentService: CommentService,
         private postQueryRepository: PostQueryRepository,
         private commentQueryRepository: CommentQueryRepository,
     ){}
@@ -30,7 +34,6 @@ export class PostController {
         return postView;
     }
 
-//*
     @Get()
     async getAll(@Query() query: GetPostQueryParams,)
         : Promise<PaginatedViewDto<PostViewDto[]>> {
@@ -74,19 +77,37 @@ export class PostController {
 
     @Get(':id/comments')
     async getCommentByPost(
-        @Param('id') inputId: IdInputDto,
+        @Param('id') postId: IdInputDto,
         @Query() query: GetCommentQueryParams
     ): Promise<PaginatedViewDto<CommentViewDto[]>> {
-        //
-        // Returns all comments for specified post
+        // Returns all comments for specified post, if the post isn't found,
+        // throw the exception "not found"
 
-        query.setParentPostIdSearchParams(inputId.id)
-        // проверка существования поста
-        await this.postQueryRepository.findByIdWithCheck(inputId.id)
+        await this.postQueryRepository.findByIdWithCheck(postId.id)
+        // check the existence of the post and throw the exception "not found"
 
+        query.setParentPostIdSearchParams(postId.id)
         const commentPaginator: PaginatedViewDto<CommentViewDto[]>
             = await this.commentQueryRepository.find(query);
         return commentPaginator;
 
     }
+
+    @Post(':id/comments')
+    async createCommentByPost(
+        @CurrentUserId() currentUserId: string,
+        @Param('id') postId: IdInputDto,
+        @Body() comment: CommentInputDto
+    ): Promise<CommentViewDto> {
+        // Create comment for specified post, if the post isn't found,
+        // throw the exception "not found"
+
+        await this.postQueryRepository.findByIdWithCheck(postId.id)
+        // check the existence of the post
+
+        const createdComment: string = await this.commentService.create(postId.id, comment, currentUserId);
+        return this.commentQueryRepository.findByIdWithCheck(createdComment);
+
+    }
+
 }
