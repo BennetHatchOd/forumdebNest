@@ -5,6 +5,8 @@ import { PostInputDto } from '../../src/modules/blogging.platform/dto/input/post
 import request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { AUTH_PATH, URL_PATH } from '../../src/core/url.path.setting';
+import { AuthBasic } from './auth.basic';
+import { CoreConfig } from '../../src/core/core.config';
 
 export class TestDataBuiler {
     users: UserInputDto[] = [];
@@ -17,8 +19,8 @@ export class TestDataBuiler {
     postIds: string[] = [];
     commentIds: string[] = [];
     posts: PostInputDto[] = [];
-    AuthPassword = "Basic YWRtaW46cXdlcnR5";
-    // to-do create a method to get the password from env
+    authLoginPassword: string;// = "Basic YWRtaW46cXdlcnR5";
+
 
 
     constructor(private app:INestApplication) {}
@@ -37,7 +39,7 @@ export class TestDataBuiler {
         for(let i = 0; i < numberBlogs; i++) {
             const blogCreate = await request(this.app.getHttpServer())
                 .post(URL_PATH.blogs)
-                .set("Authorization", this.AuthPassword)
+                .set("Authorization", this.authLoginPassword)
                 .send(this.blogs[0])
                 .expect(HttpStatus.CREATED)
             this.blogIds.push(blogCreate.body.id);
@@ -60,7 +62,7 @@ export class TestDataBuiler {
         for(let i = 0; i < numberPosts; i++){
             const postCreate = await request(this.app.getHttpServer())
                 .post(URL_PATH.posts)
-                .set("Authorization", this.AuthPassword)
+                .set("Authorization", this.authLoginPassword)
                 .send(this.posts[i])
                 .expect(HttpStatus.CREATED)
             this.postIds.push(postCreate.body.id)
@@ -82,7 +84,7 @@ export class TestDataBuiler {
         for(let i =0; i < numberUsers; i++){
             const f = await request(this.app.getHttpServer())
                 .post(`${URL_PATH.users}`)
-                .set("Authorization", this.AuthPassword)
+                .set("Authorization", this.authLoginPassword)
                 .send(this.users[i])
                 .expect(HttpStatus.CREATED);
 
@@ -98,7 +100,8 @@ export class TestDataBuiler {
                 })
                 expect(typeof token.body.accessToken).toBe('string');
             // await new Promise((resolve) => {setTimeout(resolve, 2000)})
-            // задержка если есть ограничения на обращения к ендпоинту с одного IP
+            // задержка если есть ограничения на количество обращений к ендпоинту с одного IP
+            // в промежуток времени
             this.accessTokens.push(token.body.accessToken)
     }}
 
@@ -133,8 +136,13 @@ export class TestDataBuiler {
     //         password: 'paSS'
     //     }
     // }
-    static async createTestData(app: INestApplication, ):Promise<TestDataBuiler>{
+
+
+    static async createTestData(app: INestApplication,
+                                coreConfig: CoreConfig):Promise<TestDataBuiler>{
         const testData = new this(app);
+        testData.authLoginPassword = AuthBasic.createAuthHeader(coreConfig)
+
         await testData.createManyBlogs(2);
         // создаем блоги и сохраняем их ИД в массив
         await testData.createManyPosts(4);
