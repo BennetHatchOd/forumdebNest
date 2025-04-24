@@ -5,7 +5,6 @@ import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserFieldRestrict } from '../field.restrictions';
 import { add, isBefore } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
-import { TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
 
 @Schema({ timestamps: true })
 export class User {
@@ -63,10 +62,10 @@ export class User {
         return false;
     }
 
-    createConfirmCode(): string | null  {
+    createConfirmCode(timeLifeEmailCode: number): string | null  {
         if (!this.isConfirmEmail && this.deletedAt === null) {
             this.confirmEmail.code = uuidv4();
-            this.confirmEmail.expirationTime = add(new Date(), { hours: TIME_LIFE_EMAIL_CODE });
+            this.confirmEmail.expirationTime = add(new Date(), { hours: timeLifeEmailCode });
             return this.confirmEmail.code;
         }
         return null;

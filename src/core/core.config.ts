@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { configValidationUtility } from '../setup/config.validation.utility';
 
 export enum Environments {
@@ -29,22 +29,20 @@ export class CoreConfig {
     })
     mongoURI: string;
 
+    @IsBoolean({
+        message: 'Set Env variable INCLUDE_TESTING_MODULE, to enable the module the value must be {true, 1 or enabled}'
+    })
+    includeTestingModule: boolean;
+
+    @IsBoolean({
+        message: 'Set Env variable INCLUDE_TESTING_MODULE, to enable the module the value must be {true, 1 or enabled}'
+    })
+    isSwaggerEnabled: boolean;
+
     @IsEnum(Environments, {
-        message: 'Set correct NODE_ENV value'
+        message: 'Set correct NODE_ENV value, available values are {DEVELOPMENT, STAGING, PRODUCTION or TESTING}'
     })
     env: string;
-
-    @IsNotEmpty()
-    @IsString({
-        message: 'Set Env variable ADMIN_NAME_BASIC_AUTH'
-    })
-    adminNameBasicAuth: string;
-
-    @IsNotEmpty()
-    @IsString({
-        message: 'Set Env variable ADMIN_PASSWORD_BASIC_AUTH'
-    })
-    adminPasswordBasicAuth: string;
 
     versionApp: string;
 
@@ -53,9 +51,10 @@ export class CoreConfig {
         this.mongoURI = this.configService.get('MONGO_URI');
         this.env = this.configService.get('NODE_ENV');
         this.dbName = this.configService.get('DB_NAME');
-        this.adminNameBasicAuth = this.configService.get('ADMIN_NAME_BASIC_AUTH');
-        this.adminPasswordBasicAuth = this.configService.get('ADMIN_PASSWORD_BASIC_AUTH');
+        this.includeTestingModule = configValidationUtility.convertToBoolean(this.configService.get('INCLUDE_TESTING_MODULE')) as boolean;
         this.versionApp = this.configService.get('VERSION_APP');
+        this.isSwaggerEnabled = configValidationUtility.convertToBoolean(this.configService.get('IS_SWAGGER_ENABLE')) as boolean;
+
 
         configValidationUtility.validateConfig(this);
     }

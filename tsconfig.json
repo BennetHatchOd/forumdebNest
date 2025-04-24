@@ -18,5 +18,9 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@src/*": ["src/*"],
+    }
   }
 }
