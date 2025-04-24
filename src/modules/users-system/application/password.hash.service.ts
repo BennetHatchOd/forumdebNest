@@ -1,10 +1,8 @@
 import bcrypt from 'bcrypt'
-import { saltRounds } from '../../../core/setting';
-
 
 export class PasswordHashService {
 
-    async createHash(password: string):Promise<string>{
+    async createHash(password: string, saltRounds:number):Promise<string>{
         const salt: string = await bcrypt.genSalt(saltRounds)
         const hash: string = await bcrypt.hash(password, salt)
 

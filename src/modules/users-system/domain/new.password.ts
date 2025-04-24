@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { TIME_LIFE_PASSWORD_CODE } from '../../../core/setting';
 import { HydratedDocument, Model } from 'mongoose';
 import {v4 as uuidv4} from 'uuid'
 import { add } from 'date-fns';
@@ -23,11 +22,11 @@ export class NewPassword {
     })
     expirationTime: Date;
 
-    static createInstance(userId: string): NewPasswordDocument {
+    static createInstance(userId: string, timeLifeCode: number): NewPasswordDocument {
         const newPassword = new this();
         newPassword.userId = userId;
         newPassword.code = uuidv4();
-        newPassword.expirationTime = add(new Date(), { hours: TIME_LIFE_PASSWORD_CODE});
+        newPassword.expirationTime = add(new Date(), { hours: timeLifeCode});
 
         return newPassword as NewPasswordDocument;
     }

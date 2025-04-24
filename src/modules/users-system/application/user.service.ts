@@ -4,10 +4,12 @@ import { UserInputDto } from '../dto/input/user.input.dto';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { UserRepository } from '../infrastucture/user.repository';
 import { PasswordHashService } from './password.hash.service';
+import { UserConfig } from '../config/user.config';
 
 @Injectable()
 export class UserService {
     constructor(
+        private readonly userConfig: UserConfig,
         private userRepository: UserRepository,
         private passwordHashService: PasswordHashService,
         @InjectModel(User.name) private UserModel: UserModelType,
@@ -15,7 +17,7 @@ export class UserService {
 
     async create(inputUserDto: UserInputDto): Promise<string> {
 
-        const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password);
+        const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password, this.userConfig.saltRound);
         const newUser: UserDocument = this.UserModel.createInstance({...inputUserDto,
                                                                         password: passwordHash,});
         newUser.isConfirmEmail = true;
