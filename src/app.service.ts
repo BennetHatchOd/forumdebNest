@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { VERSION_APP } from './core/setting';
+import { CoreConfig } from './core/core.config';
 
 @Injectable()
 export class AppService {
+    constructor(private readonly coreConfig: CoreConfig) {
+    }
+
     getVersion(): string {
-        return VERSION_APP;
+        return this.coreConfig.versionApp;
     }
 }

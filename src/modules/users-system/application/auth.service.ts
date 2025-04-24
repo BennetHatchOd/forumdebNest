@@ -3,7 +3,6 @@ import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
 import {v4 as uuidv4} from 'uuid';
 import {add, isBefore} from 'date-fns';
-import { ADMIN_NAME_BASIC_AUTH, ADMIN_PASSWORD_BASIC_AUTH, TIME_LIFE_EMAIL_CODE } from '../../../core/setting';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,7 +12,6 @@ import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { MailService } from '../../notifications/application/mail.service';
 import { TokenService } from './token.service';
 import { UserConfig } from '../config/user.config';
-import { CoreConfig } from '../../../core/core.config';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +21,7 @@ export class AuthService {
         private readonly tokenService: TokenService,
         private readonly passwordHashService: PasswordHashService,
         private readonly mailService: MailService,
-        private readonly coreConfig: CoreConfig,
+        private readonly userConfig: UserConfig,
         @InjectModel(User.name) private UserModel: UserModelType,
         @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
     ) {}
@@ -48,7 +46,7 @@ export class AuthService {
     async validateUserForBasicAuth(login: string, password: string):Promise<boolean> {
         // проверяет по authHeader поля логин и пароль пользователя,
 
-        return (login === this.coreConfig.adminNameBasicAuth  && password === this.coreConfig.adminPasswordBasicAuth);
+        return (login === this.userConfig.adminNameBasicAuth  && password === this.userConfig.adminPasswordBasicAuth);
     }
 
     async registrationUser(inputUserDto: UserInputDto): Promise<void> {
@@ -59,14 +57,14 @@ export class AuthService {
         if(checkUniq) {
             throw new BadRequestException("user's email or login must be uniq");
         }
-        const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password)
+        const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password, this.userConfig.saltRound)
 
         const createdUser: UserDocument = this.UserModel.createInstance({
                                                                         ...inputUserDto,
                                                                         password: passwordHash,});
         createdUser.confirmEmail = {
                 code: uuidv4(),
-                expirationTime: add(new Date(), { hours: TIME_LIFE_EMAIL_CODE}),
+                expirationTime: add(new Date(), { hours: this.userConfig.timeLifeEmailCode}),
         }
 
         await this.mailService.createConfirmEmail(inputUserDto.email, createdUser.confirmEmail.code)
@@ -94,7 +92,7 @@ export class AuthService {
         if(!userWithOutMail) {
             throw new BadRequestException("user with not verifed email not found")
         }
-        const code: string | null = userWithOutMail.createConfirmCode();
+        const code: string | null = userWithOutMail.createConfirmCode(this.userConfig.timeLifeEmailCode);
 
         await this.mailService.createConfirmEmail(email, code!)
 
@@ -112,7 +110,7 @@ export class AuthService {
             throw new BadRequestException("user with not verifed email not found")
         }
 
-        const newPassword: NewPasswordDocument = this.NewPasswordModel.createInstance(foundedUser)
+        const newPassword: NewPasswordDocument = this.NewPasswordModel.createInstance(foundedUser, this.userConfig.timeLifeEmailCode);
         await this.authRepository.save(newPassword);
 
         await this.mailService.createPasswordRecovery(email, newPassword.code)
@@ -130,7 +128,7 @@ export class AuthService {
             throw new BadRequestException("a valid recovery code wasn't received")
         }
 
-        const hash: string = await this.passwordHashService.createHash(newPassword);
+        const hash: string = await this.passwordHashService.createHash(newPassword, this.userConfig.saltRound);
         const user: UserDocument = await this.userRepository.findById(newPasswordObj.id) as UserDocument;
         user.passwordHash = hash;
         await this.authRepository.save(user);

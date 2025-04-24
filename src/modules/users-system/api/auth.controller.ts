@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
@@ -7,6 +7,7 @@ import { EmailInputDto } from '../../../core/dto/input/email.input.dto';
 import { ConfirmCodeInputDto } from '../../../core/dto/input/confirm.code.input.dto';
 import { NewPasswordInputDto } from '../../../core/dto/input/new.password.input.dto';
 import { CurrentUserId } from '../../../core/decorators/current.user';
+import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
@@ -57,10 +58,13 @@ export class AuthController {
             return await this.authService.setNewPassword(recoveryPassport.newPassword, recoveryPassport.recoveryCode)
     }
 
-    // @Get(AUTH_PATH.aboutMe)
-    // @UseGuards(AuthGuard('jwt'))
-    // async getMe(@CurrentUserId() userId: string): Promise<UserAboutViewDto>{
-    //
+    @Get(AUTH_PATH.aboutMe)
+    @UseGuards(AuthGuard('jwt'))
+    async getMe(@CurrentUserId() userId: string)//: Promise<UserAboutViewDto>
+     {
+        return {"userId": 3};
+     }
+
     //         const answer: UserAboutViewDto = await this.authService.aboutMe(userId)
     //         return answer;
     // }
