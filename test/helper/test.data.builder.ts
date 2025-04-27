@@ -98,10 +98,13 @@ export class TestDataBuiler {
                     "loginOrEmail": this.users[i].login,
                     "password":     this.users[i].password
                 })
+                expect(token.body).toHaveProperty("accessToken");
                 expect(typeof token.body.accessToken).toBe('string');
+
             // await new Promise((resolve) => {setTimeout(resolve, 2000)})
             // задержка если есть ограничения на количество обращений к ендпоинту с одного IP
             // в промежуток времени
+            // ИЗМЕНИТЬ ПРОВЕРКИ
             this.accessTokens.push(token.body.accessToken)
     }}
 
