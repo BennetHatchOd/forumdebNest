@@ -2,11 +2,11 @@ import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus, Get } from '@n
 import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
-import { AUTH_PATH, URL_PATH } from '../../../core/url.path.setting';
-import { EmailInputDto } from '../../../core/dto/input/email.input.dto';
-import { ConfirmCodeInputDto } from '../../../core/dto/input/confirm.code.input.dto';
-import { NewPasswordInputDto } from '../../../core/dto/input/new.password.input.dto';
-import { CurrentUserId } from '../../../core/decorators/current.user';
+import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
+import { EmailInputDto } from '@src/modules/users-system/dto/input/email.input.dto';
+import { ConfirmCodeInputDto } from '@src/modules/users-system/dto/input/confirm.code.input.dto';
+import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
+import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 
 @Controller(URL_PATH.auth)
