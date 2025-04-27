@@ -44,6 +44,11 @@ export class CoreConfig {
     })
     env: string;
 
+    @IsString({
+        message: 'Env variable GLOBAL_PREFIX, must be a string, example: appDB',
+    })
+    globalPrefix: string;
+
     versionApp: string;
 
     constructor(private configService: ConfigService<any, true>) {
@@ -52,6 +57,7 @@ export class CoreConfig {
         this.env = this.configService.get('NODE_ENV');
         this.dbName = this.configService.get('DB_NAME');
         this.includeTestingModule = configValidationUtility.convertToBoolean(this.configService.get('INCLUDE_TESTING_MODULE')) as boolean;
+        this.globalPrefix = this.configService.get('GLOBAL_PREFIX');
         this.versionApp = this.configService.get('VERSION_APP');
         this.isSwaggerEnabled = configValidationUtility.convertToBoolean(this.configService.get('IS_SWAGGER_ENABLE')) as boolean;
 
