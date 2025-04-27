@@ -8,12 +8,12 @@ import { configValidationUtility } from '../../../setup/config.validation.utilit
 export class UserConfig {
 
     @IsNotEmpty({
-            message: 'Env variable ACCESS_TOKEN_SECRET_KEY must be a string',
+            message: 'Env variable ACCESS_TOKEN_SECRET must be a string',
     })
     accessTokenSecret: string;//= this.configService.get('ACCESS_TOKEN_SECRET');
 
     @IsNotEmpty({
-            message: 'Env variable REFRESH_TOKEN_SECRET_KEY must be a string',
+            message: 'Env variable REFRESH_TOKEN_SECRET must be a string',
     })
     refreshTokenSecret: string; //= this.configService.get('REFRESH_TOKEN_SECRET');
 
@@ -22,7 +22,6 @@ export class UserConfig {
             message: 'Env variable TIME_LIFE_ACCESS_TOKEN must be a number',
     })
     timeLifeAccessToken: number; //= Number(this.configService.get('TIME_LIFE_ACCESS_TOKEN'));
-
     @IsNotEmpty()
     @IsNumber({},{
         message: 'Env variable TIME_LIFE_REFRESH_TOKEN must be a number',
@@ -53,13 +52,25 @@ export class UserConfig {
     })
     saltRound: number;
 
+    @IsNotEmpty()
+    @IsString({
+        message: 'Set Env variable ADMIN_NAME_BASIC_AUTH'
+    })
+    adminNameBasicAuth: string;
+
+    @IsNotEmpty()
+    @IsString({
+        message: 'Set Env variable ADMIN_PASSWORD_BASIC_AUTH'
+    })
+    adminPasswordBasicAuth: string;
+
     constructor(private configService: ConfigService<any, true>) {
-        console.log('NODE_ENV =', process.env.NODE_ENV);
-        console.log('ACCESS_TOKEN_SECRET_KEY:', this.configService.get('ACCESS_TOKEN_SECRET'));
         this.accessTokenSecret =this.configService.get('ACCESS_TOKEN_SECRET');
         this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
         this.timeLifeAccessToken = Number(this.configService.get('TIME_LIFE_ACCESS_TOKEN'));
         this.timeLifeRefreshToken = Number(this.configService.get('TIME_LIFE_REFRESH_TOKEN'));
+        this.adminNameBasicAuth = this.configService.get('ADMIN_NAME_BASIC_AUTH');
+        this.adminPasswordBasicAuth = this.configService.get('ADMIN_PASSWORD_BASIC_AUTH');
         this.passwordEmail = this.configService.get('PASSWORD_MAIL');
         this.timeLifeEmailCode = Number(this.configService.get('TIME_LIFE_EMAIL_CODE'));
         this.timeLifePasswordCode = Number(this.configService.get('TIME_LIFE_PASSWORD_CODE'));
