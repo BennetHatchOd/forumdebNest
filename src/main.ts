@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { PORT } from './core/setting';
 import { appSetup } from './setup/app.setup';
+import { CoreConfig } from './core/core.config';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    appSetup(app);
+    const coreConfig = app.get<CoreConfig>(CoreConfig);
+    appSetup(app, coreConfig.isSwaggerEnabled, coreConfig.globalPrefix);
     app.enableCors();
-    await app.listen(PORT);
-    console.log(`Server running on port ${PORT}`);
+    const port = coreConfig.port;
+    await app.listen(port);
+    console.log(`Server running on port: ${port}, on the dataBase: ${coreConfig.mongoURI}`);
 }
 bootstrap();
