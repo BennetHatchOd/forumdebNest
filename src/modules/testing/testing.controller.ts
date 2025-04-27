@@ -1,15 +1,15 @@
-import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { URL_PATH } from '../../core/url.path.setting';
 
-@Controller(URL_PATH.testing)
+@Controller()
 export class TestingController {
     constructor(
         @InjectConnection() private readonly databaseConnection: Connection,
     ) {}
 
-    @Delete()
+    @Delete(URL_PATH.testing)
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteAll() {
         const collections = await this.databaseConnection.listCollections();
@@ -18,5 +18,14 @@ export class TestingController {
             this.databaseConnection.collection(collection.name).deleteMany({}),
         );
         await Promise.all(promises);
+    }
+    @Get('json/version')
+    getVersion() {
+        return { browser: 'FakeBrowser/1.0', protocolVersion: '1.3' };
+    }
+
+    @Get('json/list')
+    getList() {
+        return [];
     }
 }
