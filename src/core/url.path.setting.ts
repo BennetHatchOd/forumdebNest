@@ -1,4 +1,3 @@
-export const GLOBAL_PREFIX = 'api';
 export const URL_PATH = {
     base: '/',
     blogs: '/blogs',

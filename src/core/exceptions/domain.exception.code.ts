@@ -1,7 +1,11 @@
 export enum DomainExceptionCode {
-    NotFound = 404,
-    BadRequest = 400,
-    Unauthorized = 401,
-    Forbidden = 403,
-    InternalServerError = 500,
+    NotFound = 1,
+    BadRequest = 2,
+    InternalServerError = 3,
+    Forbidden = 4,
+    ValidationError = 5,
+    Unauthorized = 6,
+    EmailNotConfirmed = 7,
+    ConfirmationCodeExpired = 8,
+    PasswordRecoveryCodeExpired = 9,
 }

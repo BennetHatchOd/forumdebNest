@@ -1,8 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { GLOBAL_PREFIX } from '../core/url.path.setting';
 
-export function swaggerSetup(app: INestApplication, isSwaggerEnabled: boolean) {
+export function swaggerSetup(app: INestApplication, isSwaggerEnabled: boolean, globalPrefix: string) {
     if (isSwaggerEnabled) {
         const config = new DocumentBuilder()
             .setTitle('BLOG-POST API')
@@ -18,7 +17,7 @@ export function swaggerSetup(app: INestApplication, isSwaggerEnabled: boolean) {
             .build();
 
         const document = SwaggerModule.createDocument(app, config);
-        SwaggerModule.setup(GLOBAL_PREFIX, app, document, {
+        SwaggerModule.setup(globalPrefix, app, document, {
             customSiteTitle: 'Blog-Post Swagger',
         });
     }
