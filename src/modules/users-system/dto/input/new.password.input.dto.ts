@@ -1,5 +1,5 @@
-import { TrimLength } from '../../decorators/trim.string.length';
-import { UserFieldRestrict } from '../../../modules/users-system/field.restrictions';
+import { TrimLength } from '@core/decorators/trim.string.length';
+import { UserFieldRestrict } from '../../field.restrictions';
 import { IsUUID } from 'class-validator';
 
 export class NewPasswordInputDto{
