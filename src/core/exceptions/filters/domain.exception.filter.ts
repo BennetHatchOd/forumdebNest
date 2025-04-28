@@ -25,6 +25,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
             case DomainExceptionCode.EmailNotConfirmed:
             case DomainExceptionCode.ConfirmationCodeExpired:
             case DomainExceptionCode.PasswordRecoveryCodeExpired:
+            case DomainExceptionCode.PasswordRecoveryCodeNotFound:
                 return 400;
             case DomainExceptionCode.NotFound:
                 return 404;
