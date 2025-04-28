@@ -84,7 +84,7 @@ export class AuthRepository {
         return  await this.NewPasswordModel.findOne({code: recoveryCode})
     }
 
-    async deletePasswordRecovery(userId: string) {
+    async deleteUsedPasswordRecovery(userId: string) {
         // delete all recovery codes for the user if the password has already been recovered
         return  await this.NewPasswordModel.deleteMany({userId: userId})
     }
