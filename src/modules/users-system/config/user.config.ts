@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { configValidationUtility } from '../../../setup/config.validation.utility';
+import { configValidationUtility } from '@src/setup/config.validation.utility';
 
 
 @Injectable()
@@ -10,23 +10,23 @@ export class UserConfig {
     @IsNotEmpty({
             message: 'Env variable ACCESS_TOKEN_SECRET must be a string',
     })
-    accessTokenSecret: string;//= this.configService.get('ACCESS_TOKEN_SECRET');
+    accessTokenSecret: string;
 
     @IsNotEmpty({
             message: 'Env variable REFRESH_TOKEN_SECRET must be a string',
     })
-    refreshTokenSecret: string; //= this.configService.get('REFRESH_TOKEN_SECRET');
+    refreshTokenSecret: string;
 
     @IsNotEmpty()
     @IsNumber({},{
             message: 'Env variable TIME_LIFE_ACCESS_TOKEN must be a number',
     })
-    timeLifeAccessToken: number; //= Number(this.configService.get('TIME_LIFE_ACCESS_TOKEN'));
+    timeLifeAccessToken: number;
     @IsNotEmpty()
     @IsNumber({},{
         message: 'Env variable TIME_LIFE_REFRESH_TOKEN must be a number',
     })
-    timeLifeRefreshToken: number; //= Number(this.configService.get('TIME_LIFE_REFRESH_TOKEN'));
+    timeLifeRefreshToken: number;
 
     @IsNotEmpty()
     @IsString({
