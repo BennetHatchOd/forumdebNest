@@ -34,7 +34,7 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async confirmation(@Body() inputCode: ConfirmCodeInputDto): Promise<void> {
 
-            return  await this.authService.confirmationUser(inputCode.code);
+            return  await this.authService.confirmationEmail(inputCode.code);
     }
 
     @Post(AUTH_PATH.resentEmail)
@@ -55,7 +55,7 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async resentPassword(@Body()recoveryPassport: NewPasswordInputDto):Promise<void> {
 
-            return await this.authService.setNewPassword(recoveryPassport.newPassword, recoveryPassport.recoveryCode)
+            return await this.authService.setNewPassword(recoveryPassport)
     }
 
     @Get(AUTH_PATH.aboutMe)
