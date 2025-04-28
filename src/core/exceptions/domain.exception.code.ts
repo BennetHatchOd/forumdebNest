@@ -8,4 +8,5 @@ export enum DomainExceptionCode {
     EmailNotConfirmed = 7,
     ConfirmationCodeExpired = 8,
     PasswordRecoveryCodeExpired = 9,
+    PasswordRecoveryCodeNotFound = 10,
 }

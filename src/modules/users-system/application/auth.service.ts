@@ -13,6 +13,9 @@ import { MailService } from '../../notifications/application/mail.service';
 import { UserConfig } from '../config/user.config';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { JwtService } from '@nestjs/jwt';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
+import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,81 +30,128 @@ export class AuthService {
         private readonly mailService: MailService,
         private readonly userConfig: UserConfig,
         @InjectModel(User.name) private UserModel: UserModelType,
-        @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
+        @InjectModel(NewPassword.name)
+        private NewPasswordModel: NewPasswordModelType,
     ) {}
 
     async authorization(userId: string) {
-        return this.accessJwtService.sign({user: userId})
+        return this.accessJwtService.sign({ user: userId });
     }
 
-    async validateUserForLocalAuth(loginOrEmail: string, passHash: string):Promise<string|null> {
+    async validateUserForLocalAuth(
+        loginOrEmail: string,
+        passHash: string,
+    ): Promise<string | null> {
         // проверяет по полям логин И емайл пользователя, если он найден,
         // проверяет совпадение хеша пароля и
         // возвращает ид найденного пользователя
-        const foundUser: {id:string, passHash:string} | null
-            = await this.authRepository.getPartUserByLoginEmail(loginOrEmail);
+        const foundUser: { id: string; passHash: string } | null =
+            await this.authRepository.getPartUserByLoginEmail(loginOrEmail);
 
-        if(foundUser !== null && await this.passwordHashService.checkHash(passHash, foundUser.passHash))
-            return foundUser.id
+        if (
+            foundUser !== null &&
+            (await this.passwordHashService.checkHash(
+                passHash,
+                foundUser.passHash,
+            ))
+        )
+            return foundUser.id;
 
         return null;
     }
 
-    async validateUserForBasicAuth(login: string, password: string):Promise<boolean> {
+    async validateUserForBasicAuth(
+        login: string,
+        password: string,
+    ): Promise<boolean> {
         // проверяет по authHeader поля логин и пароль пользователя,
 
-        return (login === this.userConfig.adminNameBasicAuth  && password === this.userConfig.adminPasswordBasicAuth);
+        return (
+            login === this.userConfig.adminNameBasicAuth &&
+            password === this.userConfig.adminPasswordBasicAuth
+        );
     }
 
     async registrationUser(inputUserDto: UserInputDto): Promise<void> {
+        const createdUser: UserDocument = await this.checkUniq(inputUserDto);
 
-        const checkUniq: string[] | null
-            = await this.authRepository.checkUniq(inputUserDto.login, inputUserDto.email)
-
-        if(checkUniq) {
-            throw new BadRequestException("user's email or login must be uniq");
-        }
-        const passwordHash: string = await this.passwordHashService.createHash(inputUserDto.password, this.userConfig.saltRound)
-
-        const createdUser: UserDocument = this.UserModel.createInstance({
-                                                                        ...inputUserDto,
-                                                                        password: passwordHash,});
         createdUser.confirmEmail = {
-                code: uuidv4(),
-                expirationTime: add(new Date(), { hours: this.userConfig.timeLifeEmailCode}),
-        }
+            code: uuidv4(),
+            expirationTime: add(new Date(), {
+                hours: this.userConfig.timeLifeEmailCode,
+            }),
+        };
 
-        await this.mailService.createConfirmEmail(inputUserDto.email, createdUser.confirmEmail.code)
-
+        this.mailService.createConfirmEmail(
+            inputUserDto.email,
+            createdUser.confirmEmail.code,
+        );
         await this.authRepository.save(createdUser);
         return;
     }
 
-    async confirmationUser(code: string):Promise<void> {
-        const foundUser: UserDocument|null = await this.authRepository.findByConfirmCode(code)
+    async checkUniq (inputUserDto: UserInputDto):Promise<UserDocument> {
+        const checkUniq: string[] | null = await this.authRepository.checkUniq(
+            inputUserDto.login,
+            inputUserDto.email,
+        );
 
-        if (!foundUser || !foundUser.confirmationEmail(code)){
-            throw new BadRequestException("the confirmation code is incorrect, expired or already been applied");
+        if (checkUniq) {
+            const errors = checkUniq.map((fieldError:string) => {
+                return {
+                    message: `user's ${fieldError} must be uniq`,
+                    field: fieldError,
+                };
+            });
+            throw new DomainException({
+                message: "user's email or login must be uniq",
+                code: DomainExceptionCode.ValidationError,
+                extension: errors,
+            });
         }
-        await this.authRepository.save(foundUser)
-        return ;
+
+        const passwordHash: string = await this.passwordHashService.createHash(
+            inputUserDto.password,
+            this.userConfig.saltRound,
+        );
+        return this.UserModel.createInstance({
+            ...inputUserDto,
+            password: passwordHash,
+        });
+    };
+
+    async confirmationEmail(code: string): Promise<void> {
+        const foundUser: UserDocument | null
+            = await this.authRepository.findByConfirmCode(code);
+
+        if (!foundUser || !foundUser.confirmationEmail(code))
+            throw new DomainException({
+                message: "the confirmation code is incorrect, expired or already been applied",
+                code: DomainExceptionCode.EmailNotConfirmed,
+                extension: [{message: "the confirmation code is incorrect, expired or already been applied",
+                            field: "code"}]
+            });
+        await this.authRepository.save(foundUser);
+        return;
     }
 
     async reSendEmail(email: string): Promise<void> {
-        // for a user with an unconfirmed email,
+        // for users with unconfirmed emails,
         // sends a letter with a new confirmation code
 
-        let userWithOutMail: UserDocument | null = await this.authRepository.foundUserWithOutEmail(email)
+        let userWithoutEmail: UserDocument | null =
+            await this.authRepository.foundUserWithOutEmail(email);
 
-        if(!userWithOutMail) {
-            throw new BadRequestException("user with not verifed email not found")
+        if (userWithoutEmail) {
+            const code: string | null = userWithoutEmail.createConfirmCode(
+                this.userConfig.timeLifeEmailCode);
+                this.mailService.createConfirmEmail(email, code!);
+                await this.authRepository.save(userWithoutEmail);
         }
-        const code: string | null = userWithOutMail.createConfirmCode(this.userConfig.timeLifeEmailCode);
-
-        await this.mailService.createConfirmEmail(email, code!)
-
-        await this.authRepository.save(userWithOutMail);
         return;
+        // Even if the current email address is not registered or corfirmed,
+        // do not throw an error (to prevent detection of the user's email address)
+
     }
 
     async askNewPassword(email: string): Promise<void> {
@@ -109,41 +159,65 @@ export class AuthService {
         // Generates a new recovery code and sends it via email without deleting the previous ones.
         // Delete the old codes ONLY after any of the codes are triggered.
 
-        let foundedUser: string | null = await this.authRepository.foundUserIdByEmail(email)
-        if(!foundedUser) {
-            throw new BadRequestException("user with not verifed email not found")
-        }
+        let foundedUser: string | null =
+            await this.authRepository.foundUserIdByEmail(email);
+        if (!foundedUser)
+            return;
+        // Even if the current email address is not registered,
+        // do not throw an error (to prevent detection of the user's email address)
 
-        const newPassword: NewPasswordDocument = this.NewPasswordModel.createInstance(foundedUser, this.userConfig.timeLifeEmailCode);
+        const newPassword: NewPasswordDocument =
+            this.NewPasswordModel.createInstance(
+                foundedUser,
+                this.userConfig.timeLifeEmailCode,
+            );
         await this.authRepository.save(newPassword);
 
-        await this.mailService.createPasswordRecovery(email, newPassword.code)
+        await this.mailService.createPasswordRecovery(email, newPassword.code);
 
         return;
     }
 
-    async setNewPassword(newPassword: string, recoveryCode: string):Promise<void> {
+    async setNewPassword(recoveryPassword: NewPasswordInputDto): Promise<void> {
         // Sets a new password if a valid recovery code was received
 
-        const newPasswordObj:NewPasswordDocument|null
-            = await this.authRepository.findPasswordRecovery(recoveryCode)
+        const newPasswordObj: NewPasswordDocument | null =
+            await this.authRepository.findPasswordRecovery(recoveryPassword.recoveryCode);
 
-        if(!newPasswordObj || isBefore(newPasswordObj.expirationTime, new Date())){
-            throw new BadRequestException("a valid recovery code wasn't received")
-        }
+        if (!newPasswordObj)
+            throw new DomainException({
+                message: "a valid recovery code wasn't received",
+                code: DomainExceptionCode.PasswordRecoveryCodeNotFound,
+                extension: [{message: "a valid recovery code wasn't received",
+                            field: "recoveryCode"}]
+            });
+        if (isBefore(newPasswordObj.expirationTime, new Date()))
+            throw new DomainException({
+                message: "a recovery code expired",
+                code: DomainExceptionCode.PasswordRecoveryCodeExpired,
+                extension: [{message: "a recovery code expired",
+                            field: "recoveryCode"}]
+            });
 
-        const hash: string = await this.passwordHashService.createHash(newPassword, this.userConfig.saltRound);
-        const user: UserDocument = await this.userRepository.findById(newPasswordObj.id) as UserDocument;
+        const hash: string = await this.passwordHashService.createHash(
+            recoveryPassword.newPassword,
+            this.userConfig.saltRound,
+        );
+        const user: UserDocument = (await this.userRepository.findById(
+            newPasswordObj.id,
+        )) as UserDocument;
         user.passwordHash = hash;
         await this.authRepository.save(user);
 
-        await this.authRepository.deletePasswordRecovery(newPasswordObj.userId)
+        await this.authRepository.deleteUsedPasswordRecovery(newPasswordObj.userId);
 
         return;
     }
 
     async aboutMe(userId: string): Promise<UserAboutViewDto> {
-        const user = await this.userRepository.findById(userId) as UserDocument;
+        const user = (await this.userRepository.findById(
+            userId,
+        )) as UserDocument;
         const userView = UserAboutViewDto.mapToView(user);
         return userView;
     }

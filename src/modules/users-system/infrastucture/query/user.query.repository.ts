@@ -5,6 +5,8 @@ import { FilterQuery, Types } from 'mongoose';
 import { UserViewDto } from '../../dto/view/user.view.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../../dto/input/get.user.query.params.input.dto';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @Injectable()
 export class UserQueryRepository {
@@ -18,7 +20,9 @@ export class UserQueryRepository {
 
         const userView: UserViewDto|null = await this.findByIdWitoutCheck(id);
         if(!userView){
-            throw new NotFoundException('user not found');
+            throw new DomainException({
+                message: 'user not found',
+                code: DomainExceptionCode.NotFound});
         }
         return userView;
     }

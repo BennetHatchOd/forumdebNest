@@ -6,19 +6,18 @@ import { FilterQuery, Types } from 'mongoose';
 import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
 import { Rating } from '../../../../core/Rating.enum';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @Injectable()
 export class PostQueryRepository {
-    // constructor(private likeService: LikeService) {}
     constructor(
+    // private likeService: LikeService,
         @InjectModel(Post.name) private PostModel: PostModelType,
     ){}
 
     async  findByIdWithCheck(id: string, userId: string|null = null): Promise<PostViewDto> {
         // если пост не найден, выкидываем ошибку 404 в репозитории
-
-        if (!Types.ObjectId.isValid(id))
-            throw new NotFoundException('post not found');
 
         const searchItem: PostDocument | null
             = await this.PostModel.findOne({
@@ -26,7 +25,9 @@ export class PostQueryRepository {
                                             deletedAt: null
                                         });
         if(!searchItem)
-            throw new NotFoundException('post not found');
+            throw new DomainException({
+                message: 'post not found',
+                code: DomainExceptionCode.NotFound});
 
         // если юзер не авторизирован, то статус лайка отсутствует
         let likeStatus: Rating = Rating.None

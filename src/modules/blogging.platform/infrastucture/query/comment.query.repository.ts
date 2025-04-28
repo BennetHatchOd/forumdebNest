@@ -6,6 +6,8 @@ import { CommentViewDto } from '../../dto/view/comment.view.dto';
 import { Rating } from '../../../../core/Rating.enum';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
 import { GetCommentQueryParams } from '../../dto/input/get.comment.query.params.input.dto';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @Injectable()
 export class CommentQueryRepository {
@@ -18,7 +20,9 @@ export class CommentQueryRepository {
         // returns a comment by id, if comment isn't found throws an exception
 
         if (!Types.ObjectId.isValid(id))
-            throw new NotFoundException('comment not found');
+            throw new DomainException({
+                message: 'comment not found',
+                code: DomainExceptionCode.NotFound});
         
         const searchItem: CommentDocument | null
             = await this.CommentModel.findOne({
@@ -26,7 +30,9 @@ export class CommentQueryRepository {
                                                 deletedAt: null,
                                             });
         if(!searchItem)
-            throw new NotFoundException('comment not found');
+            throw new DomainException({
+                message: 'comment not found',
+                code: DomainExceptionCode.NotFound});
 
         let likeStatus: Rating = Rating.None
         if(userId){

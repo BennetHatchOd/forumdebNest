@@ -5,6 +5,8 @@ import { FilterQuery, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @Injectable()
 export class BlogQueryRepository {
@@ -15,14 +17,18 @@ export class BlogQueryRepository {
     
     async  findByIdWithCheck(id: string): Promise<BlogViewDto> {
         if (!Types.ObjectId.isValid(id)) 
-            throw new NotFoundException('blog not found');
-        
+            throw new DomainException({
+                message: 'blog not found',
+                code: DomainExceptionCode.NotFound});
+
         const searchItem: BlogDocument | null = await this.BlogModel.findOne({
                                                     _id: new Types.ObjectId(id),
                                                     deletedAt: null
                                                 });
         if(!searchItem)
-            throw new NotFoundException('blog not found');
+            throw new DomainException({
+                message: 'blog not found',
+                code: DomainExceptionCode.NotFound});
 
         return BlogViewDto.mapToView(searchItem);
     }

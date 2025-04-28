@@ -4,6 +4,8 @@ import { PostRepository } from '../infrastucture/post.repository';
 import { Post, PostDocument, PostModelType } from '../domain/post.entity';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @Injectable()
 export class PostService {
@@ -26,7 +28,9 @@ export class PostService {
         const post: PostDocument | null = await this.postRepository.findById(id);
 
         if (!post)
-            throw new NotFoundException(`post with ${id} not found`);
+            throw new DomainException({
+                message: 'post with ${id} not found',
+                code: DomainExceptionCode.NotFound});
         const blogName
             = (await this.blogQueryRepository.findByIdWithCheck(editData.blogId)).name
         post.update(editData, blogName);
@@ -38,7 +42,9 @@ export class PostService {
         const post: PostDocument | null = await this.postRepository.findById(id);
 
         if (!post)
-            throw new NotFoundException(`post with id-${id} not found`);
+            throw new DomainException({
+                message: 'post with id-${id} not found',
+                code: DomainExceptionCode.NotFound});
         post.delete();
         this.postRepository.save(post);
         return;
