@@ -7,19 +7,19 @@ import { UserQueryRepository } from './infrastucture/query/user.query.repository
 import { UserRepository } from './infrastucture/user.repository';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from '../../core/strategy/local.strategy';
+import { LocalStrategy } from '@src/core/strategy/local.strategy';
 import { PasswordHashService } from './application/password.hash.service';
 import { AuthService } from './application/auth.service';
 import { AuthRepository } from './infrastucture/auth.repository';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { JwtStrategy } from '../../core/strategy/jwt.strategy';
-import { myBasicStrategy } from '../../core/strategy/basic.strategy';
+import { JwtService } from '@nestjs/jwt';
+import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
+import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
 import { NewPassword, NewPasswordSchema } from './domain/new.password';
-import { TokenService } from './application/token.service';
 import { UserConfig } from './config/user.config';
 import { MailService } from '../notifications/application/mail.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
 import { ConfigService } from '@nestjs/config';
+import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 
 @Module({
     imports: [
@@ -28,7 +28,6 @@ import { ConfigService } from '@nestjs/config';
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
         PassportModule,
-        JwtModule.register({}),
     ],
     controllers: [
         UserControllers,
@@ -44,12 +43,30 @@ import { ConfigService } from '@nestjs/config';
         AuthRepository,
         PasswordHashService,
         MailService,
-        TokenService,
         LocalStrategy,
         JwtStrategy,
         myBasicStrategy,
-        JwtService,
         ConfigService,
+        {
+            provide: INJECT_TOKEN.ACCESS_TOKEN,
+            useFactory: (userConfig: UserConfig): JwtService => {
+                return new JwtService({
+                    secret: userConfig.accessTokenSecret,
+                    signOptions: { expiresIn: userConfig.timeLifeAccessToken },
+                });
+            },
+            inject: [UserConfig],
+        },
+        {
+            provide: INJECT_TOKEN.REFRESH_TOKEN,
+            useFactory: (userConfig:UserConfig): JwtService => {
+                return new JwtService({
+                    secret: userConfig.refreshTokenSecret,
+                    signOptions: { expiresIn: userConfig.timeLifeRefreshToken },
+                });
+            },
+            inject: [UserConfig],
+        },
     ],
     exports:[
         UserQueryExternalRepository,

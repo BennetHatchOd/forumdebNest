@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
 import {v4 as uuidv4} from 'uuid';
@@ -10,15 +10,19 @@ import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '../domai
 import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { MailService } from '../../notifications/application/mail.service';
-import { TokenService } from './token.service';
 import { UserConfig } from '../config/user.config';
+import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
+        @Inject(INJECT_TOKEN.ACCESS_TOKEN)
+        private readonly accessJwtService: JwtService,
+        @Inject(INJECT_TOKEN.REFRESH_TOKEN)
+        private readonly refreshJwtService: JwtService,
         private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
-        private readonly tokenService: TokenService,
         private readonly passwordHashService: PasswordHashService,
         private readonly mailService: MailService,
         private readonly userConfig: UserConfig,
@@ -27,7 +31,7 @@ export class AuthService {
     ) {}
 
     async authorization(userId: string) {
-        return this.tokenService.createAccessToken(userId)
+        return this.accessJwtService.sign({user: userId})
     }
 
     async validateUserForLocalAuth(loginOrEmail: string, passHash: string):Promise<string|null> {
