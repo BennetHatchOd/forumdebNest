@@ -18,17 +18,12 @@ import { CreateCommentDto } from '@src/modules/blogging.platform/dto/create.comm
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы, при этом тестируя
     // базовые ендпоинты по созданию сущностей системы: blog, post, comment, user
-    users: UserInputDto[] = [];
     accessTokens: string[] = [];
-    // badUser: UserInputDto;
-    // titleDevices: string[];
-    comments: CommentInputDto[] = [];
-    blogs: BlogInputDto[] = [];
-    blogIds: string[] = [];
-    postIds: string[] = [];
-    commentIds: string[] = [];
-    posts: PostInputDto[] = [];
-    authLoginPassword: string = '';// = "Basic YWRtaW46cXdlcnR5";
+    users: UserDocument[] = [];
+    comments: CommentDocument[] = [];
+    blogs: BlogDocument[] = [];
+    posts: PostDocument[] = [];
+    authLoginPassword: string = '';
 
     constructor(private app:INestApplication,
                 @InjectModel(Blog.name)private BlogModel: BlogModelType,
@@ -47,28 +42,27 @@ export class TestDataBuilderByDb {
             const blog = {name: `Blog_${i}`,
                             description: `description for blog ${i}`,
                             websiteUrl:	`https://dff${i}.com`  }
-            this.blogs.push(blog);
             const newBlog: BlogDocument = this.BlogModel.createInstance(blog);
             await newBlog.save()
-            this.blogIds.push(newBlog._id.toString());
+            this.blogs.push(newBlog);
         }
     }
 
     async createManyPosts(){
         // create many posts for blog with id in this.blogIds[0]
 
+        await this.createManyBlogs();
         for(let i = 0; i < this.numberPosts; i++){
             const post ={
                 title: `post ${i}`,
                 shortDescription: `shortdescription for post ${i}`,
                 content: `content for post ${i}`,
-                blogId: this.blogIds[0]
+                blogId: this.blogs[0]._id.toString(),
             };
-            this.posts.push(post);
-            const postCreate: PostDocument
+            const newPost: PostDocument
                 = await this.PostModel.createInstance(post, this.blogs[0].name);
-            await postCreate.save();
-            this.postIds.push(postCreate._id.toString());
+            await newPost.save();
+            this.posts.push(newPost);
         }
     }
 
@@ -80,41 +74,34 @@ export class TestDataBuilderByDb {
                 email: `gh2_${i}@test.com`,
                 password: `paSSword_${i}`
             }
-            this.users.push(user);
-            const createUser: UserDocument = await this.UserModel.createInstance(user);
-            await createUser.save();
+            const newUser: UserDocument = await this.UserModel.createInstance(user);
+            await newUser.save();
+            this.users.push(newUser);
 
-            const token = await request(this.app.getHttpServer())
-                .post(`${URL_PATH.auth}${AUTH_PATH.login}`)
-                .send({
-                    "loginOrEmail": this.users[i].login,
-                    "password":     this.users[i].password
-                })
-            expect(token.body).toHaveProperty("accessToken");
-            expect(typeof token.body.accessToken).toBe('string');
-
-            this.accessTokens.push(token.body.accessToken)
+            // const token = await request(this.app.getHttpServer())
+            //     .post(`${URL_PATH.auth}${AUTH_PATH.login}`)
+            //     .send({
+            //         "loginOrEmail": this.users[i].login,
+            //         "password":     this.users[i].password
+            //     })
+            // expect(token.body).toHaveProperty("accessToken");
+            // expect(typeof token.body.accessToken).toBe('string');
+            //
+            // this.accessTokens.push(token.body.accessToken)
         }}
 
-
     async createManyComment(){
+        await this.createManyPosts();
+        await this.createManyUsers();
         for(let i =0; i < this.numberComments; i++){
-            const commentDto: CreateCommentDto =
+            const comment: CreateCommentDto =
                 {content: `This is the comment number ${i}`,
-                 postId: ,
-                 userId: this.user,
-                 login: };
-            this.comments.push(comment)
-            const commentCreate: CommentDocument = await this.CommentModel.createInstance(comment)
-
-
-
-                request(this.app.getHttpServer())
-                .post(s)
-                .set("Authorization", 'Bearer ' + this.accessTokens[0])
-                .send(this.comments[i])
-            //.expect(HttpStatus.CREATED);
-            this.commentIds.push(commentCreate.body.id)
+                 postId: this.posts[0]._id.toString(),
+                 userId: this.users[0]._id.toString(),
+                 login: this.users[0].login};
+            const newComment: CommentDocument = await this.CommentModel.createInstance(comment)
+            await newComment.save();
+            this.comments.push(newComment)
         }
     }
 
