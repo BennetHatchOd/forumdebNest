@@ -8,6 +8,6 @@ export function appSetup(app: INestApplication, isSwaggerEnable: boolean, global
     pipesSetup(app);
     app.setGlobalPrefix(globalPrefix);
     swaggerSetup(app, isSwaggerEnable, globalPrefix);
-
+    app.enableCors();
     app.useGlobalFilters(new DomainExceptionFilter(), new HttpExceptionFilter());
 }
