@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Query,
+    UseGuards,
+} from '@nestjs/common';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
@@ -13,6 +25,7 @@ import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
 import { CommentInputDto } from '../dto/input/comment.input.dto';
 import { CommentService } from '../application/comment.service';
 import { CurrentUserId } from '../../../core/decorators/current.user';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller(URL_PATH.posts)
 export class PostController {
@@ -94,6 +107,7 @@ export class PostController {
     }
 
     @Post(':id/comments')
+    @UseGuards(AuthGuard('jwt'))
     async createCommentByPost(
         @CurrentUserId() currentUserId: string,
         @Param('id') postId: IdInputDto,
@@ -105,7 +119,7 @@ export class PostController {
         await this.postQueryRepository.findByIdWithCheck(postId.id)
         // check the existence of the post
 
-        const createdComment: string = await this.commentService.create(postId.id, comment, currentUserId);
+        const createdComment: string = await this.commentService.create(postId.id, comment, "currentUserId");
         return this.commentQueryRepository.findByIdWithCheck(createdComment);
 
     }

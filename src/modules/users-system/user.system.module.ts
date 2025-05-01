@@ -11,7 +11,7 @@ import { LocalStrategy } from '@src/core/strategy/local.strategy';
 import { PasswordHashService } from './application/password.hash.service';
 import { AuthService } from './application/auth.service';
 import { AuthRepository } from './infrastucture/auth.repository';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
 import { NewPassword, NewPasswordSchema } from './domain/new.password';
@@ -27,6 +27,7 @@ import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
             { name: User.name, schema: UserSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
+        JwtModule,
         PassportModule,
     ],
     controllers: [

@@ -7,8 +7,8 @@ import { BloggingPlatformModule } from './modules/blogging.platform/blogging.pla
 import { UserSystemModule } from './modules/users-system/user.system.module';
 import { TestingModule } from './modules/testing/testing.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
-import { CoreModule } from './core/core.module';
-import { CoreConfig } from './core/core.config';
+import { CoreModule } from '@core/core.module';
+import { CoreConfig } from '@core/core.config';
 
 @Module({
     imports: [
