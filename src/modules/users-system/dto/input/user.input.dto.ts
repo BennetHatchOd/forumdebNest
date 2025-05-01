@@ -11,6 +11,6 @@ export class UserInputDto {
     email: string;
 
     @IsString()
-    @Length(UserFieldRestrict.passwordMax, UserFieldRestrict.passwordMax)
+    @Length(UserFieldRestrict.passwordMin, UserFieldRestrict.passwordMax)
     password:  string;
 }
