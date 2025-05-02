@@ -9,17 +9,16 @@ import {
     Post,
     Query,
     UseGuards,
-    ValidationPipe,
 } from '@nestjs/common';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
 import { UserService } from '../application/user.service';
 import { UserQueryRepository } from '../infrastucture/query/user.query.repository';
-import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
+import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../dto/input/get.user.query.params.input.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { URL_PATH } from '../../../core/url.path.setting';
-import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
+import { URL_PATH } from '@core/url.path.setting';
+import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard('basic'))
