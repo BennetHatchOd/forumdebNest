@@ -24,19 +24,26 @@ export class TestDataBuilderByDb {
     blogs: BlogDocument[] = [];
     posts: PostDocument[] = [];
     authLoginPassword: string = '';
+    private isCreate = {
+        blog: false,
+        post: false,
+        comment: false,
+        user: false,
+    }
 
     constructor(private app:INestApplication,
                 @InjectModel(Blog.name)private BlogModel: BlogModelType,
                 @InjectModel(Post.name)private PostModel: PostModelType,
                 @InjectModel(Comment.name)private CommentModel: CommentModelType,
                 @InjectModel(User.name)private UserModel: UserModelType,
-                readonly numberUsers : number = 1,
-                readonly numberBlogs: number = 1,
-                readonly numberPosts : number = 1,
-                readonly numberComments : number = 1,
+                public numberUsers : number = 1,
+                public numberBlogs: number = 1,
+                public numberPosts : number = 1,
+                public numberComments : number = 1,
     ) {}
 
     async createManyBlogs() {
+        this.isCreate.blog = true;
 
         for (let i = 0; i < this.numberBlogs; i++) {
             const blog = {name: `Blog_${i}`,
@@ -50,8 +57,9 @@ export class TestDataBuilderByDb {
 
     async createManyPosts(){
         // create many posts for blog with id in this.blogIds[0]
+        await this.checkBlog();
+        this.isCreate.post = true;
 
-        await this.createManyBlogs();
         for(let i = 0; i < this.numberPosts; i++){
             const post ={
                 title: `post ${i}`,
@@ -67,7 +75,7 @@ export class TestDataBuilderByDb {
     }
 
     async createManyUsers(){
-
+        this.isCreate.user = true;
         for(let i =0; i < this.numberUsers; i++){
             const user = {
                 login: `lhfg_${i}`,
@@ -91,8 +99,10 @@ export class TestDataBuilderByDb {
         }}
 
     async createManyComment(){
-        await this.createManyPosts();
-        await this.createManyUsers();
+        this.isCreate.comment = true;
+        await this.checkPost()
+        await this.checkUser();
+
         for(let i =0; i < this.numberComments; i++){
             const comment: CreateCommentDto =
                 {content: `This is the comment number ${i}`,
@@ -134,14 +144,25 @@ export class TestDataBuilderByDb {
             numberUsers, numberBlogs, numberPosts, numberComments);
         testData.authLoginPassword = AuthBasic.createAuthHeader(userConfig)
 
-        await testData.createManyBlogs();
-        // создаем блоги и сохраняем их ИД в массив
-        await testData.createManyPosts();
-        // создаем посты для 0 блога и сохраняем их ИД в массив
-        await testData.createManyUsers();
-        // создаем юзеров и сохраняем в массив для каждого из них аксесс токен
-        await testData.createManyComment();
-        // создаем комменты для 0 поста и сохраняем их ИД в массив
         return testData;
+    }
+
+    private async checkBlog(){
+        if (!this.isCreate.blog) {
+            await this.createManyBlogs();
+            this.isCreate.blog = true;
+        }
+    }
+    private async checkPost(){
+        if(this.isCreate.post){
+            await this.createManyPosts();
+            this.isCreate.post = true;
+        }
+    }
+    private async checkUser(){
+        if(this.isCreate.user) {
+            await this.createManyUsers();
+            this.isCreate.user = true;
+        }
     }
 }
