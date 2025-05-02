@@ -50,20 +50,17 @@ export const initSettings = async (
     const httpServer = app.getHttpServer();
     await deleteAllData(app, coreConfig.globalPrefix);
     
-    // const blogModel = app.get<BlogModelType>(getModelToken(Blog.name));
-    // const postModel = app.get<PostModelType>(getModelToken(Post.name));
-    // const commentModel = app.get<CommentModelType>(getModelToken(Comment.name));
-    // const userModel = app.get<UserModelType>(getModelToken(User.name));
-    // const testData = await TestDataBuilderByDb.createTestData(app,
-    //                                                                     userConfig,
-    //                                                                     blogModel,
-    //                                                                     postModel,
-    //                                                                     commentModel,
-    //                                                                     userModel,
-    //                                                                     );
-
-    const testData
-        = await TestDataBuilder.createTestData(app, userConfig,8, 2, 4, 8)
+    const blogModel = app.get<BlogModelType>(getModelToken(Blog.name));
+    const postModel = app.get<PostModelType>(getModelToken(Post.name));
+    const commentModel = app.get<CommentModelType>(getModelToken(Comment.name));
+    const userModel = app.get<UserModelType>(getModelToken(User.name));
+    const testData = await TestDataBuilderByDb.createTestData(app,
+                                                                        userConfig,
+                                                                        blogModel,
+                                                                        postModel,
+                                                                        commentModel,
+                                                                        userModel,
+                                                                        );
 
     return {
         app,

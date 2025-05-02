@@ -1,16 +1,16 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { Connection } from 'mongoose';
-import { TestDataBuilder } from '../helper/test.data.builder';
 import { URL_PATH } from '@core/url.path.setting';
-// @ts-ignore
 import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
+import * as console from 'node:console';
+import { join } from 'path';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
     let connection: Connection;
-    let testData: TestDataBuilder;
+    let testData: TestDataBuilderByDb;
     // let testData: TestDataBuilerByDb;
 
     beforeAll(async () => {
@@ -31,6 +31,8 @@ describe('UserAppController (e2e)', () => {
         app = result.app;
         connection = result.databaseConnection;
         testData = result.testData;
+        testData.numberUsers = 8;
+        await testData.createManyUsers();
     //});
     });
 
@@ -38,9 +40,19 @@ describe('UserAppController (e2e)', () => {
         await app.close();
     });
 
-    describe('Testing api/users GET', () => {
-        it('/(GET) Get all users. Should return 200 status and paginator', async () => {
+    describe('Testing api/users GET, POST, DELETE', () => {
+        const newUser = {
+            login: 'iouiu',
+            email: 'hjuhPTK@fhjuh.com',
+            password: 'gtghhTgg'};
+        const newUser2 = {
+            login: 'tydjh',
+            email: 'hjuhpPTK@hjuh.com',
+            password: 'gtghhTgg'};
+        let id1: string;
+        let id2: string;
 
+        it('/(GET) Get all users. Should return 200 status and paginator', async () => {
             const response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -55,12 +67,35 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it("/(GET) Get users by search string. Should return 200 status and paginator", async () => {
+        it('/(POST) Create new users. Should return 201 status and created object', async () => {
+            let response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send(newUser)
+                .expect(HttpStatus.CREATED)
 
-            const response = await request(app.getHttpServer())
+            expect(response.body).toEqual({
+                login: newUser.login,
+                email: newUser.email,
+                id:     expect.any(String),
+                createdAt: expect.any(String),
+            });
+            id1 = response.body.id;
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send(newUser2)
+                .expect(HttpStatus.CREATED)
+            id2 = response.body.id;
+        });
+
+        it("/(GET) Get created users by search string of login and Email. " +
+            "Should return 200 status and paginator", async () => {
+            let response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
-                .query({searchLoginTerm: '_1'})
+                .query({searchLoginTerm: 'io'})
                 .expect(HttpStatus.OK)
 
             expect(response.body).toEqual({
@@ -69,34 +104,66 @@ describe('UserAppController (e2e)', () => {
                 pageSize: 10,
                 totalCount: 1,
                 items: [{
-                    login: 'lhfg_1',
-                    email: 'gh2_1@test.com',
+                    login: newUser.login,
+                    email: newUser.email,
                     id:     expect.any(String),
                     createdAt: expect.any(String),
                 }]
             });
-        });
 
-    })
-
-    describe('Testing api/users POST', () => {
-        it('/(POST) Create new user. Should return 201 status and created object', async () => {
-
-            const response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+            response = await request(app.getHttpServer())
+                .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
-                .send({ login: 'iouiu',
-                        email: 'hjuh@hjuh.com',
-                        password: 'gtghhTgg'})
-                .expect(HttpStatus.CREATED)
+                .query({searchEmailTerm: 'pTk', sortDirection: 'asc'})
+                .expect(HttpStatus.OK)
 
             expect(response.body).toEqual({
-                login: 'iouiu',
-                email: 'hjuh@hjuh.com',
-                id:     expect.any(String),
-                createdAt: expect.any(String),
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 2,
+                items: [{
+                    login: newUser.login,
+                    email: newUser.email,
+                    id:     expect.any(String),
+                    createdAt: expect.any(String)},
+                    {login: newUser2.login,
+                    email: newUser2.email,
+                    id:     expect.any(String),
+                    createdAt: expect.any(String)}
+                ]
             });
         });
+
+        it('/(DELETE) Delete new users. Should return 204 status', async () => {
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, id1))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.NO_CONTENT)
+
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, id2))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.NO_CONTENT)
+        })
+
+        it('/(GET) Get all users. Should return 200 status and paginator', async () => {
+            const response = await request(app.getHttpServer())
+                .get(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.OK)
+
+            expect(response.body).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: testData.numberUsers,
+                items: expect.any(Array)
+            });
+        });
+    })
+
+    describe('Testing api/users GET, POST, DELETE with mistakes', () => {
 
         it("/(POST) attempt to create new user with validation error.\n" +
             "\n Should return 400 status and array of mistakes", async () => {
@@ -118,16 +185,40 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it("/(POST) attempt to create new user with authorization error.\n" +
+        it("/(POST, GET, DELETE) attempt to access endpoint user with authorization error.\n" +
             "\n Should return 404 status", async () => {
 
-            const response = await request(app.getHttpServer())
+            await request(app.getHttpServer())
                 .post(URL_PATH.users)
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .send({ login: 'hj',
                     email: 'hjuh@hjuh.com',
                     password: 'gtghhTgg6ytghujikutghikkk'})
                 .expect(HttpStatus.UNAUTHORIZED)
+            await request(app.getHttpServer())
+                .get(URL_PATH.users)
+                .expect(HttpStatus.UNAUTHORIZED)
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .set("Authorization", "Bearer FGRFdfsfdf")
+                .expect(HttpStatus.UNAUTHORIZED)
+        });
+        it("/(DELETE) attempt to delete fake user.\n" +
+            "\n Should return 404 status", async () => {
+
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.NOT_FOUND)
+        });
+
+        it("/(DELETE) attempt to delete user by fake, not valide id.\n" +
+            "\n Should return 400 status", async () => {
+
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '681896da2168245826d049'))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.BAD_REQUEST)
         });
 
     })
