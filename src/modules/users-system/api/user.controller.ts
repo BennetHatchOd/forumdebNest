@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    Query,
+    UseGuards,
+    ValidationPipe,
+} from '@nestjs/common';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
 import { UserService } from '../application/user.service';
@@ -39,11 +51,15 @@ export class UserControllers {
 
     }
 
+    // @Delete(':id')
+    // @HttpCode(HttpStatus.NO_CONTENT)
+    // async deleteUser(@Param('id') inputId: IdInputDto): Promise<void>{
+    //
+    //     return await this.userService.delete(inputId.id)
+    // }
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteUser(@Param('id') inputId: IdInputDto): Promise<void>{
-
-        return await this.userService.delete(inputId.id)
+    async deleteUser(@Param() { id }: IdInputDto): Promise<void>{
+        return await this.userService.delete(id)
     }
-
 }
