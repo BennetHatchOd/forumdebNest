@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MailService } from './application/mail.service';
+import { EmailService } from './application/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
@@ -18,8 +18,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
       },
     }),
   ],
-  providers: [MailService],
-  exports: [MailService], // 👈 export for DI
+  providers: [EmailService],
+  exports: [EmailService], // 👈 export for DI
 })
 export class NotificationsModule {}
 
