@@ -1,13 +1,6 @@
-import { UserInputDto } from '@src/modules/users-system/dto/input/user.input.dto';
-import { CommentInputDto } from '@src/modules/blogging.platform/dto/input/comment.input.dto';
-import { BlogInputDto } from '@src/modules/blogging.platform/dto/input/blog.input.dto';
-import { PostInputDto } from '@src/modules/blogging.platform/dto/input/post.input.dto';
-import request from 'supertest';
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { AUTH_PATH, URL_PATH } from '@src/core/url.path.setting';
+import { INestApplication } from '@nestjs/common';
 import { AuthBasic } from './auth.basic';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
-import * as console from 'node:console';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModelType } from '@src/modules/blogging.platform/domain/blog.entity';
 import { Post, PostDocument, PostModelType } from '@src/modules/blogging.platform/domain/post.entity';
