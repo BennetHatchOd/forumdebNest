@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { Connection } from 'mongoose';
-import { URL_PATH } from '@core/url.path.setting';
+import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
 import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
@@ -53,6 +53,7 @@ describe('UserAppController (e2e)', () => {
         let id2: string;
 
         beforeAll(async () => {
+            testData.clearData();
             testData.numberUsers = 8;
             await testData.createManyUsers();
         })
@@ -171,7 +172,15 @@ describe('UserAppController (e2e)', () => {
     })
 
     describe('Testing api/users with mistakes.', () => {
+        beforeAll(async () => {
+            testData.clearData();
+            testData.numberUsers = 2;
+            await testData.createManyUsers();
+        })
 
+        afterAll(async () => {
+            await deleteAllData(app, globalPrefix);
+        })
         it("should return 400 and an array of mistakes by attempt to create new " +
             "user with validation error", async () => {
 
@@ -192,7 +201,76 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it("should return 404 by attempt to access endpoint user with authorization error.", async () => {
+        it("should return 400 and an array of mistakes by attempt to create new " +
+            "user with exist login or email", async () => {
+            const  user = {
+                login: 'hjft',
+                email: 'hjyJ@hjuh.jhgp.com',
+                password: 'gt45hTgg6ytDFTkkk'}
+
+            await request(app.getHttpServer())
+                .post(join(URL_PATH.auth,AUTH_PATH.registration))
+                .send(user)
+                .expect(HttpStatus.NO_CONTENT)
+
+            let response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: testData.users[0].login,
+                    email: 'hjuh1@hjuh.com',
+                    password: 'gttghujikutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                message: expect.any(String),
+                field: "login"}]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: 'hjws5',
+                    email: testData.users[0].email,
+                    password: 'gtghhTgg6ytghujikk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                message: expect.any(String),
+                field: "email"}]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: user.login,
+                    email: 'hjuh4@hjuh.com',
+                    password: 'gtjikutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                message: expect.any(String),
+                field: "login"},]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: 'hjsd52',
+                    email: user.email,
+                    password: 'gtghhTkutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                message: expect.any(String),
+                field: "email"},]
+            });
+        });
+
+        it("should return 404 by attempt to access user's endpoint with authorization error.", async () => {
 
             await request(app.getHttpServer())
                 .post(URL_PATH.users)
