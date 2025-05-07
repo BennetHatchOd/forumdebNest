@@ -1,8 +1,8 @@
 
 import { BasicStrategy} from 'passport-http';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../../modules/users-system/application/auth.service';
+import { Injectable } from '@nestjs/common';
+import { AuthService } from '@src/modules/users-system/application/auth.service';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
