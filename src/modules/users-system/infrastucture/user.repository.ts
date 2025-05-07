@@ -29,7 +29,7 @@ export class UserRepository {
         if(existEmail > 0 || existLogin > 0) {
             const arrayErrors: Array<string> = []
             if(existEmail > 0)
-                arrayErrors.push('mail')
+                arrayErrors.push('email')
             if(existLogin > 0)
                 arrayErrors.push('login')
             return arrayErrors;
