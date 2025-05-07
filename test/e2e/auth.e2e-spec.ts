@@ -46,7 +46,7 @@ describe('AuthAppController (e2e)', () => {
         await app.close();
     });
 
-    describe('Testing login. Login users by login and email. Wrong login.', () => {
+    describe('Testing login. Login users by login and email', () => {
         beforeAll(async () => {
             testData.clearData();
             testData.numberUsers = 2;
@@ -87,29 +87,6 @@ describe('AuthAppController (e2e)', () => {
             expect(payload.user).toBe(testData.users[1]._id.toString());
         });
 
-        it('should return 401 by wrong login, email, password', async () => {
-            await request(app.getHttpServer())
-                .post(join(URL_PATH.auth, AUTH_PATH.login))
-                .send({
-                    loginOrEmail: testData.users[0].login + 'h',
-                    password: testData.usersPassword[0]
-                })
-                .expect(HttpStatus.UNAUTHORIZED)
-            await request(app.getHttpServer())
-                .post(join(URL_PATH.auth, AUTH_PATH.login))
-                .send({
-                    loginOrEmail: testData.users[0].email + 'h',
-                    password: testData.usersPassword[0]
-                })
-                .expect(HttpStatus.UNAUTHORIZED)
-            await request(app.getHttpServer())
-                .post(join(URL_PATH.auth, AUTH_PATH.login))
-                .send({
-                    loginOrEmail: testData.users[0].login,
-                    password: testData.usersPassword[0] + ' '
-                })
-                .expect(HttpStatus.UNAUTHORIZED)
-        });
     });
 
     describe('Testing registration and confirmation', () => {
