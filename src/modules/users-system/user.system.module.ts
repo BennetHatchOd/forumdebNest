@@ -16,7 +16,7 @@ import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
 import { NewPassword, NewPasswordSchema } from './domain/new.password';
 import { UserConfig } from './config/user.config';
-import { MailService } from '../notifications/application/mail.service';
+import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
 import { ConfigService } from '@nestjs/config';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
@@ -43,7 +43,7 @@ import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
         AuthService,
         AuthRepository,
         PasswordHashService,
-        MailService,
+        EmailService,
         LocalStrategy,
         JwtStrategy,
         myBasicStrategy,

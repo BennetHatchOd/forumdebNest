@@ -1,4 +1,3 @@
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '../domain/new.password';
