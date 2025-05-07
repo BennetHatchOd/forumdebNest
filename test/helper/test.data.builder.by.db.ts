@@ -14,12 +14,14 @@ import { Post, PostDocument, PostModelType } from '@src/modules/blogging.platfor
 import { Comment, CommentDocument, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
 import { User, UserDocument, UserModelType } from '@src/modules/users-system/domain/user.entity';
 import { CreateCommentDto } from '@src/modules/blogging.platform/dto/create.comment.dto';
+import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы, при этом тестируя
     // базовые ендпоинты по созданию сущностей системы: blog, post, comment, user
     accessTokens: string[] = [];
     users: UserDocument[] = [];
+    usersPassword: string[] = [];
     comments: CommentDocument[] = [];
     blogs: BlogDocument[] = [];
     posts: PostDocument[] = [];
@@ -36,6 +38,8 @@ export class TestDataBuilderByDb {
                 @InjectModel(Post.name)private PostModel: PostModelType,
                 @InjectModel(Comment.name)private CommentModel: CommentModelType,
                 @InjectModel(User.name)private UserModel: UserModelType,
+                public passwordHashService: PasswordHashService,
+                public userConfig: UserConfig,
                 public numberUsers : number = 1,
                 public numberBlogs: number = 1,
                 public numberPosts : number = 1,
@@ -82,7 +86,13 @@ export class TestDataBuilderByDb {
                 email: `gh2_${i}@test.com`,
                 password: `paSSword_${i}`
             }
+            this.usersPassword.push(user.password)
+            user.password = await this.passwordHashService.createHash(
+                user.password,
+                this.userConfig.saltRound,
+            );
             const newUser: UserDocument = await this.UserModel.createInstance(user);
+            newUser.isConfirmEmail = true;
             await newUser.save();
             this.users.push(newUser);
 
@@ -115,6 +125,20 @@ export class TestDataBuilderByDb {
         }
     }
 
+    clearData(){
+        this.users = [];
+        this.usersPassword = [];
+        this.comments = [];
+        this.blogs = [];
+        this.posts = [];
+        this.isCreate = {
+            blog: false,
+            post: false,
+            comment: false,
+            user: false,
+        }
+    }
+
     // createTitleDevices(){
     //     this.titleDevices = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
     // }
@@ -132,16 +156,10 @@ export class TestDataBuilderByDb {
                                 PostModel: PostModelType,
                                 CommentModel: CommentModelType,
                                 UserModel: UserModelType,
-                                numberUsers : number = 1,
-                                numberBlogs: number = 1,
-                                numberPosts : number = 1,
-                                numberComments : number = 1,
+                                passwordHashService: PasswordHashService,
     ):Promise<TestDataBuilderByDb>{
-        if(numberBlogs < 1 || numberUsers < 1 || numberPosts < 1 || numberComments < 1){
-            throw new Error("Invalid number of entity");
-        }
         const testData = new this(app, BlogModel, PostModel, CommentModel, UserModel,
-            numberUsers, numberBlogs, numberPosts, numberComments);
+            passwordHashService, userConfig);
         testData.authLoginPassword = AuthBasic.createAuthHeader(userConfig)
 
         return testData;
