@@ -6,7 +6,6 @@ import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
-import { CoreConfig } from '@core/core.config';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
