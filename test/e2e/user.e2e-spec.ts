@@ -4,14 +4,15 @@ import { Connection } from 'mongoose';
 import { URL_PATH } from '@core/url.path.setting';
 import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
-import * as console from 'node:console';
 import { join } from 'path';
+import { deleteAllData } from '../helper/delete.all.data';
+import { CoreConfig } from '@core/core.config';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
     let connection: Connection;
     let testData: TestDataBuilderByDb;
-    // let testData: TestDataBuilerByDb;
+    let globalPrefix;
 
     beforeAll(async () => {
         const result = await initSettings()
@@ -31,8 +32,7 @@ describe('UserAppController (e2e)', () => {
         app = result.app;
         connection = result.databaseConnection;
         testData = result.testData;
-        testData.numberUsers = 8;
-        await testData.createManyUsers();
+        globalPrefix = result.globalPrefix;
     //});
     });
 
@@ -40,7 +40,8 @@ describe('UserAppController (e2e)', () => {
         await app.close();
     });
 
-    describe('Testing api/users GET, POST, DELETE', () => {
+    describe('Testing api/users \n' +
+        'scenario: get -> create -> search -> delete -> get  ', () => {
         const newUser = {
             login: 'iouiu',
             email: 'hjuhPTK@fhjuh.com',
@@ -52,7 +53,15 @@ describe('UserAppController (e2e)', () => {
         let id1: string;
         let id2: string;
 
-        it('/(GET) Get all users. Should return 200 status and paginator', async () => {
+        beforeAll(async () => {
+            testData.numberUsers = 8;
+            await testData.createManyUsers();
+        })
+
+        afterAll(async () => {
+            await deleteAllData(app, globalPrefix);
+        })
+        it('should return 200 status and a paginator initially', async () => {
             const response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -67,7 +76,7 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it('/(POST) Create new users. Should return 201 status and created object', async () => {
+        it('should return 201 status and create new users', async () => {
             let response = await request(app.getHttpServer())
                 .post(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -90,8 +99,7 @@ describe('UserAppController (e2e)', () => {
             id2 = response.body.id;
         });
 
-        it("/(GET) Get created users by search string of login and Email. " +
-            "Should return 200 status and paginator", async () => {
+        it("should return users filtered by login/email search", async () => {
             let response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -135,7 +143,7 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it('/(DELETE) Delete new users. Should return 204 status', async () => {
+        it('should delete created users and return 204', async () => {
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, id1))
                 .set("Authorization", testData.authLoginPassword)
@@ -147,7 +155,7 @@ describe('UserAppController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
         })
 
-        it('/(GET) Get all users. Should return 200 status and paginator', async () => {
+        it('should return 200 status and a paginator initially', async () => {
             const response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -163,10 +171,10 @@ describe('UserAppController (e2e)', () => {
         });
     })
 
-    describe('Testing api/users GET, POST, DELETE with mistakes', () => {
+    describe('Testing api/users with mistakes.', () => {
 
-        it("/(POST) attempt to create new user with validation error.\n" +
-            "\n Should return 400 status and array of mistakes", async () => {
+        it("should return 400 and an array of mistakes by attempt to create new " +
+            "user with validation error", async () => {
 
             const response = await request(app.getHttpServer())
                 .post(URL_PATH.users)
@@ -185,8 +193,7 @@ describe('UserAppController (e2e)', () => {
             });
         });
 
-        it("/(POST, GET, DELETE) attempt to access endpoint user with authorization error.\n" +
-            "\n Should return 404 status", async () => {
+        it("should return 404 by attempt to access endpoint user with authorization error.", async () => {
 
             await request(app.getHttpServer())
                 .post(URL_PATH.users)
@@ -203,8 +210,7 @@ describe('UserAppController (e2e)', () => {
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .expect(HttpStatus.UNAUTHORIZED)
         });
-        it("/(DELETE) attempt to delete fake user.\n" +
-            "\n Should return 404 status", async () => {
+        it("should return 404 by attempt to delete fake user", async () => {
 
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
@@ -212,8 +218,7 @@ describe('UserAppController (e2e)', () => {
                 .expect(HttpStatus.NOT_FOUND)
         });
 
-        it("/(DELETE) attempt to delete user by fake, not valide id.\n" +
-            "\n Should return 400 status", async () => {
+        it("should return 400 by attempt to delete user by not valide id.", async () => {
 
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, '681896da2168245826d049'))
