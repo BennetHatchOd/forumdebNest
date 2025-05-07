@@ -21,7 +21,16 @@ export class UserService {
 
     async create(inputUserDto: UserInputDto): Promise<string> {
 
-        const newUser: UserDocument =await this.authService.checkUniq(inputUserDto);
+        await this.authService.checkUniq(inputUserDto);
+
+        const passwordHash: string = await this.passwordHashService.createHash(
+            inputUserDto.password,
+            this.userConfig.saltRound,
+        );
+        const newUser: UserDocument = this.UserModel.createInstance({
+            ...inputUserDto,
+            password: passwordHash,
+        });
 
         newUser.isConfirmEmail = true;
         // for directly created user no need to check email

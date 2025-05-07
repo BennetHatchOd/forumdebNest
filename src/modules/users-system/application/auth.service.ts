@@ -9,13 +9,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '../domain/new.password';
 import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
-import { MailService } from '../../notifications/application/mail.service';
+import { EmailService } from '../../notifications/application/email.service';
 import { UserConfig } from '../config/user.config';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { JwtService } from '@nestjs/jwt';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
+import * as console from 'node:console';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
         private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
         private readonly passwordHashService: PasswordHashService,
-        private readonly mailService: MailService,
+        private readonly mailService: EmailService,
         private readonly userConfig: UserConfig,
         @InjectModel(User.name) private UserModel: UserModelType,
         @InjectModel(NewPassword.name)
@@ -46,7 +47,7 @@ export class AuthService {
         // проверяет совпадение хеша пароля и
         // возвращает ид найденного пользователя
         const foundUser: { id: string; passHash: string } | null =
-            await this.authRepository.getPartUserByLoginEmail(loginOrEmail);
+            await this.userRepository.getPartUserByLoginEmail(loginOrEmail);
 
         if (
             foundUser !== null &&
@@ -73,7 +74,16 @@ export class AuthService {
     }
 
     async registrationUser(inputUserDto: UserInputDto): Promise<void> {
-        const createdUser: UserDocument = await this.checkUniq(inputUserDto);
+        await this.checkUniq(inputUserDto);
+
+        const passwordHash: string = await this.passwordHashService.createHash(
+            inputUserDto.password,
+            this.userConfig.saltRound,
+        );
+        const createdUser: UserDocument = this.UserModel.createInstance({
+            ...inputUserDto,
+            password: passwordHash,
+        });
 
         createdUser.confirmEmail = {
             code: uuidv4(),
@@ -86,12 +96,12 @@ export class AuthService {
             inputUserDto.email,
             createdUser.confirmEmail.code,
         );
-        await this.authRepository.save(createdUser);
+        await this.userRepository.save(createdUser);
         return;
     }
 
-    async checkUniq (inputUserDto: UserInputDto):Promise<UserDocument> {
-        const checkUniq: string[] | null = await this.authRepository.checkUniq(
+    async checkUniq (inputUserDto: UserInputDto):Promise<void> {
+        const checkUniq: string[] | null = await this.userRepository.checkUniq(
             inputUserDto.login,
             inputUserDto.email,
         );
@@ -110,19 +120,12 @@ export class AuthService {
             });
         }
 
-        const passwordHash: string = await this.passwordHashService.createHash(
-            inputUserDto.password,
-            this.userConfig.saltRound,
-        );
-        return this.UserModel.createInstance({
-            ...inputUserDto,
-            password: passwordHash,
-        });
+        return;
     };
 
     async confirmationEmail(code: string): Promise<void> {
         const foundUser: UserDocument | null
-            = await this.authRepository.findByConfirmCode(code);
+            = await this.userRepository.findByConfirmCode(code);
 
         if (!foundUser || !foundUser.confirmationEmail(code))
             throw new DomainException({
@@ -131,7 +134,7 @@ export class AuthService {
                 extension: [{message: "the confirmation code is incorrect, expired or already been applied",
                             field: "code"}]
             });
-        await this.authRepository.save(foundUser);
+        await this.userRepository.save(foundUser);
         return;
     }
 
@@ -140,13 +143,13 @@ export class AuthService {
         // sends a letter with a new confirmation code
 
         let userWithoutEmail: UserDocument | null =
-            await this.authRepository.foundUserWithOutEmail(email);
+            await this.userRepository.foundUserWithOutEmail(email);
 
         if (userWithoutEmail) {
             const code: string | null = userWithoutEmail.createConfirmCode(
                 this.userConfig.timeLifeEmailCode);
                 this.mailService.createConfirmEmail(email, code!);
-                await this.authRepository.save(userWithoutEmail);
+                await this.userRepository.save(userWithoutEmail);
         }
         return;
         // Even if the current email address is not registered or corfirmed,
@@ -160,7 +163,7 @@ export class AuthService {
         // Delete the old codes ONLY after any of the codes are triggered.
 
         let foundedUser: string | null =
-            await this.authRepository.foundUserIdByEmail(email);
+            await this.userRepository.foundUserIdByEmail(email);
         if (!foundedUser)
             return;
         // Even if the current email address is not registered,
@@ -204,10 +207,10 @@ export class AuthService {
             this.userConfig.saltRound,
         );
         const user: UserDocument = (await this.userRepository.findById(
-            newPasswordObj.id,
+            newPasswordObj.userId,
         )) as UserDocument;
         user.passwordHash = hash;
-        await this.authRepository.save(user);
+        await this.userRepository.save(user);
 
         await this.authRepository.deleteUsedPasswordRecovery(newPasswordObj.userId);
 
