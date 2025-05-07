@@ -15,6 +15,7 @@ export class AuthController {
     }
 
     @Post(AUTH_PATH.login)
+    @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
     async authorization(@CurrentUserId() userId: string):Promise<{accessToken: string}>{
 
@@ -60,14 +61,11 @@ export class AuthController {
 
     @Get(AUTH_PATH.aboutMe)
     @UseGuards(AuthGuard('jwt'))
-    async getMe(@CurrentUserId() userId: string)//: Promise<UserAboutViewDto>
+    async getMe(@CurrentUserId() user: string)//: Promise<UserAboutViewDto>
      {
-        return {"userId": 3};
-     }
-
-    //         const answer: UserAboutViewDto = await this.authService.aboutMe(userId)
-    //         return answer;
-    // }
+               const answer: UserAboutViewDto = await this.authService.aboutMe(user)
+            return answer;
+    }
 
     // @Get(AUTH_PATH.logout)
     // @UseGuards(AuthGuard(?))
