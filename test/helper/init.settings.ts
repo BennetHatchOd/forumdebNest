@@ -3,7 +3,6 @@ import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { Connection } from 'mongoose';
 import { initAppModule } from '@src/init.app.module';
 import { appSetup } from '@src/setup/app.setup';
-import { TestDataBuilder } from './test.data.builder';
 import { deleteAllData } from './delete.all.data';
 import { CoreConfig } from '@core/core.config';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
@@ -21,35 +20,41 @@ import {
     UserModelType,
 } from '@src/modules/users-system/domain/user.entity';
 import { TestDataBuilderByDb } from './test.data.builder.by.db';
+import { EmailService } from '@src/modules/notifications/application/email.service';
+import { EmailServiceMock } from '../mock/email.service.mock';
+import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 
 export const initSettings = async (
     //передаем callback, который получает ModuleBuilder, если хотим изменить настройку тестового модуля
     addSettingsToModuleBuilder?: (moduleBuilder: TestingModuleBuilder) => void,
 ) => {
     const DynamicAppModule = await initAppModule();
+    const emailServiceMock = new EmailServiceMock();
     const testingModuleBuilder: TestingModuleBuilder = Test.createTestingModule({
         imports: [DynamicAppModule],
-    })
-        // .overrideProvider(EmailService)
-        // .useClass(EmailServiceMock);
+        })
+        .overrideProvider(EmailService)
+        .useValue(emailServiceMock);
 
-    // if (addSettingsToModuleBuilder) {
-    //     addSettingsToModuleBuilder(testingModuleBuilder);
-    // }
+    if (addSettingsToModuleBuilder) {
+        addSettingsToModuleBuilder(testingModuleBuilder);
+    }
 
     const testingAppModule = await testingModuleBuilder.compile();
 
     const app = testingAppModule.createNestApplication();
     const coreConfig = app.get<CoreConfig>(CoreConfig);
     const userConfig = app.get<UserConfig>(UserConfig);
-    appSetup(app, coreConfig.isSwaggerEnabled, coreConfig.globalPrefix);
+    const globalPrefix = coreConfig.globalPrefix
+    appSetup(app, coreConfig.isSwaggerEnabled, globalPrefix);
 
     await app.init();
 
     const databaseConnection = app.get<Connection>(getConnectionToken());
     const httpServer = app.getHttpServer();
     await deleteAllData(app, coreConfig.globalPrefix);
-    
+
+    const passwordHashService = app.get<PasswordHashService>(PasswordHashService);
     const blogModel = app.get<BlogModelType>(getModelToken(Blog.name));
     const postModel = app.get<PostModelType>(getModelToken(Post.name));
     const commentModel = app.get<CommentModelType>(getModelToken(Comment.name));
@@ -60,6 +65,7 @@ export const initSettings = async (
                                                                         postModel,
                                                                         commentModel,
                                                                         userModel,
+                                                                        passwordHashService,
                                                                         );
 
     return {
@@ -67,5 +73,7 @@ export const initSettings = async (
         databaseConnection,
         httpServer,
         testData,
+        globalPrefix,
+        emailServiceMock,
     };
 };
