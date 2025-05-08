@@ -1,6 +1,5 @@
 import { ConfigModule } from '@nestjs/config';
 import {join} from "path"
-import * as console from 'node:console';
 
 export const configModule = ConfigModule.forRoot({
 

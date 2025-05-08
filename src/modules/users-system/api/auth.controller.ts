@@ -8,6 +8,7 @@ import { ConfirmCodeInputDto } from '@src/modules/users-system/dto/input/confirm
 import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
+import console from 'node:console';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
@@ -48,7 +49,6 @@ export class AuthController {
     @Post(AUTH_PATH.askNewPassword)
     @HttpCode(HttpStatus.NO_CONTENT)
     async askNewPassword(@Body() inputEmail:EmailInputDto):Promise<void> {
-
             return await this.authService.askNewPassword(inputEmail.email)
     }
 

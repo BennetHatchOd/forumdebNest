@@ -11,7 +11,8 @@ export class DomainExceptionFilter implements ExceptionFilter {
         const request = ctx.getRequest<Request>();
 
         const status = this.mapToHttp(exception);
-        if (exception.code === DomainExceptionCode.ValidationError)
+        //if (exception.code === DomainExceptionCode.ValidationError)
+        if (status === 400)
             response.status(status).json({
                 errorsMessages: exception.extension,
             })
@@ -23,6 +24,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
             case DomainExceptionCode.BadRequest:
             case DomainExceptionCode.ValidationError:
             case DomainExceptionCode.EmailNotConfirmed:
+            case DomainExceptionCode.EmailNotExist:
             case DomainExceptionCode.ConfirmationCodeExpired:
             case DomainExceptionCode.PasswordRecoveryCodeExpired:
             case DomainExceptionCode.PasswordRecoveryCodeNotFound:

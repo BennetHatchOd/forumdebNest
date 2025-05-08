@@ -92,7 +92,7 @@ export class AuthService {
             }),
         };
 
-        this.mailService.createConfirmEmail(
+        await this.mailService.createConfirmEmail(
             inputUserDto.email,
             createdUser.confirmEmail.code,
         );
@@ -145,12 +145,20 @@ export class AuthService {
         let userWithoutEmail: UserDocument | null =
             await this.userRepository.foundUserWithOutEmail(email);
 
-        if (userWithoutEmail) {
-            const code: string | null = userWithoutEmail.createConfirmCode(
-                this.userConfig.timeLifeEmailCode);
-                this.mailService.createConfirmEmail(email, code!);
-                await this.userRepository.save(userWithoutEmail);
+
+        if (!userWithoutEmail) {
+            throw new DomainException({
+                message: "user with not corfirmed email not found",
+                code: DomainExceptionCode.EmailNotExist,
+                extension: [{message: "user with not corfirmed email not found",
+                    field: "email"}]
+            })
         }
+        const code: string | null
+            = userWithoutEmail.createConfirmCode(this.userConfig.timeLifeEmailCode);
+
+        this.mailService.createNewConfirmEmail(email, code!);
+        await this.userRepository.save(userWithoutEmail);
         return;
         // Even if the current email address is not registered or corfirmed,
         // do not throw an error (to prevent detection of the user's email address)

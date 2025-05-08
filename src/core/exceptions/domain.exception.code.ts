@@ -6,6 +6,7 @@ export enum DomainExceptionCode {
     ValidationError = 5,
     Unauthorized = 6,
     EmailNotConfirmed = 7,
+    EmailNotExist = 11,
     ConfirmationCodeExpired = 8,
     PasswordRecoveryCodeExpired = 9,
     PasswordRecoveryCodeNotFound = 10,
