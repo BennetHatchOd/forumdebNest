@@ -55,9 +55,9 @@ export class User {
             && isBefore(new Date(), this.confirmEmail.expirationTime)
             && this.isConfirmEmail === false
             && this.deletedAt === null) {
-            this.isConfirmEmail = true;
-            this.confirmEmail.code = '';
-            return true;
+                this.isConfirmEmail = true;
+                this.confirmEmail.code = '';
+                return true;
         }
         return false;
     }
