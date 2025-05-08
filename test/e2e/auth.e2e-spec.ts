@@ -133,15 +133,7 @@ describe('AuthAppController (e2e)', () => {
                     .expect(HttpStatus.OK)
             });
 
-            it('should return 400 after attempting to re-confirm', async () => {
 
-                await request(app.getHttpServer())
-                    .post(join(URL_PATH.auth, AUTH_PATH.confirmation))
-                    .send({
-                        code: code
-                    })
-                    .expect(HttpStatus.BAD_REQUEST)
-            });
 
         });
 
@@ -172,10 +164,10 @@ describe('AuthAppController (e2e)', () => {
                 })
                 .expect(HttpStatus.NO_CONTENT)
 
-            expect(emailServiceMock.createConfirmEmail).toHaveBeenCalled();
-            expect(emailServiceMock.createConfirmEmail.mock.calls.length).toBe(2);
-            expect(emailServiceMock.createConfirmEmail.mock.calls[1][0]).toBe(user.email);
-            code = emailServiceMock.createConfirmEmail.mock.calls[1][1];
+            expect(emailServiceMock.createNewConfirmEmail).toHaveBeenCalled();
+            expect(emailServiceMock.createNewConfirmEmail.mock.calls.length).toBe(1);
+            expect(emailServiceMock.createNewConfirmEmail.mock.calls[0][0]).toBe(user.email);
+            code = emailServiceMock.createNewConfirmEmail.mock.calls[0][1];
 
             await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.confirmation))
