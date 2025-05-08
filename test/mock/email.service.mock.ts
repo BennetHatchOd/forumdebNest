@@ -1,5 +1,6 @@
 export class EmailServiceMock {
     createConfirmEmail = jest.fn();
+    createNewConfirmEmail = jest.fn();
     createPasswordRecovery = jest.fn();
 }
 //

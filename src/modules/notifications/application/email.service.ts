@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import * as console from 'node:console';
 
 @Injectable()
 export class EmailService {
@@ -19,6 +20,18 @@ export class EmailService {
             html: message})
     }
 
+    createNewConfirmEmail(mail: string, code: string): void{
+        const message =
+            `<h1>Thanks for your registration</h1>
+          <p> To finish registration please follow the link below:
+              <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
+          </p>`
+
+        this.mailerService.sendMail({
+            to: mail,
+            subject: 'new email with registration confirmation',
+            html: message})
+    }
     createPasswordRecovery(mail: string, code: string): void{
         const message =
             `<h1>Password recovery</h1>
