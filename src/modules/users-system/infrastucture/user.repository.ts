@@ -43,7 +43,8 @@ export class UserRepository {
         const searchItem: UserDocument | null
             = await this.UserModel.findOne({
             'confirmEmail.code': code,
-            isConfirmEmail: false})
+            isConfirmEmail: false,
+            deletedAt: null})
         return searchItem;
     }
 
@@ -70,8 +71,10 @@ export class UserRepository {
         // search user with not verifed email
 
         const searchItem: UserDocument | null
-            = await this.UserModel.findOne({email: email,
-            isConfirmEmail: false})
+            = await this.UserModel.findOne({
+            email: email,
+            isConfirmEmail: false,
+            deletedAt: null})
 
         return searchItem;
     }
