@@ -24,6 +24,7 @@
     "lib": ["ES2023"],
     "paths": {
       "@core/*": ["src/core/*"],
+      "@modules/*": ["src/modules/*"],
       "@src/*": ["src/*"]
     }
   },
