@@ -28,11 +28,7 @@ export class UserConfig {
     })
     timeLifeRefreshToken: number;
 
-    @IsNotEmpty()
-    @IsString({
-        message: 'Set Env variable PASSWORD_MAIL',
-    })
-    passwordEmail: string;
+
 
     @IsNotEmpty()
     @IsNumber({},{
@@ -71,7 +67,6 @@ export class UserConfig {
         this.timeLifeRefreshToken = Number(this.configService.get('TIME_LIFE_REFRESH_TOKEN'));
         this.adminNameBasicAuth = this.configService.get('ADMIN_NAME_BASIC_AUTH');
         this.adminPasswordBasicAuth = this.configService.get('ADMIN_PASSWORD_BASIC_AUTH');
-        this.passwordEmail = this.configService.get('PASSWORD_MAIL');
         this.timeLifeEmailCode = Number(this.configService.get('TIME_LIFE_EMAIL_CODE'));
         this.timeLifePasswordCode = Number(this.configService.get('TIME_LIFE_PASSWORD_CODE'));
         this.saltRound = Number(this.configService.get('SALT_ROUND'));

@@ -24,6 +24,12 @@ export class CoreConfig {
     })
     dbName: string;
 
+    @IsNotEmpty()
+    @IsString({
+        message: 'Set Env variable PASSWORD_MAIL',
+    })
+    passwordEmail: string;
+
     @IsNotEmpty({
         message: 'Set Env variable MONGO_URI, example: mongodb://localhost:27017/my-app-local-db',
     })
@@ -60,7 +66,7 @@ export class CoreConfig {
         this.globalPrefix = this.configService.get('GLOBAL_PREFIX');
         this.versionApp = this.configService.get('VERSION_APP');
         this.isSwaggerEnabled = configValidationUtility.convertToBoolean(this.configService.get('IS_SWAGGER_ENABLE')) as boolean;
-
+        this.passwordEmail = this.configService.get('PASSWORD_MAIL');
 
         configValidationUtility.validateConfig(this);
     }
