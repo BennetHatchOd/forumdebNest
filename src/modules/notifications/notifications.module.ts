@@ -1,25 +1,51 @@
 import { Module } from '@nestjs/common';
 import { EmailService } from './application/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { UserConfig } from '@modules/users-system/config/user.config';
+import { UserService } from '@modules/users-system/application/user.service';
+import { CoreConfig } from '@core/core.config';
+
+// @Module({
+//   imports: [
+//     MailerModule.forRoot({
+//       transport: {
+//         service: 'gmail',
+//         secure: false,
+//         auth: {
+//           user: 'vng114.work@gmail.com',
+//           pass: UserConfig.passwordEmail,
+//         },
+//       },
+//       defaults: {
+//         from: '"No Reply" <vng114.work@gmail.com>',
+//       },
+//     }),
+//   ],
+//   providers: [EmailService],
+//   exports: [EmailService], // 👈 export for DI
+// })
+// export class NotificationsModule {}
 
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        service: 'gmail',
-        secure: false,
-        auth: {
-          user: 'vng114.work@gmail.com',
-          pass: 'PASSWORD_MAIL',
+    MailerModule.forRootAsync({
+      inject: [CoreConfig],
+      useFactory: (coreConfig: CoreConfig) => ({
+        transport: {
+          service: 'gmail',
+          secure: false,
+          auth: {
+            user: 'vng114.work@gmail.com',
+            pass: coreConfig.passwordEmail,
+          },
         },
-      },
-      defaults: {
-        from: '"No Reply" <vng114.work@gmail.com>',
-      },
+        defaults: {
+          from: '"No Reply" <vng114.work@gmail.com>',
+        },
+      }),
     }),
   ],
-  providers: [EmailService],
-  exports: [EmailService], // 👈 export for DI
+  providers: [EmailService, CoreConfig],
+  exports: [EmailService],
 })
 export class NotificationsModule {}
-
