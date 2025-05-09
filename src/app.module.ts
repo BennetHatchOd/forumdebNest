@@ -3,10 +3,10 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppService } from './app.service';
-import { BloggingPlatformModule } from './modules/blogging.platform/blogging.platform.module';
-import { UserSystemModule } from './modules/users-system/user.system.module';
-import { TestingModule } from './modules/testing/testing.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
+import { BloggingPlatformModule } from '@modules/blogging.platform/blogging.platform.module';
+import { UserSystemModule } from '@modules/users-system/user.system.module';
+import { TestingModule } from '@modules/testing/testing.module';
+import { NotificationsModule } from '@modules/notifications/notifications.module';
 import { CoreModule } from '@core/core.module';
 import { CoreConfig } from '@core/core.config';
 
