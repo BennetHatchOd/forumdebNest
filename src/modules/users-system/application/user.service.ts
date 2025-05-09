@@ -27,15 +27,14 @@ export class UserService {
             inputUserDto.password,
             this.userConfig.saltRound,
         );
-        const newUser: UserDocument = this.UserModel.createInstance({
+        const createdUser: UserDocument = this.UserModel.createInstance({
             ...inputUserDto,
             password: passwordHash,
         });
 
-        newUser.isConfirmEmail = true;
         // for directly created user no need to check email
-        await this.userRepository.save(newUser);
-        return newUser._id.toString();
+        await this.userRepository.save(createdUser);
+        return createdUser._id.toString();
     }
 
     // async edit(id: string, editData: UserInputDto): Promise<void> {

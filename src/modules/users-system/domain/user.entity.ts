@@ -28,7 +28,7 @@ export class User {
     passwordHash: string;
 
     @Prop({
-        default: false,
+        default: true,
     })
     isConfirmEmail: boolean;
 

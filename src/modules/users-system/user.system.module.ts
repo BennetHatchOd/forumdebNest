@@ -20,9 +20,12 @@ import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
 import { ConfigService } from '@nestjs/config';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CommandHandlers } from '@modules/users-system/application/UseCase';
 
 @Module({
     imports: [
+        CqrsModule,
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
@@ -35,6 +38,7 @@ import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
         AuthController,
     ],
     providers: [
+        ...CommandHandlers,
         UserService,
         UserConfig,
         UserQueryRepository,

@@ -9,10 +9,15 @@ import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.pas
 import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import console from 'node:console';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
-    constructor(private authService: AuthService) {
+    constructor(
+        private authService: AuthService,
+        private readonly commandBus: CommandBus,
+        ) {
     }
 
     @Post(AUTH_PATH.login)
@@ -29,7 +34,8 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async registration(@Body() inputUserDto: UserInputDto) : Promise<void> {
 
-            return await this.authService.registrationUser(inputUserDto)
+        await this.commandBus.execute(new CreateUserCommand(inputUserDto, false));
+        return;
     }
 
     @Post(AUTH_PATH.confirmation)

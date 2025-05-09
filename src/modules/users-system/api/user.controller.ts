@@ -20,21 +20,24 @@ import { AuthGuard } from '@nestjs/passport';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { CommandBus } from '@nestjs/cqrs';
 
 @UseGuards(AuthGuard('basic'))
 @ApiBasicAuth()
 @Controller(URL_PATH.users)
 export class UserControllers {
     constructor(
+        private commandBus: CommandBus,
         private userService: UserService,
         private userQueryRepository: UserQueryRepository,
     ) {}
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    async createUser(@Body() user: UserInputDto):Promise<UserViewDto> {
+    async createUser(@Body() inputUserDto: UserInputDto):Promise<UserViewDto> {
 
-        const createId: string = await this.userService.create(user);
+        const createId: string = await this.commandBus.execute(new CreateUserCommand(inputUserDto, true));
         const userView: UserViewDto = await this.userQueryRepository.findById(createId);
         return userView;
     }

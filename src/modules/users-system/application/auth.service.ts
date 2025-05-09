@@ -73,33 +73,6 @@ export class AuthService {
         );
     }
 
-    async registrationUser(inputUserDto: UserInputDto): Promise<void> {
-        await this.checkUniq(inputUserDto);
-
-        const passwordHash: string = await this.passwordHashService.createHash(
-            inputUserDto.password,
-            this.userConfig.saltRound,
-        );
-        const createdUser: UserDocument = this.UserModel.createInstance({
-            ...inputUserDto,
-            password: passwordHash,
-        });
-
-        createdUser.confirmEmail = {
-            code: uuidv4(),
-            expirationTime: add(new Date(), {
-                hours: this.userConfig.timeLifeEmailCode,
-            }),
-        };
-
-        await this.mailService.createConfirmEmail(
-            inputUserDto.email,
-            createdUser.confirmEmail.code,
-        );
-        await this.userRepository.save(createdUser);
-        return;
-    }
-
     async checkUniq (inputUserDto: UserInputDto):Promise<void> {
         const checkUniq: string[] | null = await this.userRepository.checkUniq(
             inputUserDto.login,
@@ -144,7 +117,6 @@ export class AuthService {
 
         let userWithoutEmail: UserDocument | null =
             await this.userRepository.foundUserWithOutEmail(email);
-
 
         if (!userWithoutEmail) {
             throw new DomainException({
