@@ -4,7 +4,7 @@ import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentInputDto } from '../dto/input/comment.input.dto';
 import { Comment, CommentDocument } from '../domain/comment.entity';
 import { UserQueryExternalRepository } from '../../users-system/infrastucture/query/user.query.external.repository';
-import { CreateCommentDto } from '../dto/create.comment.dto';
+import { CreateCommentDto } from '../dto/create/create.comment.dto';
 
 @Injectable()
 export class CommentService {
