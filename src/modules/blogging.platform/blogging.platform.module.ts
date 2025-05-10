@@ -17,9 +17,13 @@ import { CommentRepository } from './infrastucture/comment.repository';
 import { PostController } from './api/post.controler';
 import { UserQueryExternalRepository } from '../users-system/infrastucture/query/user.query.external.repository';
 import { User, UserSchema } from '../users-system/domain/user.entity';
+import { CommandHandlers } from '@modules/blogging.platform/application/UseCase';
+import { CqrsModule } from '@nestjs/cqrs';
+import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.repository';
 
 @Module({
     imports: [
+        CqrsModule,
         MongooseModule.forFeature([
             { name: Blog.name, schema: BlogSchema },
             { name: Comment.name, schema: CommentSchema },
@@ -32,6 +36,7 @@ import { User, UserSchema } from '../users-system/domain/user.entity';
         PostController,
         CommentController],
     providers: [
+        ...CommandHandlers,
         BlogService,
         BlogQueryRepository,
         BlogRepository,
@@ -41,6 +46,7 @@ import { User, UserSchema } from '../users-system/domain/user.entity';
         CommentService,
         CommentQueryRepository,
         CommentRepository,
+        LikeRepository,
         UserQueryExternalRepository,
     ],
 })

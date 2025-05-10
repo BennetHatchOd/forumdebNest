@@ -36,6 +36,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
             case DomainExceptionCode.Unauthorized:
                 return 401;
             case DomainExceptionCode.InternalServerError:
+            case DomainExceptionCode.TooManyEntiriesInDB:
                 return 500;
         }
         return 500;
