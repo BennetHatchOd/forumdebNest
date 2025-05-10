@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { BlogInputDto } from '../dto/input/blog.input.dto';
-import { BlogFieldRestrict } from '../field.restrictions';
+import { BlogFieldRestrict } from '../dto/field.restrictions';
 
 @Schema({ timestamps: true,
 })

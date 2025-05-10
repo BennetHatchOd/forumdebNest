@@ -6,7 +6,7 @@ import { Blog, BlogDocument, BlogModelType } from '@src/modules/blogging.platfor
 import { Post, PostDocument, PostModelType } from '@src/modules/blogging.platform/domain/post.entity';
 import { Comment, CommentDocument, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
 import { User, UserDocument, UserModelType } from '@src/modules/users-system/domain/user.entity';
-import { CreateCommentDto } from '@src/modules/blogging.platform/dto/create.comment.dto';
+import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 
 export class TestDataBuilderByDb {

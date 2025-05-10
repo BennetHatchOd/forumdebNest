@@ -1,5 +1,5 @@
 import { IsUrl } from 'class-validator';
-import { BlogFieldRestrict } from '../../field.restrictions';
+import { BlogFieldRestrict } from '../field.restrictions';
 import { TrimLength } from '../../../../core/decorators/trim.string.length';
 
 export class BlogInputDto {

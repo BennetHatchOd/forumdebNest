@@ -1,5 +1,5 @@
 import { IsString, Length } from 'class-validator';
-import { PostFieldRestrict } from '../../field.restrictions';
+import { PostFieldRestrict } from '../field.restrictions';
 import { TrimLength } from '../../../../core/decorators/trim.string.length';
 
 export class PostByBlogInputDto {

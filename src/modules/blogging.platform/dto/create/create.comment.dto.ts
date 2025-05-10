@@ -1,5 +1,5 @@
-import { CommentInputDto } from './input/comment.input.dto';
-import { CommentatorInfoViewDto } from '../../users-system/dto/view/commentator.info.view.dto';
+import { CommentInputDto } from '../input/comment.input.dto';
+import { CommentatorInfoViewDto } from '../../../users-system/dto/view/commentator.info.view.dto';
 
 export class CreateCommentDto{
     constructor(
