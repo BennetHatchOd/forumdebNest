@@ -5,7 +5,7 @@ import { PostViewDto } from '../../dto/view/post.view.dto';
 import { FilterQuery, Types } from 'mongoose';
 import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
-import { Rating } from '../../../../core/Rating.enum';
+import { Rating } from '../../dto/rating.enum';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -33,7 +33,7 @@ export class PostQueryRepository {
         let likeStatus: Rating = Rating.None
         if(userId)
         {}
-        return PostViewDto.mapToView(searchItem, likeStatus);
+        return PostViewDto.mapToView(searchItem)//, likeStatus);
     }
 
     async find(queryReq: GetPostQueryParams, userId: string|null = null): Promise<PaginatedViewDto<PostViewDto[]>> {
@@ -68,7 +68,7 @@ export class PostQueryRepository {
             likeStatus = Rating.None
 
         const items : PostViewDto[]
-            = posts.map(item => PostViewDto.mapToView(item, likeStatus));
+            = posts.map(item => PostViewDto.mapToView(item));//, likeStatus));
 
         return PaginatedViewDto.mapToView({
             items: items,

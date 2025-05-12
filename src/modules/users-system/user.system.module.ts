@@ -22,10 +22,12 @@ import { ConfigService } from '@nestjs/config';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from '@modules/users-system/application/UseCase';
+import { AuthModule } from '@core/auth.module';
 
 @Module({
     imports: [
         CqrsModule,
+        AuthModule,
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
@@ -52,26 +54,26 @@ import { CommandHandlers } from '@modules/users-system/application/UseCase';
         JwtStrategy,
         myBasicStrategy,
         ConfigService,
-        {
-            provide: INJECT_TOKEN.ACCESS_TOKEN,
-            useFactory: (userConfig: UserConfig): JwtService => {
-                return new JwtService({
-                    secret: userConfig.accessTokenSecret,
-                    signOptions: { expiresIn: userConfig.timeLifeAccessToken },
-                });
-            },
-            inject: [UserConfig],
-        },
-        {
-            provide: INJECT_TOKEN.REFRESH_TOKEN,
-            useFactory: (userConfig:UserConfig): JwtService => {
-                return new JwtService({
-                    secret: userConfig.refreshTokenSecret,
-                    signOptions: { expiresIn: userConfig.timeLifeRefreshToken },
-                });
-            },
-            inject: [UserConfig],
-        },
+        // {
+        //     provide: INJECT_TOKEN.ACCESS_TOKEN,
+        //     useFactory: (userConfig: UserConfig): JwtService => {
+        //         return new JwtService({
+        //             secret: userConfig.accessTokenSecret,
+        //             signOptions: { expiresIn: userConfig.timeLifeAccessToken },
+        //         });
+        //     },
+        //     inject: [UserConfig],
+        // },
+        // {
+        //     provide: INJECT_TOKEN.REFRESH_TOKEN,
+        //     useFactory: (userConfig:UserConfig): JwtService => {
+        //         return new JwtService({
+        //             secret: userConfig.refreshTokenSecret,
+        //             signOptions: { expiresIn: userConfig.timeLifeRefreshToken },
+        //         });
+        //     },
+        //     inject: [UserConfig],
+        // },
     ],
     exports:[
         UserQueryExternalRepository,

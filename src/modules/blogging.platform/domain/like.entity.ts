@@ -1,16 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Rating } from '@core/Rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/rating.enum';
 import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
 import { HydratedDocument, Model } from 'mongoose';
 import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
+
+
 
 @Schema({ timestamps: true })
 export class Like {
     @Prop({
         required: true,
         enum: LikeTarget,
+        type: Number
     })
-    targetType: number;
+    targetType: LikeTarget;
 
     @Prop({
         required: true,
@@ -26,11 +29,12 @@ export class Like {
 
     @Prop({
         required: true,
+        type: String,
         enum: Rating,
     })
-    rating: string;
+    rating: Rating;
 
-    static async createInstance(dto: LikeCreateDto): Promise<LikeDocument> {
+    static createInstance(dto: LikeCreateDto): LikeDocument {
         const like = new this();
         like.targetId = dto.targetId;
         like.ownerId = dto.ownerId;

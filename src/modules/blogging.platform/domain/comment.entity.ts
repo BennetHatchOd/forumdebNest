@@ -1,11 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
-import { LikesInfo, LikesInfoSchema } from './likes.info';
-import { CommentFieldRestrict } from '../field.restrictions';
-import { CommentInputDto } from '../dto/input/comment.input.dto';
-import { CommentatorInfoViewDto } from '../../users-system/dto/view/commentator.info.view.dto';
-import { CreateCommentDto } from '../dto/create.comment.dto';
+import { CommentFieldRestrict } from '../dto/field.restrictions';
+import { CreateCommentDto } from '../dto/create/create.comment.dto';
 
 
 
@@ -24,11 +21,6 @@ export class Comment {
     parentPostId: string;
 
     createdAt: Date;
-
-    @Prop({
-        type: LikesInfoSchema,
-        required: true,})
-    likesInfo: LikesInfo;
 
     @Prop({
         type: CommentatorInfoSchema,
@@ -68,9 +60,9 @@ export class Comment {
         const comment = new this();
         comment.content = createDto.content;
         comment.parentPostId = createDto.postId;
-        comment.likesInfo = LikesInfo.createInstance()
-        comment.commentatorInfo.userId = createDto.userId;
+        comment.commentatorInfo = new CommentatorInfo();
         comment.commentatorInfo.userLogin = createDto.login;
+        comment.commentatorInfo.userId = createDto.userId;
 
         return comment as CommentDocument;
     }

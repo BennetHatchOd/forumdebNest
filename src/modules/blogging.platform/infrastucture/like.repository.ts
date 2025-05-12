@@ -21,7 +21,7 @@ export class LikeRepository {
             targetType: searchDto.targetType,
         });
         if (numberLikes == 0) return null;
-        if (numberLikes > 0)
+        if (numberLikes > 1)
             throw new DomainException({
                 message: 'too many entries in the likes database',
                 code: DomainExceptionCode.EmailNotExist,

@@ -1,5 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
-import { Rating } from '../../../../core/Rating.enum';
+import { Rating } from '../rating.enum';
+import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 
 export class PostViewDto {
     id: string;
@@ -16,7 +17,9 @@ export class PostViewDto {
         newestLikes: string[]//NewestLikesDTO;
     }
 
-    constructor(item: PostDocument, likeStatus: Rating) {
+    constructor(item: PostDocument,
+    //            likeInfo: extendedLikesInfoViewDto
+    ) {
         this.id = item._id.toString();
         this.title = item.title;
         this.shortDescription = item.shortDescription;
@@ -25,15 +28,17 @@ export class PostViewDto {
         this.blogId = item.blogId;
         this.blogName = item.blogName;
         this.extendedLikesInfo = {
-            likesCount: item.likesCount,
-            dislikesCount: item.dislikesCount,
-            myStatus: likeStatus,
-            newestLikes: [] //new NewestLikesDTO(item.extendedLikesInfo.newestLikes),
+            likesCount: 0,          //likeInfo.likesCount,
+            dislikesCount: 0,       //likeInfo.dislikesCount,
+            myStatus: Rating.None,  //likeInfo.myStatus,
+            newestLikes: []         //[...likeInfo.NewestLike]
         }
     }
 
-    static   mapToView(item: PostDocument, likeStatus: Rating):PostViewDto {
-        return  new PostViewDto(item, likeStatus);
+    static   mapToView(item: PostDocument,
+    //                   likeInfo: extendedLikesInfoViewDto
+    ):PostViewDto {
+        return  new PostViewDto(item)//, likeInfo);
     }
 }
 

@@ -18,7 +18,7 @@ export class PostService {
     async create(inputItem: PostInputDto): Promise<string> {
         const blogName
             = (await this.blogQueryRepository.findByIdWithCheck(inputItem.blogId)).name
-        const newPost: PostDocument = await this.PostModel.createInstance(inputItem, blogName);
+        const newPost: PostDocument = this.PostModel.createInstance(inputItem, blogName);
         await this.postRepository.save(newPost);
         return newPost._id.toString();
     }

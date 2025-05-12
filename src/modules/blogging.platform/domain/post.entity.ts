@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
-import { NewestLikesArray, NewestLikesSchema } from './newest.likes';
-import { PostFieldRestrict } from '../field.restrictions';
+import { PostFieldRestrict } from '../dto/field.restrictions';
 
 @Schema({timestamps: true})
 export class Post {
@@ -39,25 +38,6 @@ export class Post {
     })
     deletedAt:  Date | null;
 
-    @Prop({
-        default: 0,
-        min: 0,
-        isInteger: true,
-    })
-    likesCount: number;
-
-    @Prop({
-        default: 0,
-        min: 0,
-        isInteger: true,
-    })
-    dislikesCount: number;
-
-    @Prop({ type: NewestLikesSchema,
-        required: true,
-    })
-    newestLikes: NewestLikesArray;
-
     delete() {
         if (this.deletedAt !== null) {
             throw new Error('Post already deleted');
@@ -74,8 +54,8 @@ export class Post {
         this.blogName = blogName;
     }
 
-    static async createInstance(createDto: PostInputDto,
-                                blogName: string,): Promise<PostDocument> {
+    static createInstance(createDto: PostInputDto,
+                                blogName: string,): PostDocument {
 
         const post = new this();
         post.title = createDto.title;
@@ -83,7 +63,6 @@ export class Post {
         post.content = createDto.content;
         post.blogId = createDto.blogId;
         post.blogName = blogName;
-        post.newestLikes = new NewestLikesArray()
 
         return post as PostDocument;
     }

@@ -20,15 +20,21 @@ import { User, UserSchema } from '../users-system/domain/user.entity';
 import { CommandHandlers } from '@modules/blogging.platform/application/UseCase';
 import { CqrsModule } from '@nestjs/cqrs';
 import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.repository';
+import { Like, LikeSchema } from '@modules/blogging.platform/domain/like.entity';
+import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture/query/likes.query.repositories';
+import { AuthModule } from '@core/auth.module';
+import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 @Module({
     imports: [
         CqrsModule,
+        AuthModule,
         MongooseModule.forFeature([
             { name: Blog.name, schema: BlogSchema },
             { name: Comment.name, schema: CommentSchema },
             { name: Post.name, schema: PostSchema },
             { name: User.name, schema: UserSchema },
+            { name: Like.name, schema: LikeSchema },
         ]),
     ],
     controllers: [
@@ -37,6 +43,7 @@ import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.re
         CommentController],
     providers: [
         ...CommandHandlers,
+        ReadUserIdGuard,
         BlogService,
         BlogQueryRepository,
         BlogRepository,
@@ -47,6 +54,7 @@ import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.re
         CommentQueryRepository,
         CommentRepository,
         LikeRepository,
+        LikesQueryRepositories,
         UserQueryExternalRepository,
     ],
 })

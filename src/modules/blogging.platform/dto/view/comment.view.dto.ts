@@ -1,5 +1,6 @@
 import { CommentDocument } from '../../domain/comment.entity';
-import { Rating } from '../../../../core/Rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 
 export class CommentViewDto {
         public id: string;
@@ -15,7 +16,7 @@ export class CommentViewDto {
             myStatus: Rating,
         };
 
-    constructor(item: CommentDocument, likeStatus: Rating) {
+    constructor(item: CommentDocument, likeInfo: LikesInfoViewDto) {
         this.id = item._id.toString();
         this.content = item.content;
         this.createdAt = item.createdAt.toString();
@@ -24,14 +25,14 @@ export class CommentViewDto {
             userLogin: item.commentatorInfo.userLogin,
         };
         this.likesInfo =  {
-            likesCount: item.likesInfo.likesCount,
-                dislikesCount: item.likesInfo.dislikesCount,
-                myStatus: likeStatus,
+            likesCount: likeInfo.likesCount,
+            dislikesCount: likeInfo.dislikesCount,
+            myStatus: likeInfo.myStatus,
         }
     }
 
-    static mapToView(item: CommentDocument, likeStatus: Rating): CommentViewDto {
-        return new CommentViewDto(item, likeStatus)
+    static mapToView(item: CommentDocument, likeInfo: LikesInfoViewDto): CommentViewDto {
+        return new CommentViewDto(item, likeInfo)
     }
 }
 

@@ -8,6 +8,9 @@ import { Comment, CommentDocument, CommentModelType } from '@src/modules/bloggin
 import { User, UserDocument, UserModelType } from '@src/modules/users-system/domain/user.entity';
 import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
+import request from 'supertest';
+import { join } from 'path';
+import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы, при этом тестируя
@@ -65,7 +68,7 @@ export class TestDataBuilderByDb {
                 blogId: this.blogs[0]._id.toString(),
             };
             const newPost: PostDocument
-                = await this.PostModel.createInstance(post, this.blogs[0].name);
+                = this.PostModel.createInstance(post, this.blogs[0].name);
             await newPost.save();
             this.posts.push(newPost);
         }
@@ -84,23 +87,27 @@ export class TestDataBuilderByDb {
                 user.password,
                 this.userConfig.saltRound,
             );
-            const newUser: UserDocument = await this.UserModel.createInstance(user);
-            newUser.isConfirmEmail = true;
+            const newUser: UserDocument = this.UserModel.createInstance(user);
             await newUser.save();
             this.users.push(newUser);
+        }
+    }
 
-            // const token = await request(this.app.getHttpServer())
-            //     .post(`${URL_PATH.auth}${AUTH_PATH.login}`)
-            //     .send({
-            //         "loginOrEmail": this.users[i].login,
-            //         "password":     this.users[i].password
-            //     })
-            // expect(token.body).toHaveProperty("accessToken");
-            // expect(typeof token.body.accessToken).toBe('string');
-            //
-            // this.accessTokens.push(token.body.accessToken)
-        }}
+    async createManyAccessTokens(){
+        if(!this.isCreate.user)
+            await this.createManyUsers();
 
+        for(let i =0; i < this.numberUsers; i++) {
+
+            const token = await request(this.app.getHttpServer())
+                .post(join(URL_PATH.auth, AUTH_PATH.login))
+                .send({
+                    "loginOrEmail": this.users[i].login,
+                    "password": this.usersPassword[i]
+                })
+            this.accessTokens.push(token.body.accessToken)
+        }
+    }
     async createManyComment(){
         this.isCreate.comment = true;
         await this.checkPost()
@@ -112,7 +119,7 @@ export class TestDataBuilderByDb {
                  postId: this.posts[0]._id.toString(),
                  userId: this.users[0]._id.toString(),
                  login: this.users[0].login};
-            const newComment: CommentDocument = await this.CommentModel.createInstance(comment)
+            const newComment: CommentDocument = this.CommentModel.createInstance(comment)
             await newComment.save();
             this.comments.push(newComment)
         }
@@ -165,13 +172,13 @@ export class TestDataBuilderByDb {
         }
     }
     private async checkPost(){
-        if(this.isCreate.post){
+        if(!this.isCreate.post){
             await this.createManyPosts();
             this.isCreate.post = true;
         }
     }
     private async checkUser(){
-        if(this.isCreate.user) {
+        if(!this.isCreate.user) {
             await this.createManyUsers();
             this.isCreate.user = true;
         }

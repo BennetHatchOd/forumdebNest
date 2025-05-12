@@ -1,4 +1,4 @@
-import { Rating } from '@core/Rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/rating.enum';
 import { IsEnum, IsMongoId, IsNotEmpty } from 'class-validator';
 import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
 

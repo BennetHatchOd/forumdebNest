@@ -88,23 +88,23 @@ export class PostController {
 
     }
 
-    @Get(':id/comments')
-    async getCommentByPost(
-        @Param('id') postId: IdInputDto,
-        @Query() query: GetCommentQueryParams
-    ): Promise<PaginatedViewDto<CommentViewDto[]>> {
-        // Returns all comments for specified post, if the post isn't found,
-        // throw the exception "not found"
-
-        await this.postQueryRepository.findByIdWithCheck(postId.id)
-        // check the existence of the post and throw the exception "not found"
-
-        query.setParentPostIdSearchParams(postId.id)
-        const commentPaginator: PaginatedViewDto<CommentViewDto[]>
-            = await this.commentQueryRepository.find(query);
-        return commentPaginator;
-
-    }
+    // @Get(':id/comments')
+    // async getCommentByPost(
+    //     @Param('id') postId: IdInputDto,
+    //     @Query() query: GetCommentQueryParams
+    // ): Promise<PaginatedViewDto<CommentViewDto[]>> {
+    //     // Returns all comments for specified post, if the post isn't found,
+    //     // throw the exception "not found"
+    //
+    //     await this.postQueryRepository.findByIdWithCheck(postId.id)
+    //     // check the existence of the post and throw the exception "not found"
+    //
+    //     query.setParentPostIdSearchParams(postId.id)
+    //     const commentPaginator: PaginatedViewDto<CommentViewDto[]>
+    //         = await this.commentQueryRepository.find(query);
+    //     return commentPaginator;
+    //
+    // }
 
     @Post(':id/comments')
     @UseGuards(AuthGuard('jwt'))

@@ -14,11 +14,13 @@ import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
-import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
 import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
 import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
+import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
+import { ReadUserIdGuard } from '@core/guards/read.userid';
+import console from 'node:console';
 
 // @UseGuards(AuthGuard('jwt'))
 // @CurrentUserId() userId: string,
@@ -30,12 +32,16 @@ export class CommentController {
     ) {}
 
     @Get(':id')
-    async getById(@Param('id') inputId: IdInputDto): Promise<CommentViewDto> {
+    @UseGuards(ReadUserIdGuard)
+    async getById(
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
+    ): Promise<CommentViewDto> {
         //
         // Returns comment by id
 
         const foundComment: CommentViewDto =
-            await this.commentQueryRepository.findByIdWithCheck(inputId.id);
+            await this.commentQueryRepository.findByIdWithCheck(id, user);
         return foundComment;
     }
 
@@ -47,12 +53,14 @@ export class CommentController {
         @Param() { id }: IdInputDto,
         @Body() likeStatus: LikeInputDto,
     ) {
+
         const createLike: LikeCreateDto = {
             targetId: id,
             ownerId: user,
             rating: likeStatus.rating,
             targetType: LikeTarget.Comment,
         };
+
         await this.commandBus.execute(new MakeLikeCommand(createLike));
     }
 
