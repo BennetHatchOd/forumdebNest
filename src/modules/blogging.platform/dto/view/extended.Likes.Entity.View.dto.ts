@@ -1,4 +1,4 @@
-import { Rating } from '../rating.enum';
+import { Rating } from '../enum/rating.enum';
 import { LikeDetailsView } from './newest.likes.dto';
 
 export type ExtendedLikesEntityView = {

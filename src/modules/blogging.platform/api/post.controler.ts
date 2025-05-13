@@ -11,7 +11,7 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
+import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
@@ -20,12 +20,13 @@ import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentQueryRepository } from '../infrastucture/query/comment.query.repository';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
 import { PostService } from '../application/post.service';
-import { URL_PATH } from '../../../core/url.path.setting';
-import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
+import { URL_PATH } from '@core/url.path.setting';
+import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CommentInputDto } from '../dto/input/comment.input.dto';
 import { CommentService } from '../application/comment.service';
-import { CurrentUserId } from '../../../core/decorators/current.user';
+import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
+import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 @Controller(URL_PATH.posts)
 export class PostController {
@@ -88,23 +89,25 @@ export class PostController {
 
     }
 
-    // @Get(':id/comments')
-    // async getCommentByPost(
-    //     @Param('id') postId: IdInputDto,
-    //     @Query() query: GetCommentQueryParams
-    // ): Promise<PaginatedViewDto<CommentViewDto[]>> {
-    //     // Returns all comments for specified post, if the post isn't found,
-    //     // throw the exception "not found"
-    //
-    //     await this.postQueryRepository.findByIdWithCheck(postId.id)
-    //     // check the existence of the post and throw the exception "not found"
-    //
-    //     query.setParentPostIdSearchParams(postId.id)
-    //     const commentPaginator: PaginatedViewDto<CommentViewDto[]>
-    //         = await this.commentQueryRepository.find(query);
-    //     return commentPaginator;
-    //
-    // }
+    @Get(':id/comments')
+    @UseGuards(ReadUserIdGuard)
+    async getCommentsByPost(
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
+        @Query() query: GetCommentQueryParams
+     ){//: Promise<PaginatedViewDto<CommentViewDto[]>> {
+        // Returns all comments for specified post, if the post isn't found,
+        // return "not found"
+
+        await this.postQueryRepository.findByIdWithCheck(id)
+        // check the existence of the post and throw the exception "not found"
+
+        query.setParentPostIdSearchParams(id)
+        const commentPaginator: PaginatedViewDto<CommentViewDto[]>
+             = await this.commentQueryRepository.find(query, user);
+        return commentPaginator;
+
+    }
 
     @Post(':id/comments')
     @UseGuards(AuthGuard('jwt'))

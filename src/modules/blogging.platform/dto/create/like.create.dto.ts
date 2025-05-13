@@ -1,6 +1,6 @@
-import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { IsEnum, IsMongoId, IsNotEmpty } from 'class-validator';
-import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
+import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 
 export class LikeCreateDto {
     @IsNotEmpty()

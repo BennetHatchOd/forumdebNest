@@ -9,8 +9,8 @@
 //     return check
 //         }
 
-import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
-import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
+import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { URL_PATH } from '@core/url.path.setting';
 import { HttpStatus, INestApplication } from '@nestjs/common';

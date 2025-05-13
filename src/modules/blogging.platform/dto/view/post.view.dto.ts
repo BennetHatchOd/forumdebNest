@@ -1,5 +1,5 @@
 import { PostDocument } from '../../domain/post.entity';
-import { Rating } from '../rating.enum';
+import { Rating } from '../enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 
 export class PostViewDto {

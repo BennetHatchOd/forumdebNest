@@ -1,20 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
 import { HydratedDocument, Model } from 'mongoose';
-import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
+import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 
 
 
 @Schema({ timestamps: true })
 export class Like {
+    // какого типа сущность, которой поставлена оценка
     @Prop({
         required: true,
         enum: LikeTarget,
-        type: Number
+        type: String
     })
     targetType: LikeTarget;
 
+    // id сущность, которой поставлена оценка
     @Prop({
         required: true,
     })
@@ -22,6 +24,7 @@ export class Like {
 
     createdAt: Date;
 
+    // кто поставил оценку
     @Prop({
         required: true,
     })

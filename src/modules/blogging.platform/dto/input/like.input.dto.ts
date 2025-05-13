@@ -1,4 +1,4 @@
-import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class LikeInputDto {

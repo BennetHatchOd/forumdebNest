@@ -5,7 +5,7 @@ import { PostViewDto } from '../../dto/view/post.view.dto';
 import { FilterQuery, Types } from 'mongoose';
 import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
-import { Rating } from '../../dto/rating.enum';
+import { Rating } from '../../dto/enum/rating.enum';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 

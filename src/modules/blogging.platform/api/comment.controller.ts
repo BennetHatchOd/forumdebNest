@@ -17,13 +17,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
-import { LikeTarget } from '@modules/blogging.platform/dto/like.target.enum';
+import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import console from 'node:console';
 
-// @UseGuards(AuthGuard('jwt'))
-// @CurrentUserId() userId: string,
+
 @Controller(URL_PATH.comments)
 export class CommentController {
     constructor(

@@ -1,5 +1,5 @@
 import { CommentDocument } from '../../domain/comment.entity';
-import { Rating } from '@modules/blogging.platform/dto/rating.enum';
+import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 
 export class CommentViewDto {
