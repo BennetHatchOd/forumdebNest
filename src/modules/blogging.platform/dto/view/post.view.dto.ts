@@ -1,6 +1,8 @@
 import { PostDocument } from '../../domain/post.entity';
 import { Rating } from '../enum/rating.enum';
+import { ExtendedLikesInfoViewDto } from '@modules/blogging.platform/dto/view/extended.likes.info.view.dto';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
+import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 
 export class PostViewDto {
     id: string;
@@ -14,31 +16,37 @@ export class PostViewDto {
         likesCount: number
         dislikesCount: number;
         myStatus: Rating;
-        newestLikes: string[]//NewestLikesDTO;
+        newestLikes: {
+            addedAt: string,
+            userId: string,
+            login: string
+        }[];
     }
 
-    constructor(item: PostDocument,
-    //            likeInfo: extendedLikesInfoViewDto
+    constructor(post: PostDocument,
+                likeInfo: LikesInfoViewDto,
+                newestLikes: NewestLikesDto
     ) {
-        this.id = item._id.toString();
-        this.title = item.title;
-        this.shortDescription = item.shortDescription;
-        this.createdAt = item.createdAt.toISOString();
-        this.content = item.content;
-        this.blogId = item.blogId;
-        this.blogName = item.blogName;
+        this.id = post._id.toString();
+        this.title = post.title;
+        this.shortDescription = post.shortDescription;
+        this.createdAt = post.createdAt.toISOString();
+        this.content = post.content;
+        this.blogId = post.blogId;
+        this.blogName = post.blogName;
         this.extendedLikesInfo = {
-            likesCount: 0,          //likeInfo.likesCount,
-            dislikesCount: 0,       //likeInfo.dislikesCount,
-            myStatus: Rating.None,  //likeInfo.myStatus,
-            newestLikes: []         //[...likeInfo.NewestLike]
+            likesCount: likeInfo.likesCount,
+            dislikesCount: likeInfo.dislikesCount,
+            myStatus: likeInfo.myStatus,
+            newestLikes: newestLikes.newestLikes
         }
     }
 
-    static   mapToView(item: PostDocument,
-    //                   likeInfo: extendedLikesInfoViewDto
+    static   mapToView(post: PostDocument,
+                       likeInfo: LikesInfoViewDto,
+                       newestLikes: NewestLikesDto
     ):PostViewDto {
-        return  new PostViewDto(item)//, likeInfo);
+        return  new PostViewDto(post, likeInfo, newestLikes);
     }
 }
 

@@ -14,7 +14,7 @@ import { setCheckLikeComment } from './likesHelper/set.check.Like.comment';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import console from 'node:console';
 
-describe('LikeAppController (e2e)', () => {
+describe('LikeCommentController (e2e)', () => {
     let app: INestApplication;
     let connection: Connection;
     let testData: TestDataBuilderByDb;
@@ -288,16 +288,4 @@ describe('LikeAppController (e2e)', () => {
                                                         myStatus: Rating.None })
         });
     })
-
-
-
 })
-//
-//         it('Get all comments', async() => {
-//
-//         let commentResponce = await request(app).get(`${URL_PATH.posts}/${postsId[0]}/comments`)
-//                                                 .set("Authorization", 'Bearer ' + accessToken[2])
-//
-//
-//     })
-// })

@@ -13,6 +13,7 @@ import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture
 import { GetCommentQueryParams } from '@modules/blogging.platform/dto/input/get.comment.query.params.input.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { LikesDescriptionManyDto } from '@modules/blogging.platform/dto/likes.description.many.dto';
+import { EmptyPaginator } from '@core/dto/empty.paginator';
 
 @Injectable()
 export class CommentQueryRepository {
@@ -26,12 +27,6 @@ export class CommentQueryRepository {
         userId: string | null = null,
     ): Promise<CommentViewDto> {
         // returns a comment by id, if comment isn't found throws an exception
-
-        if (!Types.ObjectId.isValid(id))
-            throw new DomainException({
-                message: 'comment not found',
-                code: DomainExceptionCode.NotFound,
-            });
 
         const searchItem: CommentDocument | null =
             await this.CommentModel.findOne({
@@ -56,7 +51,7 @@ export class CommentQueryRepository {
     async find(
         queryReq: GetCommentQueryParams,
         userId: string | null = null,
-    ): Promise<PaginatedViewDto<CommentViewDto[]>> {
+    ): Promise<PaginatedViewDto<CommentViewDto>> {
         // получаем список всех комментариев, принадлежащих посту, Id которого
         // приходит в query запросе и находится в queryReq.searchParentPostId
 
@@ -69,6 +64,9 @@ export class CommentQueryRepository {
         };
         const totalCount: number =
             await this.CommentModel.countDocuments(queryFilter);
+
+        if(totalCount === 0)
+            return new EmptyPaginator<CommentViewDto>();
 
         const comments: CommentDocument[] = await this.CommentModel.find(
             queryFilter,)
@@ -92,11 +90,10 @@ export class CommentQueryRepository {
         });
     }
 
-    private mapCommentsView(comment:CommentDocument[], likesInfo: LikesInfoViewDto[]){
-       const commentView: CommentViewDto[] = []
-       for (let i = 0; i < comment.length; i++){
-           commentView.push(CommentViewDto.mapToView(comment[i],likesInfo[i]))
-       }
-       return commentView;
+    private mapCommentsView(comments:CommentDocument[], likeInfo: LikesInfoViewDto[]){
+        const commentView: CommentViewDto[] = comments.map((value, ind) =>
+            (CommentViewDto.mapToView(value,likeInfo[ind])))
+
+        return commentView;
     }
 }

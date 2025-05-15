@@ -11,6 +11,7 @@ import { PasswordHashService } from '@src/modules/users-system/application/passw
 import request from 'supertest';
 import { join } from 'path';
 import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
+import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы, при этом тестируя
@@ -22,6 +23,9 @@ export class TestDataBuilderByDb {
     blogs: BlogDocument[] = [];
     posts: PostDocument[] = [];
     authLoginPassword: string = '';
+    usersLikes: {addedAt: string,
+                userId: string,
+                login: string}[] = []
     private isCreate = {
         blog: false,
         post: false,
@@ -90,6 +94,10 @@ export class TestDataBuilderByDb {
             const newUser: UserDocument = this.UserModel.createInstance(user);
             await newUser.save();
             this.users.push(newUser);
+            this.usersLikes.push({
+                addedAt: expect.any(String),
+                userId: newUser._id.toString(),
+                login: user.login,})
         }
     }
 
@@ -131,12 +139,16 @@ export class TestDataBuilderByDb {
         this.comments = [];
         this.blogs = [];
         this.posts = [];
+        this.accessTokens = [];
+        this.usersLikes =[];
+
         this.isCreate = {
             blog: false,
             post: false,
             comment: false,
             user: false,
         }
+
     }
 
     // createTitleDevices(){

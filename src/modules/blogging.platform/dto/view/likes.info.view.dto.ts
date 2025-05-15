@@ -1,6 +1,6 @@
 import { Rating } from '../enum/rating.enum';
 
-export type LikesInfoViewDto = {
+export class LikesInfoViewDto {
     likesCount: number;
     dislikesCount: number;
     myStatus: Rating;
