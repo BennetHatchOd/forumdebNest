@@ -27,6 +27,7 @@ import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '../../../core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import * as process from 'node:process';
+import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 
 @Controller(URL_PATH.blogs)
@@ -40,9 +41,8 @@ export class BlogController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-//    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'))
     async createBlog(
-        @CurrentUserId() userId: string,
         @Body() blog: BlogInputDto): Promise<BlogViewDto> {
         //
         // Create new blog
@@ -56,78 +56,78 @@ export class BlogController {
     @Get()
     async getAll(
         @Query() query: GetBlogQueryParams,
-    ): Promise<PaginatedViewDto<BlogViewDto[]>> {
-        const blogPaginator: PaginatedViewDto<BlogViewDto[]> =
+    ): Promise<PaginatedViewDto<BlogViewDto>> {
+        const blogPaginator: PaginatedViewDto<BlogViewDto> =
             await this.blogQueryRepository.find(query);
 
         return blogPaginator;
     }
 
     @Get(':id')
-    async getById(@Param('id') inputId: IdInputDto): Promise<BlogViewDto> {
+    async getById(@Param() {id}: IdInputDto): Promise<BlogViewDto> {
         //
         // Returns blog by id
 
         const foundBlog: BlogViewDto =
-            await this.blogQueryRepository.findByIdWithCheck(inputId.id);
+            await this.blogQueryRepository.findByIdWithCheck(id);
         return foundBlog;
     }
 
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-//    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'))
     async correctBlog(
-        @CurrentUserId() userId: string,
-        @Param('id') inputId: IdInputDto,
+        @Param() {id}: IdInputDto,
         @Body() blog: BlogInputDto,
     ): Promise<void> {
         //
         // Update existing Blog by id with InputModel
 
-        return await this.blogService.edit(inputId.id, blog);
+        return await this.blogService.edit(id, blog);
     }
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-//    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'))
     async deleteBlog(
-        @CurrentUserId() userId: string,
-        @Param('id') inputId: IdInputDto, ): Promise<void> {
+        @Param() {id}: IdInputDto, ): Promise<void> {
         //
         // Delete blog specified by id
 
-        return await this.blogService.delete(inputId.id);
+        return await this.blogService.delete(id);
     }
 
     @Get(':id/posts')
+    @UseGuards(ReadUserIdGuard)
     async getPostByBlog(
-        @Param('id') inputId: IdInputDto,
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
         @Query() query: GetPostQueryParams,
-    ): Promise<PaginatedViewDto<PostViewDto[]>> {
+    ): Promise<PaginatedViewDto<PostViewDto>> {
         //
         // Returns all posts for specified blog
-        query.setBlogIdSearchParams(inputId.id);
+        query.setBlogIdSearchParams(id);
+        await this.blogQueryRepository.findByIdWithCheck(id);
         // проверка существования блога
-        await this.blogQueryRepository.findByIdWithCheck(inputId.id);
 
-        const postPaginator: PaginatedViewDto<PostViewDto[]> =
-            await this.postQueryRepository.find(query);
+        const postPaginator: PaginatedViewDto<PostViewDto> =
+            await this.postQueryRepository.find(query, user);
         return postPaginator;
     }
 
     @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
-//    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'))
     async createPostByBlog(
-        @CurrentUserId() userId: string,
-        @Param('id') inputId: IdInputDto,
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
         @Body() createPartDto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
         // Create new post for specific blog
-        const createDto: PostInputDto = { ...createPartDto, blogId: inputId.id };
+        const createDto: PostInputDto = { ...createPartDto, blogId: id };
         const createId: string = await this.postService.create(createDto);
         const postView: PostViewDto =
-            await this.postQueryRepository.findByIdWithCheck(createId);
+            await this.postQueryRepository.findByIdWithCheck(createId, user);
         return postView;
     }
 }

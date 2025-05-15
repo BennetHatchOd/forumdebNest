@@ -27,6 +27,11 @@ import { CommentService } from '../application/comment.service';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
+import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
+import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
+import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
+import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller(URL_PATH.posts)
 export class PostController {
@@ -34,58 +39,94 @@ export class PostController {
         private postService: PostService,
         private commentService: CommentService,
         private postQueryRepository: PostQueryRepository,
+        private commandBus: CommandBus,
         private commentQueryRepository: CommentQueryRepository,
     ){}
 
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     @HttpCode(HttpStatus.CREATED)
-    async createPost(@Body() postDto: PostInputDto):Promise<PostViewDto> {
+    async createPost(
+        @Body() postDto: PostInputDto,
+        @CurrentUserId() user: string,):Promise<PostViewDto> {
         //
         // Create new post
 
         const createdId: string = await this.postService.create(postDto);
-        const postView: PostViewDto = await this.postQueryRepository.findByIdWithCheck(createdId);
+        const postView: PostViewDto = await this.postQueryRepository.findByIdWithCheck(createdId, user);
         return postView;
     }
 
-    @Get()
-    async getAll(@Query() query: GetPostQueryParams,)
-        : Promise<PaginatedViewDto<PostViewDto[]>> {
-
-        const postPaginator: PaginatedViewDto<PostViewDto[]>
-            = await this.postQueryRepository.find(query);
-        return postPaginator;
-    }
-
-    @Get(':id')
-    async getById(@Param('id') inputId: IdInputDto):Promise<PostViewDto>{
-        //
-        // Returns post by id
-
-        const foundPost: PostViewDto = await this.postQueryRepository.findByIdWithCheck(inputId.id);
-        return foundPost;
-    }
-
     @Put(':id')
+    @UseGuards(AuthGuard('jwt'))
     @HttpCode(HttpStatus.NO_CONTENT)
     async correctPost(
-        @Param('id') inputId: IdInputDto,
+        @Param() {id}: IdInputDto,
         @Body() post: PostInputDto
     ): Promise<void>{
         //
         // Update existing Post by id with InputModel
 
-        return await this.postService.edit(inputId.id, post)
+        return await this.postService.edit(id, post)
 
     }
 
-    @Delete(':id')
+    @Put(':id/like-status')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePost(@Param('id') inputId: IdInputDto): Promise<void>{
+    @UseGuards(AuthGuard('jwt'))
+    async setLikeStatus(
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
+        @Body() likeStatus: LikeInputDto,
+    ) {
+
+        const createLike: LikeCreateDto = {
+            targetId: id,
+            ownerId: user,
+            rating: likeStatus.rating,
+            targetType: LikeTarget.Post,
+        };
+
+        await this.commandBus.execute(new MakeLikeCommand(createLike));
+    }
+
+
+    @Get()
+    @UseGuards(ReadUserIdGuard)
+    async getAll(
+        @Query() query: GetPostQueryParams,
+        @CurrentUserId() user: string,
+    ): Promise<PaginatedViewDto<PostViewDto>> {
+
+        const postPaginator: PaginatedViewDto<PostViewDto>
+            = await this.postQueryRepository.find(query, user);
+        return postPaginator;
+    }
+
+    @Get(':id')
+    @UseGuards(ReadUserIdGuard)
+    async getById(
+        @Param() {id}: IdInputDto,
+        @CurrentUserId() user: string,
+    ):Promise<PostViewDto>{
+        //
+        // Returns post by id
+
+        const foundPost: PostViewDto = await this.postQueryRepository.findByIdWithCheck(id, user);
+        return foundPost;
+    }
+
+    @Delete(':id')
+    @UseGuards(AuthGuard('jwt'))
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deletePost(
+        @Param() {id}: IdInputDto,
+        @CurrentUserId() user: string,
+    ): Promise<void>{
         //
         // Delete post specified by id
 
-        return await this.postService.delete(inputId.id)
+        return await this.postService.delete(id)
 
     }
 
@@ -95,15 +136,15 @@ export class PostController {
         @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
         @Query() query: GetCommentQueryParams
-     ){//: Promise<PaginatedViewDto<CommentViewDto[]>> {
+     ): Promise<PaginatedViewDto<CommentViewDto>> {
         // Returns all comments for specified post, if the post isn't found,
         // return "not found"
 
-        await this.postQueryRepository.findByIdWithCheck(id)
+        await this.postQueryRepository.findByIdWithCheck(id, user)
         // check the existence of the post and throw the exception "not found"
 
         query.setParentPostIdSearchParams(id)
-        const commentPaginator: PaginatedViewDto<CommentViewDto[]>
+        const commentPaginator: PaginatedViewDto<CommentViewDto>
              = await this.commentQueryRepository.find(query, user);
         return commentPaginator;
 
@@ -112,18 +153,18 @@ export class PostController {
     @Post(':id/comments')
     @UseGuards(AuthGuard('jwt'))
     async createCommentByPost(
-        @CurrentUserId() currentUserId: string,
-        @Param('id') postId: IdInputDto,
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
         @Body() comment: CommentInputDto
     ): Promise<CommentViewDto> {
         // Create comment for specified post, if the post isn't found,
         // throw the exception "not found"
 
-        await this.postQueryRepository.findByIdWithCheck(postId.id)
+        await this.postQueryRepository.findByIdWithCheck(id, user)
         // check the existence of the post
 
-        const createdComment: string = await this.commentService.create(postId.id, comment, "currentUserId");
-        return this.commentQueryRepository.findByIdWithCheck(createdComment);
+        const createdComment: string = await this.commentService.create(id, comment, user);
+        return this.commentQueryRepository.findByIdWithCheck(createdComment, user);
 
     }
 

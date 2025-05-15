@@ -44,9 +44,9 @@ export class UserControllers {
 
     @Get()
     async getAll(@Query() query: GetUserQueryParams,)
-        : Promise<PaginatedViewDto<UserViewDto[]>> {
+        : Promise<PaginatedViewDto<UserViewDto>> {
 
-        const userPaginator: PaginatedViewDto<UserViewDto[]>
+        const userPaginator: PaginatedViewDto<UserViewDto>
             = await this.userQueryRepository.find(query);
 
         return userPaginator;

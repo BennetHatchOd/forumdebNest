@@ -73,11 +73,11 @@ export class AuthController {
             return answer;
     }
 
-    // @Get(AUTH_PATH.logout)
+    // @Post(AUTH_PATH.logout)
     // @UseGuards(AuthGuard(?))
     // async logOut(@CurrentUserId() userId: string): Promise<>{}
 
-    // @Get(AUTH_PATH.refresh)
+    // @Post(AUTH_PATH.refresh)
     // @UseGuards(AuthGuard(?))
     // async newRefreshToken(@CurrentUserId() userId: string): Promise<>{
     // }

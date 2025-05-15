@@ -49,7 +49,7 @@ export class CommentController {
     @UseGuards(AuthGuard('jwt'))
     async setLikeStatus(
         @CurrentUserId() user: string,
-        @Param() { id }: IdInputDto,
+        @Param() {id}: IdInputDto,
         @Body() likeStatus: LikeInputDto,
     ) {
 
