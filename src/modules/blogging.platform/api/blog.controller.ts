@@ -22,11 +22,10 @@ import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
 import { PostService } from '../application/post.service';
-import { URL_PATH } from '../../../core/url.path.setting';
-import { IdInputDto } from '../../../core/dto/input/id.Input.Dto';
-import { CurrentUserId } from '../../../core/decorators/current.user';
+import { URL_PATH } from '@core/url.path.setting';
+import { IdInputDto } from '@core/dto/input/id.Input.Dto';
+import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
-import * as process from 'node:process';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 

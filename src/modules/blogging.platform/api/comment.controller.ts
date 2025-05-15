@@ -20,7 +20,6 @@ import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/
 import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
-import console from 'node:console';
 
 
 @Controller(URL_PATH.comments)

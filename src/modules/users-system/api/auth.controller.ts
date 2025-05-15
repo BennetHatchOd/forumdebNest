@@ -8,7 +8,6 @@ import { ConfirmCodeInputDto } from '@src/modules/users-system/dto/input/confirm
 import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
-import console from 'node:console';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 
