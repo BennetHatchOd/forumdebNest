@@ -7,6 +7,8 @@ import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../../dto/input/get.user.query.params.input.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
+import { EmptyPaginator } from '@core/dto/empty.paginator';
+
 
 @Injectable()
 export class UserQueryRepository {
@@ -42,7 +44,7 @@ export class UserQueryRepository {
         return UserViewDto.mapToView(searchItem);
     }
 
-    async find(queryReq: GetUserQueryParams): Promise<PaginatedViewDto<UserViewDto[]>> {
+    async find(queryReq: GetUserQueryParams): Promise<PaginatedViewDto<UserViewDto>> {
 
 
         const queryFilter: FilterQuery<User> = { deletedAt: null };
@@ -59,7 +61,8 @@ export class UserQueryRepository {
 
         const totalCount: number = await this.UserModel.countDocuments(queryFilter);
 
-        //if (totalCount == 0) return emptyPaginator;
+        if(totalCount === 0)
+            return new EmptyPaginator<UserViewDto>();
 
         const users: Array<UserDocument> = await this.UserModel.find(queryFilter)
             .limit(queryReq.pageSize)
