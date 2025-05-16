@@ -40,21 +40,11 @@ export class Comment {
         }
         this.deletedAt = new Date();
     }
-    //
-    // async update(change: PostInputDto,
-    //              blogQueryRepository: BlogQueryRepository,) {
-    //     this.title = change.title;
-    //     this.shortDescription = change.shortDescription;
-    //     this.content = change.content;
-    //     // проверяем ид на существование и находим имя
-    //     this.blogId = change.blogId;
-    //     const blogParent: BlogViewDto|null
-    //         = await blogQueryRepository.findByIdWitoutCheck(change.blogId);
-    //     if(!blogParent)
-    //         throw new Error('No blog found with this id');
-    //     this.blogName = blogParent.name;
-    // }
-    //
+
+    async update(change: string): Promise<void> {
+        this.content = change;
+    }
+
     static createInstance(createDto: CreateCommentDto): CommentDocument {
 
         const comment = new this();

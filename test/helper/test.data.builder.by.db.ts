@@ -78,7 +78,7 @@ export class TestDataBuilderByDb {
         }
     }
 
-    async createManyUsers(){
+    private async createManyUsers(){
         this.isCreate.user = true;
         for(let i =0; i < this.numberUsers; i++){
             const user = {
@@ -191,7 +191,7 @@ export class TestDataBuilderByDb {
     }
     private async checkUser(){
         if(!this.isCreate.user) {
-            await this.createManyUsers();
+            await this.createManyAccessTokens();
             this.isCreate.user = true;
         }
     }
