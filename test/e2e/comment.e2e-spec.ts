@@ -1,17 +1,15 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { Connection } from 'mongoose';
-import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
+import {  URL_PATH } from '@core/url.path.setting';
 import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
-import * as console from 'node:console';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
 import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';
-import { EmailService } from '@src/modules/notifications/application/email.service';
 
 describe('CommentController (e2e)', () => {
     let app: INestApplication;

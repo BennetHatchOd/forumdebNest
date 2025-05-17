@@ -1,6 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserInputDto } from '../dto/input/user.input.dto';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { UserRepository } from '../infrastucture/user.repository';
 import { PasswordHashService } from './password.hash.service';

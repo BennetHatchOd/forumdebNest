@@ -1,8 +1,7 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
-import {v4 as uuidv4} from 'uuid';
-import {add, isBefore} from 'date-fns';
+import { isBefore} from 'date-fns';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,7 +15,6 @@ import { JwtService } from '@nestjs/jwt';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
-import * as console from 'node:console';
 
 @Injectable()
 export class AuthService {

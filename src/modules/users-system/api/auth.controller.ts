@@ -13,7 +13,6 @@ import { CreateUserCommand } from '@modules/users-system/application/UseCase/cre
 import { CreateSessionCommand } from '@modules/users-system/application/UseCase/create.session.usecase';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 import { Request, Response } from 'express';
-import console from 'node:console';
 
 @Controller(URL_PATH.auth)
 export class AuthController {

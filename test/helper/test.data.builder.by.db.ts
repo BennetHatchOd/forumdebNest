@@ -11,7 +11,6 @@ import { PasswordHashService } from '@src/modules/users-system/application/passw
 import request from 'supertest';
 import { join } from 'path';
 import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
-import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы, при этом тестируя
