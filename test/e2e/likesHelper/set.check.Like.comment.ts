@@ -26,15 +26,15 @@ export async function setCheckLikeComment(
     const response = await request(app.getHttpServer())
         .put(join(URL_PATH.comments, targetId, 'like-status'))
         .set("Authorization", 'Bearer ' + accessToken)
-        .send({rating: likeStatus })
+        .send({likeStatus: likeStatus })
         .expect(HttpStatus.NO_CONTENT);
 
-    let entityResponce = await request(app.getHttpServer())
+    let entityResponse = await request(app.getHttpServer())
                                 .get(join(URL_PATH.comments, targetId))
                                 .set("Authorization", 'Bearer ' + accessToken)
                                 .expect(HttpStatus.OK);
 
-    return entityResponce.body.likesInfo
+    return entityResponse.body.likesInfo
     
-    // return entityResponce.body.extendedLikesInfo
+    // return entityResponse.body.extendedLikesInfo
 }

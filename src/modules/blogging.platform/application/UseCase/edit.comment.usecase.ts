@@ -22,14 +22,7 @@ export class EditCommentHandler implements ICommandHandler<EditCommentCommand> {
 
     async execute({ editDto }: EditCommentCommand): Promise<void> {
 
-
-        const foundComment: CommentDocument | null = await this.commentRepository.getCommentById(editDto.targetId);
-
-        if(!foundComment)
-            throw new DomainException({
-                message: "Comment not found",
-                code: DomainExceptionCode.NotFound,
-            });
+        const foundComment: CommentDocument = await this.commentRepository.getCommentById(editDto.targetId);
 
         if(foundComment.commentatorInfo.userId !== editDto.userId)
             throw new DomainException({

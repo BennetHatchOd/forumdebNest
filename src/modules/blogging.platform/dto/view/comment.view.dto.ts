@@ -19,7 +19,7 @@ export class CommentViewDto {
     constructor(item: CommentDocument, likeInfo: LikesInfoViewDto) {
         this.id = item._id.toString();
         this.content = item.content;
-        this.createdAt = item.createdAt.toString();
+        this.createdAt = item.createdAt.toISOString();
         this.commentatorInfo = {
             userId: item.commentatorInfo.userId,
             userLogin: item.commentatorInfo.userLogin,

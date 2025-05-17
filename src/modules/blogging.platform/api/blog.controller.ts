@@ -40,7 +40,7 @@ export class BlogController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     async createBlog(
         @Body() blog: BlogInputDto): Promise<BlogViewDto> {
         //
@@ -74,7 +74,7 @@ export class BlogController {
 
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     async correctBlog(
         @Param() {id}: IdInputDto,
         @Body() blog: BlogInputDto,
@@ -87,7 +87,7 @@ export class BlogController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     async deleteBlog(
         @Param() {id}: IdInputDto, ): Promise<void> {
         //
@@ -116,7 +116,7 @@ export class BlogController {
 
     @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     async createPostByBlog(
         @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,

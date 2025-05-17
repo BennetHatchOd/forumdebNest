@@ -17,7 +17,7 @@ export async function setCheckLikePost(
     const response = await request(app.getHttpServer())
         .put(join(URL_PATH.posts, targetId, 'like-status'))
         .set("Authorization", 'Bearer ' + accessToken)
-        .send({rating: likeStatus })
+        .send({likeStatus: likeStatus })
         .expect(HttpStatus.NO_CONTENT);
 
     let entityResponce = await request(app.getHttpServer())

@@ -23,14 +23,7 @@ export class DeleteCommentHandler implements ICommandHandler<DeleteCommentComman
 
     async execute({ deleteDto }: DeleteCommentCommand): Promise<void> {
 
-
-        const foundComment: CommentDocument | null = await this.commentRepository.getCommentById(deleteDto.targetId);
-
-        if(!foundComment)
-            throw new DomainException({
-                message: "Comment not found",
-                code: DomainExceptionCode.NotFound,
-            });
+        const foundComment: CommentDocument = await this.commentRepository.getCommentById(deleteDto.targetId);
 
         if(foundComment.commentatorInfo.userId !== deleteDto.userId)
             throw new DomainException({

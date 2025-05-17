@@ -26,7 +26,6 @@ import { CommentInputDto } from '@modules/blogging.platform/dto/input/comment.in
 import { EditCommentDto } from '@modules/blogging.platform/dto/edit.comment.dto';
 import { EditCommentCommand } from '@modules/blogging.platform/application/UseCase/edit.comment.usecase';
 
-
 @Controller(URL_PATH.comments)
 export class CommentController {
     constructor(
@@ -53,13 +52,13 @@ export class CommentController {
     @UseGuards(AuthGuard('jwt'))
     async setLikeStatus(
         @CurrentUserId() user: string,
-        @Param() { id }: IdInputDto,
+        @Param() {id}: IdInputDto,
         @Body() likeStatus: LikeInputDto,
     ) {
         const createLike: LikeCreateDto = {
             targetId: id,
             ownerId: user,
-            rating: likeStatus.rating,
+            rating: likeStatus.likeStatus,
             targetType: LikeTarget.Comment,
         };
 

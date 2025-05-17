@@ -25,13 +25,9 @@ export class PostService {
 
     async edit(id: string, editData: PostInputDto): Promise<void> {
 
-        const post: PostDocument | null = await this.postRepository.findById(id);
+        const post: PostDocument = await this.postRepository.findById(id);
 
-        if (!post)
-            throw new DomainException({
-                message: 'post with ${id} not found',
-                code: DomainExceptionCode.NotFound});
-        const blogName
+        const blogName: string
             = (await this.blogQueryRepository.findByIdWithCheck(editData.blogId)).name
         post.update(editData, blogName);
         this.postRepository.save(post);
@@ -39,12 +35,8 @@ export class PostService {
     }
 
     async delete(id: string): Promise<void> {
-        const post: PostDocument | null = await this.postRepository.findById(id);
+        const post: PostDocument = await this.postRepository.findById(id);
 
-        if (!post)
-            throw new DomainException({
-                message: 'post with id-${id} not found',
-                code: DomainExceptionCode.NotFound});
         post.delete();
         this.postRepository.save(post);
         return;

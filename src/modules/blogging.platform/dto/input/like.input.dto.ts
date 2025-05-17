@@ -6,5 +6,5 @@ export class LikeInputDto {
     @IsEnum(Rating,{
         message: "LikeStatus must be {Like, Dislike, None}",
     })
-    rating: Rating;
+    likeStatus: Rating;
 }

@@ -44,7 +44,7 @@ export class PostController {
     ){}
 
     @Post()
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     @HttpCode(HttpStatus.CREATED)
     async createPost(
         @Body() postDto: PostInputDto,
@@ -58,7 +58,7 @@ export class PostController {
     }
 
     @Put(':id')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     @HttpCode(HttpStatus.NO_CONTENT)
     async correctPost(
         @Param() {id}: IdInputDto,
@@ -83,7 +83,7 @@ export class PostController {
         const createLike: LikeCreateDto = {
             targetId: id,
             ownerId: user,
-            rating: likeStatus.rating,
+            rating: likeStatus.likeStatus,
             targetType: LikeTarget.Post,
         };
 
@@ -117,7 +117,7 @@ export class PostController {
     }
 
     @Delete(':id')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('basic'))
     @HttpCode(HttpStatus.NO_CONTENT)
     async deletePost(
         @Param() {id}: IdInputDto,
