@@ -300,7 +300,7 @@ describe('UserAppController (e2e)', () => {
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, '681896da2168245826d049'))
                 .set("Authorization", testData.authLoginPassword)
-                .expect(HttpStatus.BAD_REQUEST)
+                .expect(HttpStatus.NOT_FOUND)
         });
 
     })

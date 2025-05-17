@@ -157,7 +157,6 @@ describe('LikePostController (e2e)', () => {
 				   newestLikes: [testData.usersLikes[2], testData.usersLikes[0], testData.usersLikes[1]]
 				  })
 
-
 			  status = Rating.Like
 			  expect(await setCheckLikePost(app, testData.posts[0]._id.toString(), testData.accessTokens[4], status))
 				  .toEqual({
@@ -324,5 +323,71 @@ describe('LikePostController (e2e)', () => {
 
 
 	 })
+	})
+
+	describe('Send likes and dislikes post with errors', () => {
+		beforeAll(async () => {
+			testData.clearData();
+			testData.numberUsers = 1;
+			testData.numberPosts = 1;
+			await testData.createManyPosts();
+			await testData.createManyAccessTokens();
+		})
+
+		afterAll(async () => {
+			await deleteAllData(app, globalPrefix);
+		})
+
+		it('should return 401 if user is not logged in', async() => {
+			const response = await request(app.getHttpServer())
+				.put(join(URL_PATH.posts, testData.posts[0]._id.toString(), 'like-status'))
+				.set("Authorization", 'Bearer ' + "ghfgg")
+				.send({likeStatus: Rating.Like })
+				.expect(HttpStatus.UNAUTHORIZED);
+		})
+		it('should return 404 if post not exist', async() => {
+			const response = await request(app.getHttpServer())
+				.put(join(URL_PATH.posts, '5346345', 'like-status'))
+				.set("Authorization", 'Bearer ' + testData.accessTokens[0])
+				.send({likeStatus: Rating.Like })
+				.expect(HttpStatus.NOT_FOUND);
+		})
+
+		it('should return 400 if send not {likesStatus:Rating}', async() => {
+			let response = await request(app.getHttpServer())
+				.put(join(URL_PATH.posts, testData.posts[0]._id.toString(), 'like-status'))
+				.set("Authorization", 'Bearer ' + testData.accessTokens[0])
+				.send({likeStatus: 'like' })
+				.expect(HttpStatus.BAD_REQUEST);
+
+
+			expect(response.body.errorsMessages.length).toBe(1)
+			expect(response.body.errorsMessages[0]).toEqual({
+				message: expect.any(String),
+				field: "likeStatus"
+			})
+
+			response = await request(app.getHttpServer())
+				.put(join(URL_PATH.posts, testData.posts[0]._id.toString(), 'like-status'))
+				.set("Authorization", 'Bearer ' + testData.accessTokens[0])
+				.send({likesStatus: Rating.Like })
+				.expect(HttpStatus.BAD_REQUEST);
+
+			expect(response.body.errorsMessages[0]).toEqual({
+				message: expect.any(String),
+				field: "likeStatus"})
+
+			response = await request(app.getHttpServer())
+				.put(join(URL_PATH.posts, testData.posts[0]._id.toString(), 'like-status'))
+				.set("Authorization", 'Bearer ' + testData.accessTokens[0])
+				.send({likes: "Like" })
+				.expect(HttpStatus.BAD_REQUEST);
+
+			expect(response.body.errorsMessages.length).toBe(1)
+			expect(response.body.errorsMessages[0]).toEqual({
+				message: expect.any(String),
+				field: "likeStatus"
+			})
+		})
 	})
 })

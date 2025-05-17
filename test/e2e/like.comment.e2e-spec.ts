@@ -288,4 +288,69 @@ describe('LikeCommentController (e2e)', () => {
                                                         myStatus: Rating.None })
         });
     })
+
+    describe('Send likes and dislikes comment with errors', () => {
+        beforeAll(async () => {
+            testData.clearData();
+            testData.numberUsers = 1;
+            testData.numberComments = 1;
+            await testData.createManyComment();
+            await testData.createManyAccessTokens();
+        })
+
+        afterAll(async () => {
+            await deleteAllData(app, globalPrefix);
+        })
+
+        it('should return 401 if user is not logged in', async() => {
+            const response = await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .set("Authorization", 'Bearer ' + "ghfgg")
+                .send({likeStatus: Rating.Like })
+                .expect(HttpStatus.UNAUTHORIZED);
+        })
+        it('should return 404 if comment not exist', async() => {
+            const response = await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, '5346345', 'like-status'))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[0])
+                .send({likeStatus: Rating.Like })
+                .expect(HttpStatus.NOT_FOUND);
+        })
+
+        it('should return 400 if send not {likesStatus:Rating}', async() => {
+            let response = await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[0])
+                .send({likeStatus: 'like' })
+                .expect(HttpStatus.BAD_REQUEST);
+
+            expect(response.body.errorsMessages.length).toBe(1)
+            expect(response.body.errorsMessages[0]).toEqual({
+                                                        message: expect.any(String),
+                                                        field: "likeStatus"
+                                                    })
+
+            response = await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[0])
+                .send({likesStatus: Rating.Like })
+                .expect(HttpStatus.BAD_REQUEST);
+
+            expect(response.body.errorsMessages[0]).toEqual({
+                message: expect.any(String),
+                field: "likeStatus"})
+
+            response = await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[0])
+                .send({likes: "Like" })
+                .expect(HttpStatus.BAD_REQUEST);
+
+            expect(response.body.errorsMessages.length).toBe(1)
+            expect(response.body.errorsMessages[0]).toEqual({
+                message: expect.any(String),
+                field: "likeStatus"
+            })
+        })
+    })
 })
