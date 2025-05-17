@@ -19,38 +19,6 @@ export class UserService {
         @InjectModel(User.name) private UserModel: UserModelType,
     ) {}
 
-    async create(inputUserDto: UserInputDto): Promise<string> {
-
-        await this.authService.checkUniq(inputUserDto);
-
-        const passwordHash: string = await this.passwordHashService.createHash(
-            inputUserDto.password,
-            this.userConfig.saltRound,
-        );
-        const createdUser: UserDocument = this.UserModel.createInstance({
-            ...inputUserDto,
-            password: passwordHash,
-        });
-
-        // for directly created user no need to check email
-        await this.userRepository.save(createdUser);
-        return createdUser._id.toString();
-    }
-
-    // async edit(id: string, editData: UserInputDto): Promise<void> {
-    //
-    //     const user: UserDocument | null = await this.userRepository.findById(id);
-    //
-    //     if (!user)
-    //         throw new DomainException({
-    //                 message: 'user with ${id} not found',
-    //                 code: DomainExceptionCode.NotFound});
-    //     const passwordHash: string = await this.passwordHashService.createHash(editData.password);
-    //     user.edit({...editData,
-    //                   password: passwordHash});
-    //     this.userRepository.save(user);
-    //     return;
-    // }
 
     async delete(id: string): Promise<void> {
         const user: UserDocument | null = await this.userRepository.findById(id);

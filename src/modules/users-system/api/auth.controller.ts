@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus, Get } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus, Get, Req, Res } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
@@ -10,6 +10,10 @@ import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { CreateSessionCommand } from '@modules/users-system/application/UseCase/create.session.usecase';
+import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
+import { Request, Response } from 'express';
+import console from 'node:console';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
@@ -22,11 +26,27 @@ export class AuthController {
     @Post(AUTH_PATH.login)
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
-    async authorization(@CurrentUserId() userId: string):Promise<{accessToken: string}>{
+    async authorization1(
+        @CurrentUserId() user: string,
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response,
+    ):Promise<{accessToken: string}>{
 
-        const userTokens: string = await this.authService.authorization(userId)
+        const device =  req.headers['user-agent'] || 'unknown device';
+        const ip = req.ip || 'unknown ip';
+
+        const session: SessionInputDto ={
+            userId: user,
+            deviceName: device,
+            ip: ip
+        }
+        const refreshToken: string = await this.commandBus.execute(new CreateSessionCommand(session))
+        const accessTokens: string = await this.authService.authorization(user)
+        res.cookie('refreshToken', refreshToken,
+            {httpOnly: true,
+             secure: true,})
         return {
-            accessToken: userTokens};
+            accessToken: accessTokens};
     }
 
     @Post(AUTH_PATH.registration)

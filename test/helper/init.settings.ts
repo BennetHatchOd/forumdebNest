@@ -23,6 +23,7 @@ import { TestDataBuilderByDb } from './test.data.builder.by.db';
 import { EmailService } from '@src/modules/notifications/application/email.service';
 import { EmailServiceMock } from '../mock/email.service.mock';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 export const initSettings = async (
     //передаем callback, который получает ModuleBuilder, если хотим изменить настройку тестового модуля
@@ -42,7 +43,7 @@ export const initSettings = async (
 
     const testingAppModule = await testingModuleBuilder.compile();
 
-    const app = testingAppModule.createNestApplication();
+    const app = testingAppModule.createNestApplication<NestExpressApplication>();
     const coreConfig = app.get<CoreConfig>(CoreConfig);
     const userConfig = app.get<UserConfig>(UserConfig);
     const globalPrefix = coreConfig.globalPrefix

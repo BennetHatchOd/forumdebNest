@@ -1,6 +1,6 @@
 
-// export function compareArr(arr1: Array<string>, arr2: Array<DeviceViewType>){
-//     let deviceNamesSource: Array<DeviceViewType> = arr2
+// export function compareArr(arr1: Array<string>, arr2: Array<SessionViewType>){
+//     let deviceNamesSource: Array<SessionViewType> = arr2
 //     let deviceNames = deviceNamesSource.map(s => s.title)
 //     const check = arr1.reduce((acc, current)=>{acc += deviceNames.includes(current)
 //                                                         ? 1

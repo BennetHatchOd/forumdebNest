@@ -78,7 +78,7 @@ export class TestDataBuilderByDb {
         }
     }
 
-    private async createManyUsers(){
+    async createManyUsers(){
         this.isCreate.user = true;
         for(let i =0; i < this.numberUsers; i++){
             const user = {
@@ -151,8 +151,8 @@ export class TestDataBuilderByDb {
 
     }
 
-    // createTitleDevices(){
-    //     this.titleDevices = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
+    // createTitleSessions(){
+    //     this.titleSessions = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
     // }
     // createBadUser(){
     //     this.badUser = {

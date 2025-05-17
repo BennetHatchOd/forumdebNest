@@ -36,6 +36,8 @@ export class AuthService {
     ) {}
 
     async authorization(userId: string) {
+
+
         return this.accessJwtService.sign({ user: userId });
     }
 

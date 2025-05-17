@@ -60,6 +60,9 @@ describe('AuthAppController (e2e)', () => {
         it('should return 200 and a correct accessToken by login', async () => {
             const response = await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
+                .set("Authorization", testData.authLoginPassword)
+                .set("user-agent", "Honor 15")
+                .set("x-forwarded-for", "254:154:78:6")
                 .send({
                     loginOrEmail: testData.users[0].login,
                     password: testData.usersPassword[0]
@@ -68,7 +71,7 @@ describe('AuthAppController (e2e)', () => {
             expect(response.body).toHaveProperty('accessToken');
             const accessToken = response.body.accessToken;
             const jwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
-            const payload = jwtService.verify(accessToken); // <— проверит подпись и вернёт payload
+            const payload = jwtService.verify(accessToken);
             expect(payload.user).toBe(testData.users[0]._id.toString());
         });
 
@@ -193,7 +196,7 @@ describe('AuthAppController (e2e)', () => {
         beforeAll(async () => {
             testData.clearData();
             testData.numberUsers = 1;
-            await testData.createManyUsers();
+            await testData.createManyAccessTokens();
             jest.clearAllMocks();
         })
 
@@ -251,7 +254,7 @@ describe('AuthAppController (e2e)', () => {
         beforeAll(async () => {
             testData.clearData();
             testData.numberUsers = 1;
-            await testData.createManyUsers();
+            await testData.createManyAccessTokens();
             jest.clearAllMocks();
         })
 

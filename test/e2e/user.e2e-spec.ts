@@ -55,7 +55,7 @@ describe('UserAppController (e2e)', () => {
         beforeAll(async () => {
             testData.clearData();
             testData.numberUsers = 8;
-            await testData.createManyUsers();
+            await testData.createManyAccessTokens();
         })
 
         afterAll(async () => {

@@ -14,7 +14,7 @@ export class TestDataBuilder {
     // базовые ендпоинты по созданию сущностей системы: blog, post, comment, user
     users: UserInputDto[] = [];
     accessTokens: string[] = [];
-    // titleDevices: string[];
+    // titleSessions: string[];
     comments: CommentInputDto[] = [];
     blogs: BlogInputDto[] = [];
     blogIds: string[] = [];
@@ -140,8 +140,8 @@ export class TestDataBuilder {
         }
     }
 
-    // createTitleDevices(){
-    //     this.titleDevices = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
+    // createTitleSessions(){
+    //     this.titleSessions = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
     // }
     // createBadUser(){
     //     this.badUser = {

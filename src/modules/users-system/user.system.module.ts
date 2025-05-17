@@ -23,6 +23,8 @@ import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from '@modules/users-system/application/UseCase';
 import { AuthModule } from '@core/auth.module';
+import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
+import { Session, SessionSchema } from '@modules/users-system/domain/session.entity';
 
 @Module({
     imports: [
@@ -30,6 +32,7 @@ import { AuthModule } from '@core/auth.module';
         AuthModule,
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
+            { name: Session.name, schema: SessionSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
         JwtModule,
@@ -54,6 +57,7 @@ import { AuthModule } from '@core/auth.module';
         JwtStrategy,
         myBasicStrategy,
         ConfigService,
+        SessionRepository,
         // {
         //     provide: INJECT_TOKEN.ACCESS_TOKEN,
         //     useFactory: (userConfig: UserConfig): JwtService => {
@@ -64,16 +68,16 @@ import { AuthModule } from '@core/auth.module';
         //     },
         //     inject: [UserConfig],
         // },
-        // {
-        //     provide: INJECT_TOKEN.REFRESH_TOKEN,
-        //     useFactory: (userConfig:UserConfig): JwtService => {
-        //         return new JwtService({
-        //             secret: userConfig.refreshTokenSecret,
-        //             signOptions: { expiresIn: userConfig.timeLifeRefreshToken },
-        //         });
-        //     },
-        //     inject: [UserConfig],
-        // },
+        {
+            provide: INJECT_TOKEN.REFRESH_TOKEN,
+            useFactory: (userConfig:UserConfig): JwtService => {
+                return new JwtService({
+                    secret: userConfig.refreshTokenSecret,
+                    signOptions: { expiresIn: userConfig.timeLifeRefreshToken },
+                });
+            },
+            inject: [UserConfig],
+        },
     ],
     exports:[
         UserQueryExternalRepository,
