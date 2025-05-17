@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { Session, SessionDocument, SessionModelType } from '@modules/users-system/domain/session.entity';
 import { getTime } from 'date-fns';
 import { tokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
-import { CommentDocument } from '@modules/blogging.platform/domain/comment.entity';
 
 @Injectable()
 export class SessionRepository {
@@ -18,17 +17,15 @@ export class SessionRepository {
         await this.clearExpired(session.userId)
 
         const findAnswer
-            = await this.SessionModel.findOne({
+            = await this.SessionModel.countDocuments({
                 userId: session.userId,
                 version: session.version,
                 deviceId: session.deviceId
             })
 
-        return findAnswer
-            ? true
-            : false
-
+        return (findAnswer == 1);
     }
+
     private async clearExpired(userId: string): Promise<void> {
         // clears the database of expired sessions for this user
 
@@ -40,6 +37,7 @@ export class SessionRepository {
     async save(changedItem: SessionDocument): Promise<void> {
         await changedItem.save();
     }
+
     mapTokenFromSession(session: SessionDocument): tokenPayloadDto{
         return {
             userId:     session.userId,
