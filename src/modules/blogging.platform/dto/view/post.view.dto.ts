@@ -1,6 +1,5 @@
 import { PostDocument } from '../../domain/post.entity';
 import { Rating } from '../enum/rating.enum';
-import { ExtendedLikesInfoViewDto } from '@modules/blogging.platform/dto/view/extended.likes.info.view.dto';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 
@@ -42,7 +41,7 @@ export class PostViewDto {
         }
     }
 
-    static   mapToView(post: PostDocument,
+    public static mapToView(post: PostDocument,
                        likeInfo: LikesInfoViewDto,
                        newestLikes: NewestLikesDto
     ):PostViewDto {

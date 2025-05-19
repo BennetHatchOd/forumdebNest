@@ -31,7 +31,7 @@ export class CommentViewDto {
         }
     }
 
-    static mapToView(item: CommentDocument, likeInfo: LikesInfoViewDto): CommentViewDto {
+     public static mapToView(item: CommentDocument, likeInfo: LikesInfoViewDto): CommentViewDto {
         return new CommentViewDto(item, likeInfo)
     }
 }
