@@ -2,20 +2,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import ShortUniqueId from 'short-unique-id';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
+import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 
 @Schema({ timestamps: true })
 export class Session {
-    @Prop({
-        required: true,
-    })
+    @Prop({ required: true, })
     userId:     string;
 
-
-    @Prop({
-        required: true,
-    })
+    @Prop({ required: true, })
     version:    string;
-
 
     @Prop({
         unique: true,
@@ -23,28 +18,19 @@ export class Session {
     })
     deviceId:   string;
 
-
-    @Prop({
-        required: true,
-    })
+    @Prop({ required: true, })
     deviceName: string;
 
-
-    @Prop({
-        required: true,
-    })
+    @Prop({ required: true, })
     ip:         string;
 
     createdAt:  Date;
 
-    @Prop({ type: Date, default: null })
-    deletedAt: Date | null;
+    update(){
+        const uid = new ShortUniqueId({ length: 7 });
 
-    delete() {
-        if (this.deletedAt !== null) {
-            throw new Error('Session already deleted');
-        }
-        this.deletedAt = new Date();
+        this.createdAt = new Date();
+        this.version = uid.rnd();
     }
 
     static createInstance(dto: SessionInputDto,
