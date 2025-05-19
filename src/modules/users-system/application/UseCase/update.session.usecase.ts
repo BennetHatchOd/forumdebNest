@@ -33,7 +33,7 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
         }
 
         const updatingSession
-            = await this.sessionRepository.getByFilter(payload)
+            = await this.sessionRepository.getByFilter(queryFilter)
 
         if(!updatingSession)
             throw new DomainException({
