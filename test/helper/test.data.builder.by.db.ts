@@ -13,8 +13,7 @@ import { join } from 'path';
 import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
 
 export class TestDataBuilderByDb {
-    // создаем первоначальное наполнение системы, при этом тестируя
-    // базовые ендпоинты по созданию сущностей системы: blog, post, comment, user
+    // создаем первоначальное наполнение системы
     accessTokens: string[] = [];
     users: UserDocument[] = [];
     usersPassword: string[] = [];

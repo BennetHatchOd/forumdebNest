@@ -11,7 +11,7 @@ import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';
-import { EmailService } from '@src/modules/notifications/application/email.service';
+import * as cookie from 'cookie';
 
 describe('AuthAppController (e2e)', () => {
     let app: INestApplication;
@@ -30,6 +30,16 @@ describe('AuthAppController (e2e)', () => {
                         return new JwtService({
                             secret: userConfig.accessTokenSecret,
                             signOptions: { expiresIn: '2s' },
+                        });
+                    },
+                    inject: [UserConfig],
+                })
+                .overrideProvider(INJECT_TOKEN.REFRESH_TOKEN)
+                .useFactory({
+                    factory: (userConfig: UserConfig) => {
+                        return new JwtService({
+                            secret: userConfig.refreshTokenSecret,
+                            signOptions: { expiresIn: '40s' },
                         });
                     },
                     inject: [UserConfig],
@@ -57,10 +67,9 @@ describe('AuthAppController (e2e)', () => {
             await deleteAllData(app, globalPrefix);
         })
 
-        it('should return 200 and a correct accessToken by login', async () => {
+        it('should return 200 and a correct accessToken by after login login', async () => {
             const response = await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
-                .set("Authorization", testData.authLoginPassword)
                 .set("user-agent", "Honor 15")
                 .set("x-forwarded-for", "254:154:78:6")
                 .send({
@@ -70,12 +79,27 @@ describe('AuthAppController (e2e)', () => {
                 .expect(HttpStatus.OK)
             expect(response.body).toHaveProperty('accessToken');
             const accessToken = response.body.accessToken;
-            const jwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
-            const payload = jwtService.verify(accessToken);
+            const jwtServiceAT = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
+            const jwtServiceRT = app.get<JwtService>(INJECT_TOKEN.REFRESH_TOKEN);
+            const payload = jwtServiceAT.verify(accessToken);
             expect(payload.user).toBe(testData.users[0]._id.toString());
+
+            const setCookieHeader = response.headers['set-cookie'][0];
+            const parsedCookie = cookie.parse(setCookieHeader);
+            const refreshToken = parsedCookie['refreshToken']!;
+
+            const payloadRT = jwtServiceRT.verify(refreshToken);
+            expect(payloadRT).toEqual({
+                userId: testData.users[0]._id.toString(),
+                version: expect.any(String),
+                iat: expect.any(Number),
+                deviceId: expect.any(String),
+                exp: expect.any(Number),
+            });
+
         });
 
-        it('should return 200 and a correct accessToken by email', async () => {
+        it('should return 200 and a correct accessToken after login by email', async () => {
             const response = await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
                 .send({
@@ -92,7 +116,7 @@ describe('AuthAppController (e2e)', () => {
 
     });
 
-    describe('Testing registration and confirmation', () => {
+    describe('Testing user registration and verification', () => {
             const user = {
                 "login": "HE__2TeVSg",
                 "password": "string",
@@ -119,7 +143,7 @@ describe('AuthAppController (e2e)', () => {
 
             });
 
-            it('should return 204 after confirmation, 200 after login', async () => {
+            it('should return 204 after confirmation and 200 after login this user', async () => {
                 await request(app.getHttpServer())
                     .post(join(URL_PATH.auth, AUTH_PATH.confirmation))
                     .send({
@@ -205,7 +229,7 @@ describe('AuthAppController (e2e)', () => {
         })
 
         it('should return 204 and a code by email for recovery password', async () => {
-            const response = await request(app.getHttpServer())
+            await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.askNewPassword))
                 .send({
                     email: testData.users[0].email,
@@ -219,7 +243,7 @@ describe('AuthAppController (e2e)', () => {
         });
 
         it('should return 204 after set new password', async () => {
-                const response = await request(app.getHttpServer())
+                await request(app.getHttpServer())
                     .post(join(URL_PATH.auth, AUTH_PATH.confirmNewPassword))
                     .send({
                         newPassword: newPassword,
@@ -240,7 +264,7 @@ describe('AuthAppController (e2e)', () => {
             });
 
         it('should return 401 after login with old password', async () => {
-            const response = await request(app.getHttpServer())
+            await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
                 .send({
                     loginOrEmail: testData.users[0].login,
@@ -262,7 +286,7 @@ describe('AuthAppController (e2e)', () => {
             await deleteAllData(app, globalPrefix);
         })
 
-        it('should return 200 and an object information about user', async () => {
+        it('should return 200 and the user will receive object information about themselves', async () => {
             const response = await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
                 .send({
