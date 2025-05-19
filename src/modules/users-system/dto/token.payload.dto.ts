@@ -1,4 +1,4 @@
-export type tokenPayloadDto = {
+export type TokenPayloadDto = {
     userId:     string;
     version:    string;
     iat:        number;

@@ -53,12 +53,6 @@ export class UserControllers {
 
     }
 
-    // @Delete(':id')
-    // @HttpCode(HttpStatus.NO_CONTENT)
-    // async deleteUser(@Param('id') inputId: IdInputDto): Promise<void>{
-    //
-    //     return await this.userService.delete(inputId.id)
-    // }
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteUser(@Param() { id }: IdInputDto): Promise<void>{

@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { TokenPayloadDto } from '@modules/users-system/dto/tokenPayloadDto';
+import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 
 @Injectable()
 export class SessionIsActiveGuard implements CanActivate {
