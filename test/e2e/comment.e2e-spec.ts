@@ -106,14 +106,15 @@ describe('CommentController (e2e)', () => {
         })
 
         it('should return 204 after editing comment', async () => {
-            const response = await request(app.getHttpServer())
-                .put(join(URL_PATH.comments, commentIds[0]))
-                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
-                .send({
-                    content: content[1],
-                })
-                .expect(HttpStatus.NO_CONTENT)
-            expect(response.body).toEqual({})}
+                const response = await request(app.getHttpServer())
+                    .put(join(URL_PATH.comments, commentIds[0]))
+                    .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                    .send({
+                        content: content[1],
+                    })
+                    .expect(HttpStatus.NO_CONTENT)
+                expect(response.body).toEqual({})
+            }
         )
         it('should return 204 after deleting and 404 after get this comment', async () => {
             await request(app.getHttpServer())
@@ -144,19 +145,19 @@ describe('CommentController (e2e)', () => {
         })
 
         it('should return 200 and create many comments for the second post', async () => {
-            for(let i = 0; i<=5; i++)
+            for (let i = 0; i <= 5; i++)
                 await request(app.getHttpServer())
-                .post(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
-                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
-                .send({
-                    content: 'this text not have any sense ' + `${i}`,
-                })
-                .expect(HttpStatus.CREATED)
+                    .post(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
+                    .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                    .send({
+                        content: 'this text not have any sense ' + `${i}`,
+                    })
+                    .expect(HttpStatus.CREATED)
         })
         it('should return 200 and a paginator', async () => {
             const response = await request(app.getHttpServer())
                 .get(join(URL_PATH.posts, testData.posts[0]._id.toString(), "comments"))
-                .query({pageSize: 4})
+                .query({ pageSize: 4 })
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 pagesCount: 3,
@@ -170,7 +171,7 @@ describe('CommentController (e2e)', () => {
         it('should return 204 and a paginator', async () => {
             const response = await request(app.getHttpServer())
                 .get(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
-                .query({pageSize: 12})
+                .query({ pageSize: 12 })
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 pagesCount: 1,
@@ -182,8 +183,7 @@ describe('CommentController (e2e)', () => {
             expect(response.body.items.length).toBe(6)
         })
     })
-// it('should return 200 and a paginator with comments for specified post', async () => {
-    // })
+
     describe('Testing create, edit and delete comments with some wrongs', () => {
         beforeAll(async () => {
             testData.clearData();
@@ -198,9 +198,51 @@ describe('CommentController (e2e)', () => {
         afterAll(async () => {
             await deleteAllData(app, globalPrefix);
         })
-        it('should return 204 and a paginator after deleting', async () => {
+
+        it('should return 400 if we send wrong content', async () => {
+            await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[0])
+                .send({
+                    contents: 'this text not have any sense ',
+                })
+                .expect(HttpStatus.BAD_REQUEST)
         })
+        it('should return 401 if user not authorization', async () => {
+            await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .set("Authorization", 'Bearer ' + 'jj')
+                .send({contents: 'this text not have any sense ' })
+                .expect(HttpStatus.UNAUTHORIZED)
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .expect(HttpStatus.UNAUTHORIZED)
         })
-        it('should return 200 and a paginator with comments for specified post', async () => {
+        it("should return 403 if user edit or delete someone else's we send wrong content", async () => {
+            await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                .send({ content: 'this text not have any sense ' })
+                .expect(HttpStatus.FORBIDDEN)
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                .expect(HttpStatus.FORBIDDEN)
         })
+
+        it('should return 404 if comment not exist', async () => {
+            await request(app.getHttpServer())
+                .put(join(URL_PATH.comments, "testData"))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                .send({ content: 'this text not have any sense ' })
+                .expect(HttpStatus.NOT_FOUND)
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.comments, "testData"))
+                .set("Authorization", 'Bearer ' + testData.accessTokens[1])
+                .expect(HttpStatus.NOT_FOUND)
+            await request(app.getHttpServer())
+                .get(join(URL_PATH.comments, "testData"))
+                .expect(HttpStatus.NOT_FOUND)
+        })
+    })
 })

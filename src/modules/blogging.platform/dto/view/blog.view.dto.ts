@@ -15,7 +15,7 @@ export class BlogViewDto {
             this.isMembership = item.isMembership;
             this.websiteUrl = item.websiteUrl;
         }
-    static   mapToView(item: BlogDocument): BlogViewDto {
+    public static   mapToView(item: BlogDocument): BlogViewDto {
         return  new BlogViewDto(item);
     }
 }

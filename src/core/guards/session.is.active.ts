@@ -20,10 +20,7 @@ export class SessionIsActiveGuard implements CanActivate {
         try {
             const payload: TokenPayloadDto = this.refreshJwtService.verify(token);
             if (!await this.sessionRepository.isActive(payload))
-                throw new DomainException({
-                    message: 'refrashToken is not valid',
-                    code: DomainExceptionCode.Unauthorized
-                });
+                throw new Error()
 
             request.user = payload;
             return true;

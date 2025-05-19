@@ -29,6 +29,11 @@ export class PostQueryRepository {
         userId: string|null = null): Promise<PostViewDto> {
         // returns a post by id, if comment isn't found throws an exception
 
+        if (!Types.ObjectId.isValid(id))
+            throw new DomainException({
+                message: 'post not found',
+                code: DomainExceptionCode.NotFound,
+            });
         const searchItem: PostDocument | null
             = await this.PostModel.findOne({
                                             _id: new Types.ObjectId(id),

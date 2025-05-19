@@ -13,19 +13,22 @@ import { CreateUserCommand } from '@modules/users-system/application/UseCase/cre
 import { CreateSessionCommand } from '@modules/users-system/application/UseCase/create.session.usecase';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 import { Request, Response } from 'express';
+import { SessionIsActiveGuard } from '@core/guards/session.is.active';
+import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
+import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/delete.my.session.usecase';
+import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/update.session.usecase';
 
 @Controller(URL_PATH.auth)
 export class AuthController {
     constructor(
         private authService: AuthService,
         private readonly commandBus: CommandBus,
-        ) {
-    }
+    ){}
 
     @Post(AUTH_PATH.login)
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
-    async authorization1(
+    async authorization(
         @CurrentUserId() user: string,
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
@@ -91,13 +94,34 @@ export class AuthController {
             return answer;
     }
 
-    // @Post(AUTH_PATH.logout)
-    // @UseGuards(AuthGuard(?))
-    // async logOut(@CurrentUserId() userId: string): Promise<>{}
+    @Post(AUTH_PATH.logout)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @UseGuards(SessionIsActiveGuard)
+    async logOut(
+        @CurrentUserId() user: TokenPayloadDto,
+    ):Promise<void>{
 
-    // @Post(AUTH_PATH.refresh)
-    // @UseGuards(AuthGuard(?))
-    // async newRefreshToken(@CurrentUserId() userId: string): Promise<>{
-    // }
+        await this.commandBus.execute(new DeleteMySessionCommand(
+            user.userId,
+            user.deviceId));
+        return;
+    }
+
+    @Post(AUTH_PATH.refresh)
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(SessionIsActiveGuard)
+    async newRefreshToken(
+        @CurrentUserId() user: TokenPayloadDto,
+        @Res({ passthrough: true }) res: Response,
+    ):Promise<{accessToken: string}>{
+
+        const refreshToken: string = await this.commandBus.execute(new UpdateSessionCommand(user))
+        const accessTokens: string = await this.authService.authorization(user.userId)
+        res.cookie('refreshToken', refreshToken,
+            {httpOnly: true,
+                secure: true,})
+        return {
+            accessToken: accessTokens};
+    }
 }
 

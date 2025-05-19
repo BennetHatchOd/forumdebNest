@@ -34,6 +34,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
             case DomainExceptionCode.Forbidden:
                 return 403;
             case DomainExceptionCode.Unauthorized:
+            case DomainExceptionCode.RefreshTokenNotVerify:
                 return 401;
             case DomainExceptionCode.InternalServerError:
             case DomainExceptionCode.TooManyEntiriesInDB:

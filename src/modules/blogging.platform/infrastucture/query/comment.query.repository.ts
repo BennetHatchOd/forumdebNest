@@ -3,10 +3,8 @@ import { FilterQuery, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument, CommentModelType } from '../../domain/comment.entity';
 import { CommentViewDto } from '../../dto/view/comment.view.dto';
-import { Rating } from '../../dto/enum/rating.enum';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { Like, LikeModelType } from '@modules/blogging.platform/domain/like.entity';
 import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture/query/likes.query.repositories';
@@ -27,6 +25,12 @@ export class CommentQueryRepository {
         userId: string | null = null,
     ): Promise<CommentViewDto> {
         // returns a comment by id, if comment isn't found throws an exception
+
+        if (!Types.ObjectId.isValid(id))
+            throw new DomainException({
+                message: 'comment not found',
+                code: DomainExceptionCode.NotFound,
+            });
 
         const searchItem: CommentDocument | null =
             await this.CommentModel.findOne({

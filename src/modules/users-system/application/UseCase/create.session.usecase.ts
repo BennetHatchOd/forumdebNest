@@ -7,7 +7,7 @@ import { SessionRepository } from '@modules/users-system/infrastucture/session.r
 import { Inject } from '@nestjs/common';
 import { INJECT_TOKEN } from '@modules/users-system/constans/jwt.tokens';
 import { JwtService } from '@nestjs/jwt';
-import { tokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
+import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 
 export class CreateSessionCommand extends Command<string> {
     constructor(
@@ -20,7 +20,6 @@ export class CreateSessionCommand extends Command<string> {
 export class CreateSessionHandler implements ICommandHandler<CreateSessionCommand, string> {
     constructor(
         private readonly sessionRepository: SessionRepository,
-        private readonly userConfig: UserConfig,
         @Inject(INJECT_TOKEN.REFRESH_TOKEN)
         private readonly refreshJwtService: JwtService,
         @InjectModel(Session.name) private SessionModel: SessionModelType,
@@ -31,8 +30,8 @@ export class CreateSessionHandler implements ICommandHandler<CreateSessionComman
         const session: SessionDocument = this.SessionModel.createInstance(sessionInputDto)
         await this.sessionRepository.save(session);
 
-        const payload: tokenPayloadDto =  this.sessionRepository.mapTokenFromSession(session)
-        const token = await this.refreshJwtService.sign(payload);
+        const payload: TokenPayloadDto =  this.sessionRepository.mapTokenFromSession(session)
+        const token = this.refreshJwtService.sign(payload);
         return token;
     }
 }

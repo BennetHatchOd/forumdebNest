@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import ShortUniqueId from 'short-unique-id';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
-import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 
 @Schema({ timestamps: true })
 export class Session {
