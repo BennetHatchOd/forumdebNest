@@ -1,4 +1,0 @@
-export const INJECT_TOKEN = {
-    ACCESS_TOKEN: Symbol("ACCESS_TOKEN"),
-    REFRESH_TOKEN: Symbol("REFRESH_TOKEN")
-}

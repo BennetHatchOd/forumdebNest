@@ -1,4 +1,4 @@
-import { Session, SessionDocument } from '@modules/users-system/domain/session.entity';
+import { SessionDocument } from '@modules/users-system/domain/session.entity';
 
 export class SessionViewDto{
     ip: string;

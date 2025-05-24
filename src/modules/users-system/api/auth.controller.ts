@@ -17,7 +17,7 @@ import { SessionIsActiveGuard } from '@core/guards/session.is.active';
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/delete.my.session.usecase';
 import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/update.session.usecase';
-import { SkipThrottle, Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 
 
 @Controller(URL_PATH.auth)
