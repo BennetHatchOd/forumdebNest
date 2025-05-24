@@ -5,7 +5,7 @@ import { Session, SessionDocument, SessionModelType } from '@modules/users-syste
 import { InjectModel } from '@nestjs/mongoose';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
 import { Inject } from '@nestjs/common';
-import { INJECT_TOKEN } from '@modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 

@@ -11,7 +11,7 @@ export class SessionViewDto{
 
         session.deviceId = dto.deviceId;
         session.title = dto.deviceName;
-        session.lastActiveDate = dto.createdAt.toISOString();
+        session.lastActiveDate = dto.updatedAt.toISOString();
         session.ip = dto.ip;
 
         return session;

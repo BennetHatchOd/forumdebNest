@@ -19,7 +19,7 @@ import { UserConfig } from './config/user.config';
 import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
 import { ConfigService } from '@nestjs/config';
-import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from '@modules/users-system/application/UseCase';
 import { AuthModule } from '@core/auth.module';
@@ -27,6 +27,7 @@ import { SessionRepository } from '@modules/users-system/infrastucture/session.r
 import { Session, SessionSchema } from '@modules/users-system/domain/session.entity';
 import { SessionQueryRepository } from '@modules/users-system/infrastucture/query/session.query.repository';
 import { DeviceController } from '@modules/users-system/api/device.controller';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
     imports: [
@@ -37,6 +38,14 @@ import { DeviceController } from '@modules/users-system/api/device.controller';
             { name: Session.name, schema: SessionSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
+        ThrottlerModule.forRoot({
+            throttlers: [
+                {
+                    ttl: 10000,
+                    limit: 55,
+                },
+            ],
+        }),
         JwtModule,
         PassportModule,
     ],

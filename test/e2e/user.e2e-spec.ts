@@ -6,6 +6,10 @@ import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
+import { UserConfig } from '@modules/users-system/config/user.config';
+import { JwtService } from '@nestjs/jwt';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
@@ -14,20 +18,15 @@ describe('UserAppController (e2e)', () => {
     let globalPrefix;
 
     beforeAll(async () => {
-        const result = await initSettings()
-        // (moduleBuilder) =>
-        //     moduleBuilder
-        //         .overrideProvider(UserConfig)
-        //         .useFactory({
-        //             factory: (userConfig: UserConfig) => {
-        //                 return new JwtService({
-        //                     secret: userConfig.accessTokenSecret,
-        //                     signOptions: { expiresIn: '2s' },
-        //                 });
-        //             },
-        //             inject: [UserConfig],
-        //         }),
-        // );
+        const result
+            = await initSettings((moduleBuilder) =>
+                moduleBuilder
+                    .overrideProvider(ThrottlerGuard)
+                    .useValue({
+                        canActivate: () => true,
+                    }),
+            // .compile();
+        );
         app = result.app;
         connection = result.databaseConnection;
         testData = result.testData;

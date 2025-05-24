@@ -65,7 +65,7 @@ export class SessionRepository {
         return {
             userId:     session.userId,
             version:    session.version,
-            iat:        Math.floor(getTime(session.createdAt) / 1000),
+            iat:        Math.floor(getTime(session.updatedAt) / 1000),
             deviceId:   session.deviceId
         }
     }

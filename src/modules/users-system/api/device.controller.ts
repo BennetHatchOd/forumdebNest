@@ -10,7 +10,9 @@ import { SessionRepository } from '@modules/users-system/infrastucture/session.r
 import { DeleteOthersSessionCommand } from '@modules/users-system/application/UseCase/delete.others.sessions.usecase';
 import { DeleteOneSessionCommand } from '@modules/users-system/application/UseCase/delete.one.session.usecase';
 import { CurrentUserId } from '@core/decorators/current.user';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller(URL_PATH.devices)
 export class DeviceController {
     constructor(

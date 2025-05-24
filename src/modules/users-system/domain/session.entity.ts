@@ -23,12 +23,11 @@ export class Session {
     @Prop({ required: true, })
     ip:         string;
 
-    createdAt:  Date;
+    updatedAt:  Date;
 
     update(){
         const uid = new ShortUniqueId({ length: 7 });
 
-        this.createdAt = new Date();
         this.version = uid.rnd();
     }
 

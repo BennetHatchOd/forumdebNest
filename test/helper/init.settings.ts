@@ -41,7 +41,8 @@ export const initSettings = async (
         addSettingsToModuleBuilder(testingModuleBuilder);
     }
 
-    const testingAppModule = await testingModuleBuilder.compile();
+    const testingAppModule = await testingModuleBuilder
+        .compile();
 
     const app = testingAppModule.createNestApplication<NestExpressApplication>();
     const coreConfig = app.get<CoreConfig>(CoreConfig);

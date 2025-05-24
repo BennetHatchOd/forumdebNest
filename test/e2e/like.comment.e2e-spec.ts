@@ -3,7 +3,7 @@ import { Connection } from 'mongoose';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { EmailServiceMock } from '../mock/email.service.mock';
 import { initSettings } from '../helper/init.settings';
-import { INJECT_TOKEN } from '@modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { deleteAllData } from '../helper/delete.all.data';

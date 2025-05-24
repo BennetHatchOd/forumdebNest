@@ -10,7 +10,7 @@ import { UserRepository } from '../infrastucture/user.repository';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { EmailService } from '../../notifications/application/email.service';
 import { UserConfig } from '../config/user.config';
-import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { JwtService } from '@nestjs/jwt';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';

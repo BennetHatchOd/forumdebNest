@@ -7,7 +7,7 @@ import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import * as console from 'node:console';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
-import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';

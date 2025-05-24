@@ -6,10 +6,11 @@ import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
-import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('DeviceController (e2e)', () => {
     let app: INestApplication;
@@ -25,27 +26,32 @@ describe('DeviceController (e2e)', () => {
     beforeAll(async () => {
         const result
             = await initSettings((moduleBuilder) =>
-            moduleBuilder
-                .overrideProvider(INJECT_TOKEN.ACCESS_TOKEN)
-                .useFactory({
-                    factory: (userConfig: UserConfig) => {
-                        return new JwtService({
-                            secret: userConfig.accessTokenSecret,
-                            signOptions: { expiresIn: '2s' },
-                        });
-                    },
-                    inject: [UserConfig],
-                })
-                .overrideProvider(INJECT_TOKEN.REFRESH_TOKEN)
-                .useFactory({
-                    factory: (userConfig: UserConfig) => {
-                        return new JwtService({
-                            secret: userConfig.refreshTokenSecret,
-                            signOptions: { expiresIn: '40s' },
-                        });
-                    },
-                    inject: [UserConfig],
-                }),
+                moduleBuilder
+                    .overrideProvider(INJECT_TOKEN.ACCESS_TOKEN)
+                    .useFactory({
+                        factory: (userConfig: UserConfig) => {
+                            return new JwtService({
+                                secret: userConfig.accessTokenSecret,
+                                signOptions: { expiresIn: '2s' },
+                            });
+                        },
+                        inject: [UserConfig],
+                    })
+                    .overrideProvider(INJECT_TOKEN.REFRESH_TOKEN)
+                    .useFactory({
+                        factory: (userConfig: UserConfig) => {
+                            return new JwtService({
+                                secret: userConfig.refreshTokenSecret,
+                                signOptions: { expiresIn: '40s' },
+                            });
+                        },
+                        inject: [UserConfig],
+                    })
+                    .overrideProvider(ThrottlerGuard)
+                    .useValue({
+                        canActivate: () => true,
+                    }),
+            // .compile();
         );
         app = result.app;
         connection = result.databaseConnection;

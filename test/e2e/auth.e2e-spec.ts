@@ -7,13 +7,14 @@ import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import * as console from 'node:console';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
-import { INJECT_TOKEN } from '@src/modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';
 import * as cookie from 'cookie';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
-describe('AuthAppController (e2e)', () => {
+describe('AuthController (e2e)', () => {
     let app: INestApplication;
     let connection: Connection;
     let testData: TestDataBuilderByDb;
@@ -43,7 +44,12 @@ describe('AuthAppController (e2e)', () => {
                         });
                     },
                     inject: [UserConfig],
+                })
+                .overrideProvider(ThrottlerGuard)
+                .useValue({
+                    canActivate: () => true,
                 }),
+            // .compile();
         );
         app = result.app;
         connection = result.databaseConnection;
@@ -313,5 +319,85 @@ describe('AuthAppController (e2e)', () => {
             });
 
         });
-    })
+    });
+
+    describe('Testing update refreshToken', () => {
+        let refresh1: string;
+        let refresh2: string;
+        const ip = '127.40.157.214';
+        const device = 'Honor'
+
+        beforeAll(async () => {
+            testData.clearData();
+            testData.numberUsers = 1;
+            await testData.createManyUsers();
+        })
+
+        afterAll(async () => {
+            await deleteAllData(app, globalPrefix);
+        })
+
+        it('should return 200 and the refreshToken for user', async () => {
+            const response = await request(app.getHttpServer())
+                .post(join(URL_PATH.auth, AUTH_PATH.login))
+                .set("user-agent", device)
+                .set("x-forwarded-for", ip)
+                .send({
+                    loginOrEmail: testData.users[0].email,
+                    password: testData.usersPassword[0]
+                })
+                .expect(HttpStatus.OK)
+            let setCookieHeader = response.headers['set-cookie'][0];
+            let parsedCookie = cookie.parse(setCookieHeader);
+            refresh1 = parsedCookie['refreshToken']!;
+
+            await request(app.getHttpServer())
+                .get(URL_PATH.devices)
+                .set("Cookie", 'refreshToken=' + refresh1)
+                .expect(HttpStatus.OK);
+        });
+
+        it('should return 200 and new refreshToken for user', async () => {
+            const response = await request(app.getHttpServer())
+                .post(join(URL_PATH.auth, AUTH_PATH.refresh))
+                .set("Cookie", 'refreshToken=' + refresh1)
+                .expect(HttpStatus.OK)
+
+            expect(response.body).toHaveProperty('accessToken');
+            const accessToken = response.body.accessToken;
+
+            let setCookieHeader = response.headers['set-cookie'][0];
+            let parsedCookie = cookie.parse(setCookieHeader);
+            refresh2 = parsedCookie['refreshToken']!;
+
+            const jwtServiceAT = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
+            const jwtServiceRT = app.get<JwtService>(INJECT_TOKEN.REFRESH_TOKEN);
+            const payload = jwtServiceAT.verify(accessToken);
+            const payloadRefresh = jwtServiceRT.verify(refresh2);
+
+            expect(payload.user).toBe(testData.users[0]._id.toString());
+            expect(payloadRefresh.userId).toBe(testData.users[0]._id.toString())
+        });
+
+        it('should return 200 after new refreshToken', async () => {
+            const sessionResponse = await request(app.getHttpServer())
+                .get(URL_PATH.devices)
+                .set("Cookie", 'refreshToken=' + refresh2)
+                .expect(HttpStatus.OK);
+            expect(sessionResponse.body.length).toBe(1);
+            expect(sessionResponse.body[0]).toEqual({
+                ip: ip,
+                title: device,
+                lastActiveDate: expect.any(String),
+                deviceId: expect.any(String),
+            });
+        });
+
+        it('should return 401 after old refreshToken', async () => {
+            await request(app.getHttpServer())
+                .get(URL_PATH.devices)
+                .set("Cookie", 'refreshToken=' + refresh1)
+                .expect(HttpStatus.UNAUTHORIZED);
+        });
+    });
 })

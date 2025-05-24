@@ -1,4 +1,4 @@
-import { INJECT_TOKEN } from '@modules/users-system/constans/jwt.tokens';
+import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';

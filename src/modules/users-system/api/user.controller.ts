@@ -4,7 +4,7 @@ import {
     Delete,
     Get,
     HttpCode,
-    HttpStatus,
+    HttpStatus, Inject,
     Param,
     Post,
     Query,
@@ -22,7 +22,9 @@ import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CommandBus } from '@nestjs/cqrs';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @UseGuards(AuthGuard('basic'))
 @ApiBasicAuth()
 @Controller(URL_PATH.users)

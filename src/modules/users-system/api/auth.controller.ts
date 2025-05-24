@@ -17,8 +17,11 @@ import { SessionIsActiveGuard } from '@core/guards/session.is.active';
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/delete.my.session.usecase';
 import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/update.session.usecase';
+import { SkipThrottle, Throttle, ThrottlerGuard } from '@nestjs/throttler';
+
 
 @Controller(URL_PATH.auth)
+@UseGuards(ThrottlerGuard)
 export class AuthController {
     constructor(
         private authService: AuthService,
@@ -87,6 +90,7 @@ export class AuthController {
     }
 
     @Get(AUTH_PATH.aboutMe)
+    @SkipThrottle()
     @UseGuards(AuthGuard('jwt'))
     async getMe(@CurrentUserId() user: string)//: Promise<UserAboutViewDto>
      {
@@ -96,6 +100,7 @@ export class AuthController {
 
     @Post(AUTH_PATH.logout)
     @HttpCode(HttpStatus.NO_CONTENT)
+    @SkipThrottle()
     @UseGuards(SessionIsActiveGuard)
     async logOut(
         @CurrentUserId() user: TokenPayloadDto,
@@ -109,6 +114,7 @@ export class AuthController {
 
     @Post(AUTH_PATH.refresh)
     @HttpCode(HttpStatus.OK)
+    @SkipThrottle()
     @UseGuards(SessionIsActiveGuard)
     async newRefreshToken(
         @CurrentUserId() user: TokenPayloadDto,

@@ -60,6 +60,16 @@ export class UserConfig {
     })
     adminPasswordBasicAuth: string;
 
+    @IsNumber({},{
+        message: 'Env variable COUNT_RATE_LIMITED, must be a number',
+    })
+    countRateLimiting: number;
+
+    @IsNumber({},{
+        message: 'Env variable TIME_RATE_LIMITED, must be a number',
+    })
+    timeRateLimiting: number;
+
     constructor(private configService: ConfigService<any, true>) {
         this.accessTokenSecret =this.configService.get('ACCESS_TOKEN_SECRET');
         this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
@@ -70,6 +80,8 @@ export class UserConfig {
         this.timeLifeEmailCode = Number(this.configService.get('TIME_LIFE_EMAIL_CODE'));
         this.timeLifePasswordCode = Number(this.configService.get('TIME_LIFE_PASSWORD_CODE'));
         this.saltRound = Number(this.configService.get('SALT_ROUND'));
+        this.timeRateLimiting = Number(this.configService.get('TIME_RATE_LIMITED'));
+        this.countRateLimiting = Number(this.configService.get('COUNT_RATE_LIMITED'));
 
         configValidationUtility.validateConfig(this);
     }
