@@ -13,6 +13,7 @@ import request from 'supertest';
 import { URL_PATH } from '@core/url.path.setting';
 import { join } from 'path';
 import console from 'node:console';
+import { defaultUserConfig } from '../helper/default.user.config';
 
 describe('LikePostController (e2e)', () => {
 	 let app: INestApplication;
@@ -34,7 +35,12 @@ describe('LikePostController (e2e)', () => {
 				});
 			   },
 			   inject: [UserConfig],
-			  }),
+			  })
+			  .overrideProvider(UserConfig).useValue({
+			  ...defaultUserConfig,
+			  timeRateLimiting: 10000,
+			  countRateLimiting: 55,
+		  })
 	  );
 	  app = result.app;
 	  connection = result.databaseConnection;

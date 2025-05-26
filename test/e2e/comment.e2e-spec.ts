@@ -10,6 +10,7 @@ import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';
+import { defaultUserConfig } from '../helper/default.user.config';
 
 describe('CommentController (e2e)', () => {
     let app: INestApplication;
@@ -35,7 +36,12 @@ describe('CommentController (e2e)', () => {
                         });
                     },
                     inject: [UserConfig],
-                }),
+                })
+                .overrideProvider(UserConfig).useValue({
+                ...defaultUserConfig,
+                timeRateLimiting: 10000,
+                countRateLimiting: 55,
+            })
         );
         app = result.app;
         connection = result.databaseConnection;

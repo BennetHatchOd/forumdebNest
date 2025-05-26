@@ -13,6 +13,7 @@ import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
 import { setCheckLikeComment } from './likesHelper/set.check.Like.comment';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import console from 'node:console';
+import { defaultUserConfig } from '../helper/default.user.config';
 
 describe('LikeCommentController (e2e)', () => {
     let app: INestApplication;
@@ -34,7 +35,12 @@ describe('LikeCommentController (e2e)', () => {
                         });
                     },
                     inject: [UserConfig],
-                }),
+                })
+                .overrideProvider(UserConfig).useValue({
+                ...defaultUserConfig,
+                timeRateLimiting: 10000,
+                countRateLimiting: 55,
+            })
         );
         app = result.app;
         connection = result.databaseConnection;

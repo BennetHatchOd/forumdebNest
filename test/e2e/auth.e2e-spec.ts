@@ -12,6 +12,7 @@ import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
 import { EmailServiceMock } from '../mock/email.service.mock';
 import * as cookie from 'cookie';
+import { defaultUserConfig } from '../helper/default.user.config'
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('AuthController (e2e)', () => {
@@ -45,11 +46,15 @@ describe('AuthController (e2e)', () => {
                     },
                     inject: [UserConfig],
                 })
-                .overrideProvider(ThrottlerGuard)
-                .useValue({
-                    canActivate: () => true,
-                }),
-            // .compile();
+                .overrideProvider(UserConfig).useValue({
+                    ...defaultUserConfig,
+                    timeRateLimiting: 10000,
+                    countRateLimiting: 55,
+                })
+                // .overrideProvider(ThrottlerGuard)
+                // .useValue({
+                //     canActivate: () => true,
+                // }),
         );
         app = result.app;
         connection = result.databaseConnection;

@@ -4,11 +4,10 @@ import {
     Delete,
     Get,
     HttpCode,
-    HttpStatus, Inject,
+    HttpStatus,
     Param,
     Post,
-    Query,
-    UseGuards,
+    Query, UseGuards,
 } from '@nestjs/common';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
@@ -23,6 +22,8 @@ import { ApiBasicAuth } from '@nestjs/swagger';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CommandBus } from '@nestjs/cqrs';
 import { SkipThrottle } from '@nestjs/throttler';
+//import { UserSQLRepository } from '@modules/users-system/infrastucture/user.sql.repository';
+//import { DATA_SOURCE } from '@core/constans/data.source';
 
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))
@@ -33,7 +34,13 @@ export class UserControllers {
         private commandBus: CommandBus,
         private userService: UserService,
         private userQueryRepository: UserQueryRepository,
+ //       private userSQLRepository: UserSQLRepository,
     ) {}
+
+    // @Get('test')
+    // async test(){
+    //     return this.userSQLRepository.test();
+    // }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)

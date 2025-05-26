@@ -28,23 +28,28 @@ import { Session, SessionSchema } from '@modules/users-system/domain/session.ent
 import { SessionQueryRepository } from '@modules/users-system/infrastucture/query/session.query.repository';
 import { DeviceController } from '@modules/users-system/api/device.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DatabaseModule } from '@core/database.module';
+import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-options.interface';
+//import { UserSQLRepository } from '@modules/users-system/infrastucture/user.sql.repository';
 
 @Module({
     imports: [
         CqrsModule,
         AuthModule,
+        DatabaseModule,
         MongooseModule.forFeature([
             { name: User.name, schema: UserSchema },
             { name: Session.name, schema: SessionSchema },
             { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
-        ThrottlerModule.forRoot({
-            throttlers: [
-                {
-                    ttl: 10000,
-                    limit: 55,
-                },
-            ],
+        ThrottlerModule.forRootAsync({
+            imports:[UserSystemModule],
+            inject: [UserConfig],
+            useFactory: (userConfig:UserConfig):ThrottlerOptions[] => {
+                return[ {
+                    ttl:userConfig.timeRateLimiting,
+                    limit:userConfig.countRateLimiting
+                } ] as ThrottlerOptions[]},
         }),
         JwtModule,
         PassportModule,
@@ -56,6 +61,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ],
     providers: [
         ...CommandHandlers,
+//        UserSQLRepository,
         UserService,
         UserConfig,
         UserQueryRepository,
@@ -93,7 +99,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         },
     ],
     exports:[
-        UserQueryExternalRepository,
+        UserQueryExternalRepository,UserConfig,
     ]
 })
 export class UserSystemModule {}
