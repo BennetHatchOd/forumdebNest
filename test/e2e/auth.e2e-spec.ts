@@ -93,7 +93,7 @@ describe('AuthController (e2e)', () => {
             const jwtServiceAT = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
             const jwtServiceRT = app.get<JwtService>(INJECT_TOKEN.REFRESH_TOKEN);
             const payload = jwtServiceAT.verify(accessToken);
-            expect(payload.user).toBe(testData.users[0]._id.toString());
+            expect(payload.user).toBe(testData.users[0].id.toString());
 
             const setCookieHeader = response.headers['set-cookie'][0];
             const parsedCookie = cookie.parse(setCookieHeader);
@@ -101,7 +101,7 @@ describe('AuthController (e2e)', () => {
 
             const payloadRT = jwtServiceRT.verify(refreshToken);
             expect(payloadRT).toEqual({
-                userId: testData.users[0]._id.toString(),
+                userId: testData.users[0].id.toString(),
                 version: expect.any(String),
                 iat: expect.any(Number),
                 deviceId: expect.any(String),
@@ -122,7 +122,7 @@ describe('AuthController (e2e)', () => {
             const accessToken = response.body.accessToken;
             const jwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
             const payload = jwtService.verify(accessToken); // <— проверит подпись и вернёт payload
-            expect(payload.user).toBe(testData.users[1]._id.toString());
+            expect(payload.user).toBe(testData.users[1].id.toString());
         });
 
     });
@@ -320,7 +320,7 @@ describe('AuthController (e2e)', () => {
             expect(responseAbout.body).toEqual({
                 email: testData.users[0].email,
                 login: testData.users[0].login,
-                userId: testData.users[0]._id.toString(),
+                userId: testData.users[0].id.toString(),
             });
 
         });
@@ -380,8 +380,8 @@ describe('AuthController (e2e)', () => {
             const payload = jwtServiceAT.verify(accessToken);
             const payloadRefresh = jwtServiceRT.verify(refresh2);
 
-            expect(payload.user).toBe(testData.users[0]._id.toString());
-            expect(payloadRefresh.userId).toBe(testData.users[0]._id.toString())
+            expect(payload.user).toBe(testData.users[0].id.toString());
+            expect(payloadRefresh.userId).toBe(testData.users[0].id.toString())
         });
 
         it('should return 200 after new refreshToken', async () => {

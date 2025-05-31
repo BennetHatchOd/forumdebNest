@@ -52,13 +52,13 @@ describe('UserAppController (e2e)', () => {
         let id2: string;
 
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 8;
             await testData.createManyAccessTokens();
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
         it('should return 200 status and a paginator initially', async () => {
             const response = await request(app.getHttpServer())
@@ -154,7 +154,7 @@ describe('UserAppController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
         })
 
-        it('should return 200 status and a paginator initially', async () => {
+        it('should return 200 status and a paginator initially too', async () => {
             const response = await request(app.getHttpServer())
                 .get(URL_PATH.users)
                 .set("Authorization", testData.authLoginPassword)
@@ -172,13 +172,13 @@ describe('UserAppController (e2e)', () => {
 
     describe('Testing api/users with mistakes.', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             await testData.createManyUsers();
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
         it("should return 400 and an array of mistakes by attempt to create new " +
             "user with validation error", async () => {
@@ -286,6 +286,7 @@ describe('UserAppController (e2e)', () => {
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .expect(HttpStatus.UNAUTHORIZED)
         });
+
         it("should return 404 by attempt to delete fake user", async () => {
 
             await request(app.getHttpServer())
