@@ -1,16 +1,16 @@
-import { UserDocument } from '../../domain/user.entity';
+import { User } from '@modules/users-system/domain/user.entity';
 
 export class UserAboutViewDto {
         userId:              string;
         login:           string;
         email:           string;
-    constructor(user: UserDocument) {
-        this.userId = user._id.toString();
+    constructor(user: User) {
+        this.userId = user.id.toString();
         this.login = user.login;
         this.email = user.email;
     }
 
-    static   mapToView(inputUser: UserDocument): UserAboutViewDto {
+    static   mapToView(inputUser: User): UserAboutViewDto {
         return  new UserAboutViewDto(inputUser);
     }
 }

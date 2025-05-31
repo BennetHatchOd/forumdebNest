@@ -17,7 +17,7 @@ export class CommentService {
 
     async create(postId: string, comment: CommentInputDto, userId: string): Promise<string> {
 
-        const commentatorInfo = await this.userQueryExternalRepository.findNameById(userId)
+        const commentatorInfo = await this.userQueryExternalRepository.getLoginByUserId(userId)
         const createCommentDto: CreateCommentDto = CreateCommentDto.createInstance(postId, comment, commentatorInfo!);
         const newComment: CommentDocument = this.commentModel.createInstance(createCommentDto);
         await this.commentRepository.save(newComment);

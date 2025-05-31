@@ -1,14 +1,15 @@
-import { UserDocument } from '../../domain/user.entity';
+import { UserTuple } from '@modules/users-system/domain/user.tuple';
 
 export class CommentatorInfoViewDto {
         userId:          string;
         login:           string;
-    constructor(user: UserDocument) {
-        this.userId = user._id.toString();
+
+    constructor(user: UserTuple) {
+        this.userId = user.id.toString();
         this.login = user.login;
     }
 
-    static   mapToView(inputUser: UserDocument): CommentatorInfoViewDto {
+    static   mapToView(inputUser: UserTuple): CommentatorInfoViewDto {
         return  new CommentatorInfoViewDto(inputUser);
     }
 }

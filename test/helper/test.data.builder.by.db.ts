@@ -1,21 +1,24 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Inject } from '@nestjs/common';
 import { AuthBasic } from './auth.basic';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModelType } from '@src/modules/blogging.platform/domain/blog.entity';
 import { Post, PostDocument, PostModelType } from '@src/modules/blogging.platform/domain/post.entity';
 import { Comment, CommentDocument, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
-import { User, UserDocument, UserModelType } from '@src/modules/users-system/domain/user.entity';
 import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 import request from 'supertest';
 import { join } from 'path';
 import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
+import { DATA_SOURCE } from '@core/constans/data.source';
+import { DataSource } from 'typeorm';
+import { User } from '@modules/users-system/domain/user.entity';
+import console from 'node:console';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы
     accessTokens: string[] = [];
-    users: UserDocument[] = [];
+    users: User[] = [];
     usersPassword: string[] = [];
     comments: CommentDocument[] = [];
     blogs: BlogDocument[] = [];
@@ -35,7 +38,7 @@ export class TestDataBuilderByDb {
                 @InjectModel(Blog.name)private BlogModel: BlogModelType,
                 @InjectModel(Post.name)private PostModel: PostModelType,
                 @InjectModel(Comment.name)private CommentModel: CommentModelType,
-                @InjectModel(User.name)private UserModel: UserModelType,
+                @Inject(DATA_SOURCE)private readonly dataSource: DataSource,
                 public passwordHashService: PasswordHashService,
                 public userConfig: UserConfig,
                 public numberUsers : number = 1,
@@ -89,12 +92,18 @@ export class TestDataBuilderByDb {
                 user.password,
                 this.userConfig.saltRound,
             );
-            const newUser: UserDocument = this.UserModel.createInstance(user);
-            await newUser.save();
+            const newUser: User = User.createInstance(user, true);
+
+            const result = await this.dataSource.query(`
+                INSERT INTO public."Users"(
+                    login, email, "passwordHash")
+                VALUES('${user.login}', '${user.email}', '${user.password}')
+                RETURNING id;`)
+            newUser.id = result[0].id;
             this.users.push(newUser);
             this.usersLikes.push({
                 addedAt: expect.any(String),
-                userId: newUser._id.toString(),
+                userId: newUser.id!.toString(),
                 login: user.login,})
         }
     }
@@ -123,7 +132,7 @@ export class TestDataBuilderByDb {
             const comment: CreateCommentDto =
                 {content: `This is the comment number ${i}`,
                  postId: this.posts[0]._id.toString(),
-                 userId: this.users[0]._id.toString(),
+                 userId: this.users[0].id.toString(),
                  login: this.users[0].login};
             const newComment: CommentDocument = this.CommentModel.createInstance(comment)
             await newComment.save();
@@ -165,10 +174,10 @@ export class TestDataBuilderByDb {
                                 BlogModel: BlogModelType,
                                 PostModel: PostModelType,
                                 CommentModel: CommentModelType,
-                                UserModel: UserModelType,
+                                dataSource: DataSource,
                                 passwordHashService: PasswordHashService,
     ):Promise<TestDataBuilderByDb>{
-        const testData = new this(app, BlogModel, PostModel, CommentModel, UserModel,
+        const testData = new this(app, BlogModel, PostModel, CommentModel, dataSource,
             passwordHashService, userConfig);
         testData.authLoginPassword = AuthBasic.createAuthHeader(userConfig)
 

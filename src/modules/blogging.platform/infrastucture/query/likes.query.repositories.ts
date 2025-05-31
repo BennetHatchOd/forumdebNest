@@ -59,7 +59,7 @@ export class LikesQueryRepositories{
         // return 3 last likes for one entity
 
         const likeUserId: string[] = likes.map((like: LikeDocument) => like.ownerId.toString())
-        const usersLogins = await this.userQueryExternalRepository.getUsersLogins(likeUserId);
+        const usersLogins = await this.userQueryExternalRepository.getManyLoginsByUserIds(likeUserId);
         // получаем логин юзеров, поставивших последние 3 лайка
 
         const extendedInfo: NewestLikesDto = {newestLikes:
@@ -97,7 +97,7 @@ export class LikesQueryRepositories{
         const userIds: string[] = [];
         lastLikes.forEach(likeInfo => likeInfo.likes.forEach(like => userIds.push(like.userId)));
         const uniqUserId = Array.from(new Set(userIds));
-        const usersLogins = await this.userQueryExternalRepository.getUsersLogins(uniqUserId);
+        const usersLogins = await this.userQueryExternalRepository.getManyLoginsByUserIds(uniqUserId);
 
         const extendedPartInfo
             = lastLikes.map(entityInfo => ({

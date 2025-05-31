@@ -1,20 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './domain/user.entity';
 import { UserControllers } from './api/user.controller';
-import { UserService } from './application/user.service';
 import { UserQueryRepository } from './infrastucture/query/user.query.repository';
-import { UserRepository } from './infrastucture/user.repository';
 import { AuthController } from './api/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from '@src/core/strategy/local.strategy';
 import { PasswordHashService } from './application/password.hash.service';
-import { AuthService } from './application/auth.service';
-import { AuthRepository } from './infrastucture/auth.repository';
+import { UserService } from './application/user.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
-import { NewPassword, NewPasswordSchema } from './domain/new.password';
 import { UserConfig } from './config/user.config';
 import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
@@ -30,7 +25,7 @@ import { DeviceController } from '@modules/users-system/api/device.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from '@core/database.module';
 import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-options.interface';
-//import { UserSQLRepository } from '@modules/users-system/infrastucture/user.sql.repository';
+import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
 
 @Module({
     imports: [
@@ -38,9 +33,7 @@ import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-option
         AuthModule,
         DatabaseModule,
         MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema },
             { name: Session.name, schema: SessionSchema },
-            { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
         ThrottlerModule.forRootAsync({
             imports:[UserSystemModule],
@@ -61,14 +54,12 @@ import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-option
     ],
     providers: [
         ...CommandHandlers,
-//        UserSQLRepository,
-        UserService,
+        UserRepository,
         UserConfig,
         UserQueryRepository,
         UserQueryExternalRepository,
         UserRepository,
-        AuthService,
-        AuthRepository,
+        UserService,
         PasswordHashService,
         EmailService,
         LocalStrategy,

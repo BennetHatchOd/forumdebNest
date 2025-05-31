@@ -18,7 +18,6 @@ export class EmailService {
             subject: 'registration confirmation',
             html: message})
     }
-
     createNewConfirmEmail(mail: string, code: string): void{
         const message =
             `<h1>Thanks for your registration</h1>

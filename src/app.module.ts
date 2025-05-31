@@ -14,7 +14,7 @@ import { DatabaseModule } from '@core/database.module';
 @Module({
     imports: [
         configModule,
-        //DatabaseModule,
+        DatabaseModule,
         MongooseModule.forRootAsync({
             useFactory: (coreConfig:CoreConfig) =>{
                 const  url = new URL(coreConfig.mongoURI)

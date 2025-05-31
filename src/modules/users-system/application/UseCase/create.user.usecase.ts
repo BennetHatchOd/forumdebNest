@@ -1,5 +1,4 @@
-import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { User, UserDocument, UserModelType } from '@modules/users-system/domain/user.entity';
+import { Command, CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { UserInputDto } from '@modules/users-system/dto/input/user.input.dto';
@@ -7,12 +6,19 @@ import { UserConfig } from '@modules/users-system/config/user.config';
 import { EmailService } from '@modules/notifications/application/email.service';
 import { PasswordHashService } from '../password.hash.service';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
-import { InjectModel } from '@nestjs/mongoose';
+import { User } from '@modules/users-system/domain/user.entity';
+import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { add } from 'date-fns';
+import {
+    CreateCodeConfirmationEmailCommand
+} from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
 
 export class CreateUserCommand extends Command<string> {
     constructor(
         public userDto: UserInputDto,
-        public confirmedEmail: boolean,
+        public isConfirmedEmail: boolean = true,
+        public toSentEmail: boolean = false,
     ) {
         super()}
 }
@@ -22,13 +28,13 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
     constructor(
         private readonly userRepository: UserRepository,
         private readonly passwordHashService: PasswordHashService,
-        private readonly mailService: EmailService,
         private readonly userConfig: UserConfig,
-        @InjectModel(User.name) private UserModel: UserModelType,
-        ) {}
+        private readonly commandBus: CommandBus,
+    ) {}
 
-    async execute({userDto, confirmedEmail}: CreateUserCommand):Promise<string> {
+    async execute({userDto, isConfirmedEmail, toSentEmail}: CreateUserCommand):Promise<string> {
 
+        // check the uniqueness of the login and email
         const checkUniq: string[] | null = await this.userRepository.checkUniq(
             userDto.login,
             userDto.email,
@@ -48,25 +54,22 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
             });
         }
 
+        // create a password hash
         const passwordHash: string = await this.passwordHashService.createHash(
             userDto.password,
             this.userConfig.saltRound,
         );
-        const createdUser: UserDocument = this.UserModel.createInstance({
-            ...userDto,
-            password: passwordHash,
-        });
+        const createdUser: User = User.createInstance({
+                ...userDto,
+                password: passwordHash,
+            },
+            isConfirmedEmail);
 
-        if(!confirmedEmail) {
-            createdUser.isConfirmEmail = false;
-            createdUser.createConfirmCode(this.userConfig.timeLifeEmailCode)
-            this.mailService.createConfirmEmail(
-                userDto.email,
-                createdUser.confirmEmail.code,
-            );
-        }
-        await this.userRepository.save(createdUser);
-        return createdUser._id.toString();
+        await this.userRepository.saveUser(createdUser);
+
+        if(toSentEmail && !isConfirmedEmail)
+            await this.commandBus.execute(new CreateCodeConfirmationEmailCommand(createdUser.email, createdUser.id))
+        return createdUser.id.toString();
     }
 }
 

@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
-import { UserService } from '../application/user.service';
 import { UserQueryRepository } from '../infrastucture/query/user.query.repository';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../dto/input/get.user.query.params.input.dto';
@@ -19,11 +18,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CommandBus } from '@nestjs/cqrs';
 import { SkipThrottle } from '@nestjs/throttler';
-//import { UserSQLRepository } from '@modules/users-system/infrastucture/user.sql.repository';
-//import { DATA_SOURCE } from '@core/constans/data.source';
+import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
+import { DeleteUserCommand } from '@modules/users-system/application/UseCase/delete.user.usecase';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))
@@ -32,15 +31,9 @@ import { SkipThrottle } from '@nestjs/throttler';
 export class UserControllers {
     constructor(
         private commandBus: CommandBus,
-        private userService: UserService,
         private userQueryRepository: UserQueryRepository,
- //       private userSQLRepository: UserSQLRepository,
+        private userSQLRepository: UserRepository,
     ) {}
-
-    // @Get('test')
-    // async test(){
-    //     return this.userSQLRepository.test();
-    // }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
@@ -65,6 +58,6 @@ export class UserControllers {
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteUser(@Param() { id }: IdInputDto): Promise<void>{
-        return await this.userService.delete(id)
+        return await this.commandBus.execute(new DeleteUserCommand(id));
     }
 }
