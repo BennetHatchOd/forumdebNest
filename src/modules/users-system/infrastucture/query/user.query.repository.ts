@@ -7,7 +7,8 @@ import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
 import { DataSource } from 'typeorm';
 import { DATA_SOURCE } from '@core/constans/data.source';
-import { UserTuple } from '@modules/users-system/domain/user.tuple';
+import { User } from '@modules/users-system/domain/user.entity';
+import { FilterQuery } from '@core/infrastucture/filter.query';
 
 
 @Injectable()
@@ -27,12 +28,11 @@ export class UserQueryRepository {
                 code: DomainExceptionCode.NotFound,
             });
 
-        const user: UserTuple[] = await this.dataSource.query(`
-            SELECT * 
-                FROM public."Users" 
-                WHERE 
-                      id = $1 
-                  AND "deletedAt" IS NULL 
+        const {clause} = new FilterQuery<User>({
+                id: numericId,
+                deletedAt: null}).buildWhereClause();
+        const user: User[] = await this.dataSource.query(`
+            SELECT * FROM public."Users" ${clause}
                 LIMIT 1;`,
             [numericId]);
 
@@ -60,12 +60,10 @@ export class UserQueryRepository {
             whereClausesOR.push(`email ILIKE $${queryParams.length}`);
         }
 
-
         if (whereClausesOR.length > 0) {
             const whereSqlOR = whereClausesOR.join(' OR ');
             whereClausesAND.push(`(${whereSqlOR})`);
         }
-
         const whereSql = whereClausesAND.join(' AND ');
 
         const sqlRequest = `FROM public."Users" WHERE ${whereSql}`;
@@ -79,7 +77,7 @@ export class UserQueryRepository {
         if(+totalCount[0].count === 0)
             return new EmptyPaginator<UserViewDto>();
 
-        const users: UserTuple[] = await this.dataSource.query(sql, queryParams);
+        const users: User[] = await this.dataSource.query(sql, queryParams);
 
         const items = users.map(UserViewDto.mapToView);
 

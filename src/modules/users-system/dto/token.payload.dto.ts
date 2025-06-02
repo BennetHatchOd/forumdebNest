@@ -1,5 +1,5 @@
 export type TokenPayloadDto = {
-    userId:     string;
+    userId:     number;
     version:    string;
     iat:        number;
     deviceId:   string;

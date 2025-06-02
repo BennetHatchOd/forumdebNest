@@ -2,7 +2,7 @@ export const URL_PATH = {
     base: '/',
     blogs: '/blogs',
     posts: '/posts',
-    users: '/users',
+    users: '/sa/users',
     auth: '/auth',
     devices: '/security/devices',
     comments: '/comments',

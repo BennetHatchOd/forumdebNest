@@ -7,7 +7,7 @@ import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { Session } from '@modules/users-system/domain/session.entity';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery } from '@core/infrastucture/filter.query';
 
 export class UpdateSessionCommand extends Command<string> {
     constructor(
@@ -26,11 +26,11 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
 
     async execute({payload}: UpdateSessionCommand):Promise<string> {
 
-        const queryFilter: FilterQuery<Session> ={
+        const queryFilter = new FilterQuery<Session> ({
             userId: payload.userId,
             version: payload.version,
             deviceId: payload.deviceId
-        }
+        })
 
         const updatingSession
             = await this.sessionRepository.getByFilter(queryFilter)

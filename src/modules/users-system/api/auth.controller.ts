@@ -9,19 +9,19 @@ import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.pas
 import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateSessionCommand } from '@modules/users-system/application/UseCase/create.session.usecase';
+import { CreateSessionCommand } from '@modules/users-system/application/UseCase/session/create.session.usecase';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 import { Request, Response } from 'express';
 import { SessionIsActiveGuard } from '@core/guards/session.is.active';
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
-import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/delete.my.session.usecase';
-import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/update.session.usecase';
+import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/session/delete.my.session.usecase';
+import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/session/update.session.usecase';
 import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
-import { ConfirmationEmailCommand } from '@modules/users-system/application/UseCase/confirmation.email.usecase';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/user/create.user.usecase';
+import { ConfirmationEmailCommand } from '@modules/users-system/application/UseCase/auth/confirmation.email.usecase';
 import {
     CreateCodeConfirmationEmailCommand
-} from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
+} from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
 
 
 @Controller(URL_PATH.auth)
@@ -36,7 +36,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
     async authorization(
-        @CurrentUserId() user: string,
+        @CurrentUserId() user: number,
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
     ):Promise<{accessToken: string}>{

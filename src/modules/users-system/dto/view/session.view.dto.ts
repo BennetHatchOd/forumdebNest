@@ -1,4 +1,4 @@
-import { SessionDocument } from '@modules/users-system/domain/session.entity';
+import { Session } from '@modules/users-system/domain/session.entity';
 
 export class SessionViewDto{
     ip: string;
@@ -6,7 +6,7 @@ export class SessionViewDto{
     lastActiveDate: string;
     deviceId: string;
 
-    public static mapToView(dto: SessionDocument): SessionViewDto{
+    public static mapToView(dto: Session): SessionViewDto{
         const session = new SessionViewDto();
 
         session.deviceId = dto.deviceId;

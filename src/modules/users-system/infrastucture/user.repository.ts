@@ -2,24 +2,26 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { User } from '@modules/users-system/domain/user.entity';
-import { UserTuple } from '@modules/users-system/domain/user.tuple';
 import { UserEntityAssociated } from '@modules/users-system/dto/user.entity.associated';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
+import { FilterQuery } from '@core/infrastucture/filter.query';
 
 @Injectable()
 export class UserRepository {
     constructor(@Inject(DATA_SOURCE) private dataSource: DataSource) {}
 
-    //+
     async findById(id: string): Promise<User | null> {
 
         const numericId = Number(id);
         if (!Number.isInteger(numericId) || numericId < 1) return null;
 
-        const searchItem: UserTuple[] = await this.dataSource.query(`
-            SELECT * 
-            FROM public."Users"
-            WHERE id = $1 AND "deletedAt" IS NULL
+        const {clause, values} = new FilterQuery({
+            id: numericId,
+            deletedAt: null})
+            .buildWhereClause()
+
+        const searchItem: User[] = await this.dataSource.query(`
+            SELECT * FROM public."Users" ${clause}
             LIMIT 1`,
             [numericId]
         );
@@ -29,7 +31,6 @@ export class UserRepository {
         return this.mapTupleToUser(searchItem[0]);
     }
 
-    //+
     async checkUniq(loginCheck: string, emailCheck: string):Promise<string[]|null>  {
         // checks the uniqueness of the entered login and email, in case of duplication,
         // returns an array indicating the duplicated field
@@ -56,7 +57,6 @@ export class UserRepository {
 
     }
 
-    //+
     async findAndDeleteConfirmCode(code: string): Promise<UserEntityAssociated|null> {
         // search for an unconfirmed email and the user associated with it by code,
         // delete the record about the code
@@ -64,15 +64,16 @@ export class UserRepository {
         const searchItem  = await this.dataSource.query(`
             SELECT 
                 "Users".id AS "userId",  
+                "Users".login,  
                 "Users".email,  
                 "Users"."passwordHash",  
                 "Users"."isConfirmEmail",  
                 "Users"."deletedAt",  
                 "ConfirmationEmail".id AS "confirmId", 
-                "ConfirmationEmail".expiredTime
+                "ConfirmationEmail"."expirationTime"
             FROM public."Users"
             JOIN public."ConfirmationEmail"
-                ON "Users".id = "ConfirmationEmail".userId
+                ON "Users".id = "ConfirmationEmail"."userId"
             WHERE "ConfirmationEmail".code = $1 
             LIMIT 1;`,
             [code]
@@ -87,18 +88,19 @@ export class UserRepository {
             [searchItem[0].confirmId]
         );
         const result = new UserEntityAssociated(
-            searchItem[0].id,
+            searchItem[0].userId,
             searchItem[0].email,
+            searchItem[0].login,
             searchItem[0].passwordHash,
             searchItem[0].isConfirmEmail,
             searchItem[0].deletedAt,
-            searchItem[0].expiredTime);
+            searchItem[0].expirationTime);
         return result;
     }
 
     async getPartUserByLoginEmail(loginOrEmail: string): Promise<{id:string, passHash:string}|null> {
 
-        const checkedUser: UserTuple[] = await this.dataSource.query(`
+        const checkedUser: User[] = await this.dataSource.query(`
             SELECT * 
                 FROM public."Users"
                 WHERE (login = $1 OR email = $2) AND "isConfirmEmail" AND "deletedAt" IS NULL
@@ -113,11 +115,11 @@ export class UserRepository {
             : {id: checkedUser[0].id.toString(),
                passHash: checkedUser[0].passwordHash};
     }
-    //+
+
     async findUserIdByUnconfirmedEmail(email: string):Promise <number|null>{
         // search user with unconfirmed email
 
-        const searchItem: number[] = await this.dataSource.query(`
+        const searchItem = await this.dataSource.query(`
             SELECT id 
                 FROM public."Users"
                 WHERE email = $1 AND "isConfirmEmail" = false AND "deletedAt" IS NULL
@@ -127,14 +129,13 @@ export class UserRepository {
 
         return searchItem.length == 0
             ? null
-            : searchItem[0];
+            : searchItem[0].id;
     }
 
-    //+
     async findUserIdByEmail(email: string):Promise <number|null>{
         // search user with confirmed email
 
-        const searchItem: UserTuple[] = await this.dataSource.query(`
+        const searchItem: User[] = await this.dataSource.query(`
             SELECT id 
                 FROM public."Users"
                 WHERE email = $1 AND "isConfirmEmail" AND "deletedAt" IS NULL
@@ -147,7 +148,6 @@ export class UserRepository {
             : searchItem[0].id;
     }
 
-    //+
     async saveUser(savedItem: User): Promise<void> {
 
             const result = await this.dataSource.query(`
@@ -167,11 +167,10 @@ export class UserRepository {
                     savedItem.isConfirmEmail,
                     savedItem.deletedAt,
                 ])
-            savedItem.id = result[0].id;
+            savedItem.id ??= result[0].id;
             return ;
         }
 
-    //+
     async saveConfirmEmailCode(createDto: CreateCodeDto): Promise<void>   {
 
         await this.dataSource.query(`
@@ -192,7 +191,7 @@ export class UserRepository {
             INSERT INTO public."ResetPassword" 
                 ("userId", code, "expirationTime")
             VALUES ($1, $2, $3)
-                ON CONFLICT (userId)
+                ON CONFLICT ("userId")
                 DO UPDATE SET
                 code = EXCLUDED.code,
                 "expirationTime" = EXCLUDED."expirationTime";`,
@@ -205,14 +204,15 @@ export class UserRepository {
             SELECT
                 "Users".id AS "userId",
                 "Users".email,
+                "Users".login,
                 "Users"."passwordHash",
                 "Users"."isConfirmEmail",
                 "Users"."deletedAt",
                 "ResetPassword".id AS "passwordId",
-                "ResetPassword".expiredTime
+                "ResetPassword"."expirationTime"
             FROM public."Users"
                      JOIN public."ResetPassword"
-                          ON "Users".id = "ResetPassword".userId
+                          ON "Users".id = "ResetPassword"."userId"
             WHERE "ResetPassword".code = $1
                 LIMIT 1;`,
             [resetCode]
@@ -227,16 +227,17 @@ export class UserRepository {
             [searchItem[0].passwordId]
         );
         const result = new UserEntityAssociated(
-            searchItem[0].id,
+            searchItem[0].userId,
             searchItem[0].email,
+            searchItem[0].login,
             searchItem[0].passwordHash,
             searchItem[0].isConfirmEmail,
             searchItem[0].deletedAt,
-            searchItem[0].expiredTime);
+            searchItem[0].expirationTime);
         return result;
     }
 
-    mapTupleToUser(tuple: UserTuple): User{
+    mapTupleToUser(tuple: User): User{
         const user = new User();
         user.id = tuple.id;
         user.login = tuple.login;

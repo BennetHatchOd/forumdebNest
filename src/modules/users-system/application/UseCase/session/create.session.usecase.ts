@@ -1,7 +1,7 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 import { UserConfig } from '@modules/users-system/config/user.config';
-import { Session, SessionDocument, SessionModelType } from '@modules/users-system/domain/session.entity';
+import { Session } from '@modules/users-system/domain/session.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
 import { Inject } from '@nestjs/common';
@@ -22,12 +22,11 @@ export class CreateSessionHandler implements ICommandHandler<CreateSessionComman
         private readonly sessionRepository: SessionRepository,
         @Inject(INJECT_TOKEN.REFRESH_TOKEN)
         private readonly refreshJwtService: JwtService,
-        @InjectModel(Session.name) private SessionModel: SessionModelType,
         ) {}
 
     async execute({sessionInputDto}: CreateSessionCommand):Promise<string> {
 
-        const session: SessionDocument = this.SessionModel.createInstance(sessionInputDto)
+        const session: Session =  Session.createInstance(sessionInputDto)
         await this.sessionRepository.save(session);
 
         const payload: TokenPayloadDto =  this.sessionRepository.mapTokenFromSession(session)

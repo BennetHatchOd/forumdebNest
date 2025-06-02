@@ -4,6 +4,7 @@ export class UserEntityAssociated {
     constructor(
         public userId: number,
         public email: string,
+        public login: string,
         public passwordHash: string,
         public isConfirmEmail: boolean,
         public deletedAt:Date,
@@ -13,6 +14,7 @@ export class UserEntityAssociated {
         const user = new User();
         user.id = this.userId;
         user.email = this.email;
+        user.login = this.login;
         user.isConfirmEmail = this.isConfirmEmail;
         user.deletedAt = this.deletedAt;
         user.passwordHash = this.passwordHash;

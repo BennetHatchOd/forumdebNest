@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { UserConfig } from '@modules/users-system/config/user.config';
 import { EmailService } from '@modules/notifications/application/email.service';
+import console from 'node:console';
 
 export class CreateCodeConfirmationEmailCommand extends Command<void> {
     constructor(

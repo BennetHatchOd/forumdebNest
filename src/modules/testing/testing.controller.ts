@@ -27,7 +27,6 @@ export class TestingController {
             `);
         const tableNames = result.map((row) => `"${row.table_name}"`).join(', ');
         const result1 = await this.dataSource.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE;`);
-console.log("result = ", result1)
 
         const promises = collections.map((collection) =>
             this.databaseConnection.collection(collection.name).deleteMany({}),

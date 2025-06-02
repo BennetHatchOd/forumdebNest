@@ -19,7 +19,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from '@modules/users-system/application/UseCase';
 import { AuthModule } from '@core/auth.module';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
-import { Session, SessionSchema } from '@modules/users-system/domain/session.entity';
 import { SessionQueryRepository } from '@modules/users-system/infrastucture/query/session.query.repository';
 import { DeviceController } from '@modules/users-system/api/device.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -32,9 +31,6 @@ import { UserRepository } from '@modules/users-system/infrastucture/user.reposit
         CqrsModule,
         AuthModule,
         DatabaseModule,
-        MongooseModule.forFeature([
-            { name: Session.name, schema: SessionSchema },
-        ]),
         ThrottlerModule.forRootAsync({
             imports:[UserSystemModule],
             inject: [UserConfig],

@@ -7,8 +7,8 @@ import { SessionViewDto } from '@modules/users-system/dto/view/session.view.dto'
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { SessionQueryRepository } from '@modules/users-system/infrastucture/query/session.query.repository';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
-import { DeleteOthersSessionCommand } from '@modules/users-system/application/UseCase/delete.others.sessions.usecase';
-import { DeleteOneSessionCommand } from '@modules/users-system/application/UseCase/delete.one.session.usecase';
+import { DeleteOthersSessionCommand } from '@modules/users-system/application/UseCase/session/delete.others.sessions.usecase';
+import { DeleteOneSessionCommand } from '@modules/users-system/application/UseCase/session/delete.one.session.usecase';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { SkipThrottle } from '@nestjs/throttler';
 
@@ -27,9 +27,8 @@ export class DeviceController {
     async getAllSessions(@CurrentUserId() user: TokenPayloadDto
     ):Promise<SessionViewDto[]>{
 
-        await this.sessionRepository.clearExpired(user.userId);
         const sessions: SessionViewDto[]
-            = await this.sessionQueryRepository.findByUserId(user.userId);
+            = await this.sessionQueryRepository.findByUserId(+user.userId);
         return sessions;
     }
 
@@ -39,7 +38,7 @@ export class DeviceController {
     async deleteOtherDevices(@CurrentUserId() user: TokenPayloadDto) : Promise<void> {
 
         await this.commandBus.execute(new DeleteOthersSessionCommand(
-            user.userId,
+            +user.userId,
             user.deviceId));
         return;
     }
@@ -53,7 +52,7 @@ export class DeviceController {
     ): Promise<void> {
 
         await this.commandBus.execute(new DeleteOneSessionCommand(
-            user.userId,
+            +user.userId,
             id));
         return;
     }

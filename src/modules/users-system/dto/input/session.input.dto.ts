@@ -1,8 +1,9 @@
-import { IsMongoId, IsString } from 'class-validator';
+import { IsMongoId, IsNumber, IsString, Min } from 'class-validator';
 
 export class SessionInputDto {
-    @IsMongoId()
-    userId: string;
+    @IsNumber()
+    @Min(1)
+    userId: number;
 
     @IsString()
     deviceName:  string;

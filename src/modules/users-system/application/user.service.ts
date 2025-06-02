@@ -12,6 +12,7 @@ import { UserRepository } from '@modules/users-system/infrastucture/user.reposit
 import { UserEntityAssociated } from '@modules/users-system/dto/user.entity.associated';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
+import { EmailService } from '@modules/notifications/application/email.service';
 
 @Injectable()
 export class UserService {
@@ -19,11 +20,12 @@ export class UserService {
         @Inject(INJECT_TOKEN.ACCESS_TOKEN)
         private readonly accessJwtService: JwtService,
         private readonly userRepository: UserRepository,
+        private readonly mailService: EmailService,
         private readonly passwordHashService: PasswordHashService,
         private readonly userConfig: UserConfig,
     ) {}
 
-    async createAccessToken(userId: string) {
+    async createAccessToken(userId: number) {
 
 
         return this.accessJwtService.sign({ user: userId });
@@ -80,7 +82,7 @@ export class UserService {
         const expirationTime = add(new Date(), {hours: this.userConfig.timeLifePasswordCode});
         const resetPasswordDto = new CreateCodeDto(foundedUser, code, expirationTime);
         await this.userRepository.saveResetPasswordCode(resetPasswordDto);
-
+        this.mailService.createPasswordRecovery(email, code);
         return;
     }
 

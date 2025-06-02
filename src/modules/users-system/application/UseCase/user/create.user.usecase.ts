@@ -3,16 +3,10 @@ import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { UserInputDto } from '@modules/users-system/dto/input/user.input.dto';
 import { UserConfig } from '@modules/users-system/config/user.config';
-import { EmailService } from '@modules/notifications/application/email.service';
-import { PasswordHashService } from '../password.hash.service';
+import { PasswordHashService } from '../../password.hash.service';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
 import { User } from '@modules/users-system/domain/user.entity';
-import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { add } from 'date-fns';
-import {
-    CreateCodeConfirmationEmailCommand
-} from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
+import { CreateCodeConfirmationEmailCommand} from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
 
 export class CreateUserCommand extends Command<string> {
     constructor(

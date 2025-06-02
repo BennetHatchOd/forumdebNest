@@ -21,8 +21,8 @@ import { ApiBasicAuth } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
-import { DeleteUserCommand } from '@modules/users-system/application/UseCase/delete.user.usecase';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { DeleteUserCommand } from '@modules/users-system/application/UseCase/user/delete.user.usecase';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/user/create.user.usecase';
 
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))
