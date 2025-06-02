@@ -69,13 +69,13 @@ describe('AuthController (e2e)', () => {
 
     describe('Testing login. Login users by login and email', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             await testData.createManyUsers();
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
 
         it('should return 200 and a correct accessToken by after login login', async () => {
@@ -136,10 +136,10 @@ describe('AuthController (e2e)', () => {
             let code: string;
 
             beforeAll(async () => {
+                await deleteAllData(app, globalPrefix);
                 jest.clearAllMocks();
             })
             afterAll(async () => {
-                await deleteAllData(app, globalPrefix);
             })
 
             it('should return 204 after registration and a correct code for email', async () => {
@@ -170,9 +170,6 @@ describe('AuthController (e2e)', () => {
                     })
                     .expect(HttpStatus.OK)
             });
-
-
-
         });
 
     describe('Testing resending email for confirmation', () => {
@@ -182,10 +179,10 @@ describe('AuthController (e2e)', () => {
             "email": "example2@example.com"
         }
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             jest.clearAllMocks();
         })
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
 
         it('should return 204 after resending email. Registration, confirmation and login are used', async () => {
@@ -202,10 +199,11 @@ describe('AuthController (e2e)', () => {
                 })
                 .expect(HttpStatus.NO_CONTENT)
 
-            expect(emailServiceMock.createNewConfirmEmail).toHaveBeenCalled();
-            expect(emailServiceMock.createNewConfirmEmail.mock.calls.length).toBe(1);
-            expect(emailServiceMock.createNewConfirmEmail.mock.calls[0][0]).toBe(user.email);
-            code = emailServiceMock.createNewConfirmEmail.mock.calls[0][1];
+
+            expect(emailServiceMock.createConfirmEmail).toHaveBeenCalled();
+            expect(emailServiceMock.createConfirmEmail.mock.calls.length).toBe(2);
+            expect(emailServiceMock.createConfirmEmail.mock.calls[1][0]).toBe(user.email);
+            code = emailServiceMock.createConfirmEmail.mock.calls[1][1];
 
             await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.confirmation))
@@ -229,6 +227,7 @@ describe('AuthController (e2e)', () => {
         const newPassword = 'Gt_re434g-ge';
 
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 1;
             await testData.createManyAccessTokens();
@@ -236,7 +235,6 @@ describe('AuthController (e2e)', () => {
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
 
         it('should return 204 and a code by email for recovery password', async () => {
@@ -287,6 +285,7 @@ describe('AuthController (e2e)', () => {
 
     describe('Testing about Me', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 1;
             await testData.createManyAccessTokens();
@@ -294,7 +293,6 @@ describe('AuthController (e2e)', () => {
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
 
         it('should return 200 and the user will receive object information about themselves', async () => {
@@ -333,13 +331,13 @@ describe('AuthController (e2e)', () => {
         const device = 'Honor'
 
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 1;
             await testData.createManyUsers();
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
 
         it('should return 200 and the refreshToken for user', async () => {
@@ -380,8 +378,8 @@ describe('AuthController (e2e)', () => {
             const payload = jwtServiceAT.verify(accessToken);
             const payloadRefresh = jwtServiceRT.verify(refresh2);
 
-            expect(payload.user).toBe(testData.users[0].id.toString());
-            expect(payloadRefresh.userId).toBe(testData.users[0].id.toString())
+            expect(+payload.user).toBe(testData.users[0].id);
+            expect(payloadRefresh.userId).toBe(testData.users[0].id)
         });
 
         it('should return 200 after new refreshToken', async () => {

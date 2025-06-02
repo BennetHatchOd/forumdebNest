@@ -6,9 +6,6 @@ import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
-import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
-import { UserConfig } from '@modules/users-system/config/user.config';
-import { JwtService } from '@nestjs/jwt';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('UserAppController (e2e)', () => {
@@ -266,6 +263,141 @@ describe('UserAppController (e2e)', () => {
             expect(response.body).toEqual({"errorsMessages": [{
                 message: expect.any(String),
                 field: "email"},]
+            });
+        });
+
+        it("should return 404 by attempt to access user's endpoint with authorization error.", async () => {
+
+            await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", "Bearer FGRFdfsfdf")
+                .send({ login: 'hj',
+                    email: 'hjuh@hjuh.com',
+                    password: 'gtghhTgg6ytghujikutghikkk'})
+                .expect(HttpStatus.UNAUTHORIZED)
+            await request(app.getHttpServer())
+                .get(URL_PATH.users)
+                .expect(HttpStatus.UNAUTHORIZED)
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .set("Authorization", "Bearer FGRFdfsfdf")
+                .expect(HttpStatus.UNAUTHORIZED)
+        });
+
+        it("should return 404 by attempt to delete fake user", async () => {
+
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.NOT_FOUND)
+        });
+
+        it("should return 400 by attempt to delete user by not valide id.", async () => {
+
+            await request(app.getHttpServer())
+                .delete(join(URL_PATH.users, '681896da2168245826d049'))
+                .set("Authorization", testData.authLoginPassword)
+                .expect(HttpStatus.NOT_FOUND)
+        });
+
+    })
+
+    describe('Testing paginator for api/users.', () => {
+        beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
+            testData.clearData();
+            testData.numberUsers = 2;
+            await testData.createManyUsers();
+        })
+
+        afterAll(async () => {
+        })
+        it("should return 400 and an array of mistakes by attempt to create new " +
+            "user with validation error", async () => {
+
+            const response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({ login: 'hj',
+                    email: 'hjuh@hjuh.com',
+                    password: 'gtghhTgg6ytghujikutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [
+                    {message: expect.any(String),
+                        field: "login"},
+                    {message: expect.any(String),
+                        field: "password"}
+                ]
+            });
+        });
+
+        it("should return 400 and an array of mistakes by attempt to create new " +
+            "user with exist login or email", async () => {
+            const  user = {
+                login: 'hjft',
+                email: 'hjyJ@hjuh.jhgp.com',
+                password: 'gt45hTgg6ytDFTkkk'}
+
+            await request(app.getHttpServer())
+                .post(join(URL_PATH.auth,AUTH_PATH.registration))
+                .send(user)
+                .expect(HttpStatus.NO_CONTENT)
+
+            let response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: testData.users[0].login,
+                    email: 'hjuh1@hjuh.com',
+                    password: 'gttghujikutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                    message: expect.any(String),
+                    field: "login"}]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: 'hjws5',
+                    email: testData.users[0].email,
+                    password: 'gtghhTgg6ytghujikk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                    message: expect.any(String),
+                    field: "email"}]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: user.login,
+                    email: 'hjuh4@hjuh.com',
+                    password: 'gtjikutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                    message: expect.any(String),
+                    field: "login"},]
+            });
+
+            response = await request(app.getHttpServer())
+                .post(URL_PATH.users)
+                .set("Authorization", testData.authLoginPassword)
+                .send({
+                    login: 'hjsd52',
+                    email: user.email,
+                    password: 'gtghhTkutghikkk'})
+                .expect(HttpStatus.BAD_REQUEST)
+
+            expect(response.body).toEqual({"errorsMessages": [{
+                    message: expect.any(String),
+                    field: "email"},]
             });
         });
 
