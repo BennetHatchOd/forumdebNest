@@ -59,7 +59,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
             },
             isConfirmedEmail);
 
-        await this.userRepository.saveUser(createdUser);
+        await this.userRepository.save(createdUser);
 
         if(toSentEmail && !isConfirmedEmail)
             await this.commandBus.execute(new CreateCodeConfirmationEmailCommand(createdUser.email, createdUser.id))
