@@ -1,4 +1,4 @@
-import { BlogDocument } from '../../domain/blog.entity';
+import { Blog } from '@modules/blogging.platform/domain/blog.entity';
 
 export class BlogViewDto {
         id:              string;
@@ -7,15 +7,15 @@ export class BlogViewDto {
         createdAt:       string;
         isMembership:    boolean;
         websiteUrl:      string;
-        constructor(item: BlogDocument) {
-            this.id = item._id.toString();
+        constructor(item: Blog) {
+            this.id = item.id!.toString();
             this.name = item.name;
             this.description = item.description;
             this.createdAt = item.createdAt.toISOString();
             this.isMembership = item.isMembership;
             this.websiteUrl = item.websiteUrl;
         }
-    public static   mapToView(item: BlogDocument): BlogViewDto {
+    public static   mapToView(item: Blog): BlogViewDto {
         return  new BlogViewDto(item);
     }
 }
