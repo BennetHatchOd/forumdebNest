@@ -1,12 +1,14 @@
 export const URL_PATH = {
     base: '/',
-    blogs: '/blogs',
-    posts: '/posts',
-    users: '/sa/users',
+    blogsQuery: '/blogs',
+    postsQuery: '/posts',
     auth: '/auth',
     devices: '/security/devices',
     comments: '/comments',
     testing: '/testing/all-data',
+    blogs: '/sa/blogs',
+    posts: '/sa/posts',
+    users: '/sa/users',
 };
 
 export const AUTH_PATH = {
