@@ -1,4 +1,4 @@
-export type Condition<T> = T | null | { $ne: T };
+export type Condition<T> = T | null | { $ne: T } | { $like: T |null };
 export type Filter<T> = {
     [P in keyof T]?: Condition<T[P]>;
 };
@@ -24,6 +24,15 @@ export class FilterQuery<T extends Record<string, any>> {
             if (typeof value === 'object' && value !== null && '$ne' in value) {
                 conditions.push(`"${String(key)}" <> $${index}`);
                 values.push(value.$ne);
+                index++;
+                continue;
+            }
+
+            if (typeof value === 'object' && value !== null  && '$like' in value ) {
+                if(value.$like === null)
+                    continue;
+                conditions.push(`"${String(key)}" ILIKE $${index}`);
+                values.push(`%${value.$like}%`);
                 index++;
                 continue;
             }
