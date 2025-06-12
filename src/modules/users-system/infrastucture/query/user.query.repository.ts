@@ -48,36 +48,35 @@ export class UserQueryRepository {
 
         const whereClausesAND: string[] = [`"deletedAt" IS NULL`];
         const whereClausesOR: string[] = [];
-        const queryParams: any[] = [];
+        const values: any[] = [];
 
         if (queryReq.searchLoginTerm) {
-            queryParams.push(`%${queryReq.searchLoginTerm}%`);
-            whereClausesOR.push(`login ILIKE $${queryParams.length}`);
+            values.push(`%${queryReq.searchLoginTerm}%`);
+            whereClausesOR.push(`login ILIKE $${values.length}`);
         }
-
         if (queryReq.searchEmailTerm) {
-            queryParams.push(`%${queryReq.searchEmailTerm}%`);
-            whereClausesOR.push(`email ILIKE $${queryParams.length}`);
+            values.push(`%${queryReq.searchEmailTerm}%`);
+            whereClausesOR.push(`email ILIKE $${values.length}`);
         }
-
         if (whereClausesOR.length > 0) {
             const whereSqlOR = whereClausesOR.join(' OR ');
             whereClausesAND.push(`(${whereSqlOR})`);
         }
-        const whereSql = whereClausesAND.join(' AND ');
 
-        const sqlRequest = `FROM public."Users" WHERE ${whereSql}`;
+        const clause = whereClausesAND.join(' AND ');
+
+        const sqlRequest = `FROM public."Users" WHERE ${clause}`;
         const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
         const sql = ` SELECT * ${sqlRequest}
             ORDER BY "${queryReq.sortBy}" ${queryReq.sortDirection} 
             LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
 
-        const totalCount: number = await this.dataSource.query(sqlCount + ';', queryParams);
+        const totalCount = await this.dataSource.query(sqlCount + ';', values);
 
         if(+totalCount[0].count === 0)
             return new EmptyPaginator<UserViewDto>();
 
-        const users: User[] = await this.dataSource.query(sql, queryParams);
+        const users: User[] = await this.dataSource.query(sql, values);
 
         const items = users.map(UserViewDto.mapToView);
 

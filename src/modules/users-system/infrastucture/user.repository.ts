@@ -5,30 +5,17 @@ import { User } from '@modules/users-system/domain/user.entity';
 import { UserEntityAssociated } from '@modules/users-system/dto/user.entity.associated';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { FilterQuery } from '@core/infrastucture/filter.query';
+import { BaseRepository } from '@core/repository/base.repository';
 
 @Injectable()
-export class UserRepository {
-    constructor(@Inject(DATA_SOURCE) private dataSource: DataSource) {}
+export class UserRepository extends BaseRepository{
+    constructor(@Inject(DATA_SOURCE) protected dataSource: DataSource) {
+        super(dataSource);
+    }
 
-    async findById(id: string): Promise<User | null> {
+    async findById(id: string|number): Promise<User | null> {
 
-        const numericId = Number(id);
-        if (!Number.isInteger(numericId) || numericId < 1) return null;
-
-        const {clause, values} = new FilterQuery({
-            id: numericId,
-            deletedAt: null})
-            .buildWhereClause()
-
-        const searchItem: User[] = await this.dataSource.query(`
-            SELECT * FROM public."Users" ${clause}
-            LIMIT 1`,
-            [numericId]
-        );
-        if (searchItem.length == 0)
-            return null;
-
-        return this.mapTupleToUser(searchItem[0]);
+        return this.findEntityById<User>(id, 'Users', User);
     }
 
     async checkUniq(loginCheck: string, emailCheck: string):Promise<string[]|null>  {
@@ -57,48 +44,7 @@ export class UserRepository {
 
     }
 
-    async findAndDeleteConfirmCode(code: string): Promise<UserEntityAssociated|null> {
-        // search for an unconfirmed email and the user associated with it by code,
-        // delete the record about the code
-
-        const searchItem  = await this.dataSource.query(`
-            SELECT 
-                "Users".id AS "userId",  
-                "Users".login,  
-                "Users".email,  
-                "Users"."passwordHash",  
-                "Users"."isConfirmEmail",  
-                "Users"."deletedAt",  
-                "ConfirmationEmail".id AS "confirmId", 
-                "ConfirmationEmail"."expirationTime"
-            FROM public."Users"
-            JOIN public."ConfirmationEmail"
-                ON "Users".id = "ConfirmationEmail"."userId"
-            WHERE "ConfirmationEmail".code = $1 
-            LIMIT 1;`,
-            [code]
-        );
-
-        if (searchItem.length == 0)
-            return null;
-
-        await this.dataSource.query(`
-            DELETE FROM public."ConfirmationEmail"
-            WHERE id = $1;`,
-            [searchItem[0].confirmId]
-        );
-        const result = new UserEntityAssociated(
-            searchItem[0].userId,
-            searchItem[0].email,
-            searchItem[0].login,
-            searchItem[0].passwordHash,
-            searchItem[0].isConfirmEmail,
-            searchItem[0].deletedAt,
-            searchItem[0].expirationTime);
-        return result;
-    }
-
-    async getPartUserByLoginEmail(loginOrEmail: string): Promise<{id:string, passHash:string}|null> {
+    async getIdAndPasswordByLoginEmail(loginOrEmail: string): Promise<{id:string, passHash:string}|null> {
 
         const checkedUser: User[] = await this.dataSource.query(`
             SELECT * 
@@ -119,36 +65,15 @@ export class UserRepository {
     async findUserIdByUnconfirmedEmail(email: string):Promise <number|null>{
         // search user with unconfirmed email
 
-        const searchItem = await this.dataSource.query(`
-            SELECT id 
-                FROM public."Users"
-                WHERE email = $1 AND "isConfirmEmail" = false AND "deletedAt" IS NULL
-                LIMIT 1;`,
-            [email]
-        );
-
-        return searchItem.length == 0
-            ? null
-            : searchItem[0].id;
+        return this.findUserIdByEmail(email, false)
     }
-
-    async findUserIdByEmail(email: string):Promise <number|null>{
+    async findUserIdByConfirmEmail(email: string):Promise <number|null>{
         // search user with confirmed email
 
-        const searchItem: User[] = await this.dataSource.query(`
-            SELECT id 
-                FROM public."Users"
-                WHERE email = $1 AND "isConfirmEmail" AND "deletedAt" IS NULL
-                LIMIT 1;`,
-            [email]
-        );
-
-        return searchItem.length == 0
-            ? null
-            : searchItem[0].id;
+        return this.findUserIdByEmail(email, true)
     }
 
-    async saveUser(savedItem: User): Promise<void> {
+    async save(savedItem: User): Promise<void> {
 
             const result = await this.dataSource.query(`
                 INSERT INTO public."Users"(
@@ -184,7 +109,6 @@ export class UserRepository {
             [createDto.userId, createDto.code, createDto.expirationTime]);
         return;
     }
-
     async saveResetPasswordCode(createDto: CreateCodeDto): Promise<void>   {
 
         await this.dataSource.query(`
@@ -199,54 +123,14 @@ export class UserRepository {
         return;
     }
 
-    async findResetPasswordCode(resetCode: string): Promise<UserEntityAssociated|null> {
-        const searchItem  = await this.dataSource.query(`
-            SELECT
-                "Users".id AS "userId",
-                "Users".email,
-                "Users".login,
-                "Users"."passwordHash",
-                "Users"."isConfirmEmail",
-                "Users"."deletedAt",
-                "ResetPassword".id AS "passwordId",
-                "ResetPassword"."expirationTime"
-            FROM public."Users"
-                     JOIN public."ResetPassword"
-                          ON "Users".id = "ResetPassword"."userId"
-            WHERE "ResetPassword".code = $1
-                LIMIT 1;`,
-            [resetCode]
-        );
+    async findAndDeleteResetPasswordCode(code: string): Promise<UserEntityAssociated|null> {
 
-        if (searchItem.length == 0)
-            return null;
-
-        await this.dataSource.query(`
-            DELETE FROM public."ResetPassword"
-            WHERE id = $1;`,
-            [searchItem[0].passwordId]
-        );
-        const result = new UserEntityAssociated(
-            searchItem[0].userId,
-            searchItem[0].email,
-            searchItem[0].login,
-            searchItem[0].passwordHash,
-            searchItem[0].isConfirmEmail,
-            searchItem[0].deletedAt,
-            searchItem[0].expirationTime);
-        return result;
+        return await this.findAndDeleteCode(code, 'ResetPassword');
     }
+    async findAndDeleteConfirmCode(code: string): Promise<UserEntityAssociated|null> {
+        // search for an unconfirmed email and the user associated with it by code,
+        // delete the record about the code
 
-    mapTupleToUser(tuple: User): User{
-        const user = new User();
-        user.id = tuple.id;
-        user.login = tuple.login;
-        user.email = tuple.email;
-        user.passwordHash = tuple.passwordHash;
-        user.isConfirmEmail = tuple.isConfirmEmail;
-        user.createdAt = tuple.createdAt;
-        user.deletedAt = tuple.deletedAt;
-
-        return user;
+        return await this.findAndDeleteCode(code, 'ConfirmationEmail');
     }
 }

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UserControllers } from './api/user.controller';
 import { UserQueryRepository } from './infrastucture/query/user.query.repository';
 import { AuthController } from './api/auth.controller';

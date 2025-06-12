@@ -39,7 +39,7 @@ export class UserService {
         // проверяет совпадение хеша пароля и
         // возвращает ид найденного пользователя
         const foundUser: { id: string; passHash: string } | null =
-            await this.userRepository.getPartUserByLoginEmail(loginOrEmail);
+            await this.userRepository.getIdAndPasswordByLoginEmail(loginOrEmail);
 
         if (
             foundUser !== null &&
@@ -72,7 +72,7 @@ export class UserService {
         // Delete the old codes ONLY after any of the codes are triggered.
 
         let foundedUser: number | null =
-            await this.userRepository.findUserIdByEmail(email);
+            await this.userRepository.findUserIdByConfirmEmail(email);
         if (!foundedUser)
             return;
         // Even if the current email address is not registered,
@@ -90,7 +90,7 @@ export class UserService {
         // Sets a new password if a valid recovery code was received
 
         const userNewPassword: UserEntityAssociated|null =
-            await this.userRepository.findResetPasswordCode(recoveryPassword.recoveryCode);
+            await this.userRepository.findAndDeleteResetPasswordCode(recoveryPassword.recoveryCode);
 
         if (!userNewPassword || isBefore(userNewPassword.entityExpiredTime, new Date()))
             throw new DomainException({
@@ -106,7 +106,7 @@ export class UserService {
         );
         userNewPassword.passwordHash = hash;
         const user = userNewPassword.mapToUser()
-        await this.userRepository.saveUser(user);
+        await this.userRepository.save(user);
 
         return;
     }
