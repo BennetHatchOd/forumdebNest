@@ -44,7 +44,7 @@ export class TestDataBuilder {
 
         for(let i = 0; i < this.numberBlogs; i++) {
             const blogCreate = await request(this.app.getHttpServer())
-                .post(URL_PATH.blogs)
+                .post(URL_PATH.blogsQuery)
                 .set("Authorization", this.authLoginPassword)
                 .send(this.blogs[0])
                 .expect(HttpStatus.CREATED)
@@ -67,7 +67,7 @@ export class TestDataBuilder {
 
         for(let i = 0; i < this.numberPosts; i++){
             const postCreate = await request(this.app.getHttpServer())
-                .post(URL_PATH.posts)
+                .post(URL_PATH.postsQuery)
                 .set("Authorization", this.authLoginPassword)
                 .send(this.posts[i])
                 .expect(HttpStatus.CREATED)
@@ -130,7 +130,7 @@ export class TestDataBuilder {
         //
         this.prepareManyComment();
         for(let i =0; i < this.numberComments; i++){
-            const s = `${URL_PATH.posts}/${this.postIds[0]}/comments`;
+            const s = `${URL_PATH.postsQuery}/${this.postIds[0]}/comments`;
             const commentCreate = await request(this.app.getHttpServer())
                 .post(s)
                 .set("Authorization", 'Bearer ' + this.accessTokens[0])

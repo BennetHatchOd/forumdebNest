@@ -1,10 +1,9 @@
 import { INestApplication, Inject } from '@nestjs/common';
 import { AuthBasic } from './auth.basic';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModelType } from '@src/modules/blogging.platform/domain/blog.entity';
-import { Post, PostDocument, PostModelType } from '@src/modules/blogging.platform/domain/post.entity';
-import { Comment, CommentDocument, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
+import { Blog} from '@src/modules/blogging.platform/domain/blog.entity';
+import { Post } from '@src/modules/blogging.platform/domain/post.entity';
+import { Comment } from '@src/modules/blogging.platform/domain/comment.entity';
 import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 import request from 'supertest';
@@ -13,19 +12,18 @@ import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
 import { User } from '@modules/users-system/domain/user.entity';
-import console from 'node:console';
 
 export class TestDataBuilderByDb {
     // создаем первоначальное наполнение системы
     accessTokens: string[] = [];
     users: User[] = [];
     usersPassword: string[] = [];
-    comments: CommentDocument[] = [];
-    blogs: BlogDocument[] = [];
-    posts: PostDocument[] = [];
+    comments: Comment[] = [];
+    blogs: Blog[] = [];
+    posts: Post[] = [];
     authLoginPassword: string = '';
     usersLikes: {addedAt: string,
-                userId: string,
+                userId: number,
                 login: string}[] = []
     private isCreate = {
         blog: false,
@@ -35,9 +33,6 @@ export class TestDataBuilderByDb {
     }
 
     constructor(private app:INestApplication,
-                @InjectModel(Blog.name)private BlogModel: BlogModelType,
-                @InjectModel(Post.name)private PostModel: PostModelType,
-                @InjectModel(Comment.name)private CommentModel: CommentModelType,
                 @Inject(DATA_SOURCE)private readonly dataSource: DataSource,
                 public passwordHashService: PasswordHashService,
                 public userConfig: UserConfig,
@@ -51,12 +46,20 @@ export class TestDataBuilderByDb {
         this.isCreate.blog = true;
 
         for (let i = 0; i < this.numberBlogs; i++) {
-            const blog = {name: `Blog_${i}`,
-                            description: `description for blog ${i}`,
-                            websiteUrl:	`https://dff${i}.com`  }
-            const newBlog: BlogDocument = this.BlogModel.createInstance(blog);
-            await newBlog.save()
-            this.blogs.push(newBlog);
+            const blog = {
+                name: `Blog_${i}`,
+                description: `description for blog ${i}`,
+                websiteUrl:	`https://dff${i}.com`
+            }
+            const result = await this.dataSource.query(`
+                INSERT INTO public.blogs(
+                    name, description, "websiteUrl")
+                VALUES('${blog.name}', '${blog.description}', '${blog.websiteUrl}')
+                RETURNING id;`)
+
+            const blogInstance: Blog = Blog.createInstance(blog);
+            blogInstance.id = result[0].id;
+            this.blogs.push(blogInstance);
         }
     }
 
@@ -70,12 +73,17 @@ export class TestDataBuilderByDb {
                 title: `post ${i}`,
                 shortDescription: `shortdescription for post ${i}`,
                 content: `content for post ${i}`,
-                blogId: this.blogs[0]._id.toString(),
+                blogId: this.blogs[0].id!,
             };
-            const newPost: PostDocument
-                = this.PostModel.createInstance(post, this.blogs[0].name);
-            await newPost.save();
-            this.posts.push(newPost);
+            const result = await this.dataSource.query(`
+                INSERT INTO public.posts(
+                    title, content, "shortDescription", "blogId")
+                VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${post.blogId}')
+                RETURNING id;`);
+
+            const postInstance: Post = Post.createInstance(post);
+            postInstance.id = result[0].id;
+            this.posts.push(postInstance);
         }
     }
 
@@ -101,10 +109,10 @@ export class TestDataBuilderByDb {
                 RETURNING id;`)
             newUser.id = result[0].id;
             this.users.push(newUser);
-            this.usersLikes.push({
-                addedAt: expect.any(String),
-                userId: newUser.id!.toString(),
-                login: user.login,})
+            // this.usersLikes.push({
+            //     addedAt: expect.any(String),
+            //     userId: newUser.id!,
+            //     login: user.login,})
         }
     }
 
@@ -131,12 +139,37 @@ export class TestDataBuilderByDb {
         for(let i =0; i < this.numberComments; i++){
             const comment: CreateCommentDto =
                 {content: `This is the comment number ${i}`,
-                 postId: this.posts[0]._id.toString(),
-                 userId: this.users[0].id.toString(),
+                 postId: this.posts[0].id!,
+                 userId: this.users[0].id!,
                  login: this.users[0].login};
-            const newComment: CommentDocument = this.CommentModel.createInstance(comment)
-            await newComment.save();
-            this.comments.push(newComment)
+
+            const result = await this.dataSource.query(`
+                INSERT INTO public.comments(
+                    content, "postId", "userId")
+                VALUES('${comment.content}', '${comment.postId}', '${comment.userId}')
+                RETURNING id;`);
+
+            const commentInstance: Comment = Comment.createInstance(comment);
+            commentInstance.id = result[0].id;
+            this.comments.push(commentInstance);
+        }
+    }
+
+    async writeToDB<T extends object>(
+        entities: T[],
+        tableName: string,
+    ):Promise<void> {
+
+            if (!entities.length) return;
+
+        for (const entity of entities) {
+            const fields = Object.keys(entity).map(f => `"${f}"`).join(", ");
+            const values = Object.values(entity).map(this.toRawSql).join(", ");
+
+            const sql = `
+            INSERT INTO "${tableName}" (${fields})
+            VALUES (${values})`;
+            await this.dataSource.query(sql);
         }
     }
 
@@ -155,33 +188,14 @@ export class TestDataBuilderByDb {
             comment: false,
             user: false,
         }
-
     }
 
-    // createTitleSessions(){
-    //     this.titleSessions = ['Chrome 12', 'Chrome 34', 'Android 17', 'Android 5', 'IoS 6']
-    // }
-    // createBadUser(){
-    //     this.badUser = {
-    //         login: 'lhfg',
-    //         email: 'gh2@test.com',
-    //         password: 'paSS'
-    //     }
-    // }
-
-    static async createTestData(app: INestApplication,
-                                userConfig: UserConfig,
-                                BlogModel: BlogModelType,
-                                PostModel: PostModelType,
-                                CommentModel: CommentModelType,
-                                dataSource: DataSource,
-                                passwordHashService: PasswordHashService,
-    ):Promise<TestDataBuilderByDb>{
-        const testData = new this(app, BlogModel, PostModel, CommentModel, dataSource,
-            passwordHashService, userConfig);
-        testData.authLoginPassword = AuthBasic.createAuthHeader(userConfig)
-
-        return testData;
+    private toRawSql(value: any): string {
+        if (value === null) return 'NULL';
+        if (typeof value === 'string') return `'${value}'`;
+        if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
+        if (value instanceof Date) return `'${value.toISOString()}'`;
+        return value.toString();
     }
 
     private async checkBlog(){
@@ -201,5 +215,15 @@ export class TestDataBuilderByDb {
             await this.createManyAccessTokens();
             this.isCreate.user = true;
         }
+    }
+
+    static async createTestData(app: INestApplication,
+                                userConfig: UserConfig,
+                                dataSource: DataSource,
+                                passwordHashService: PasswordHashService,
+    ):Promise<TestDataBuilderByDb>{
+        const testData = new this(app, dataSource, passwordHashService, userConfig);
+        testData.authLoginPassword = AuthBasic.createAuthHeader(userConfig)
+        return testData;
     }
 }
