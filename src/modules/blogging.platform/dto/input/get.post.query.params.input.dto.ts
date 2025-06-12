@@ -1,5 +1,6 @@
 import { BaseSortablePaginationParams } from '../../../../core/dto/base.query.params.input.dto';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum PostSortBy {
     CreatedAt = 'createdAt',
@@ -14,14 +15,16 @@ export class GetPostQueryParams extends BaseSortablePaginationParams<PostSortBy>
     @IsEnum(PostSortBy)
     sortBy = PostSortBy.CreatedAt;
 
-    @IsString()
     @IsOptional()
-    searchBlogId: string | null = null;
+    @Type(()=> Number)
+    @IsNumber()
+    @Min(1)
+    searchBlogId?: number;
 
-    // для поиска всех постов, соответсвующих блогу с id равным searchBlogId
+    // для поиска всех постов, соответствующих блогу с id равным searchBlogId
     // устанавливает в query из метода Get, строку поиска
     //
-    setBlogIdSearchParams(searchBlogId: string): void {
+    setBlogIdSearchParams(searchBlogId?: number): void {
         this.searchBlogId = searchBlogId;
     }
 }

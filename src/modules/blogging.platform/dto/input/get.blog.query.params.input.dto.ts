@@ -9,11 +9,13 @@ export enum BlogSortBy {
 }
 
 export class GetBlogQueryParams extends BaseSortablePaginationParams<BlogSortBy> {
+
     @IsEnum(BlogSortBy)
     sortBy = BlogSortBy.CreatedAt;
 
     @IsString()
     @IsOptional()
     searchNameTerm: string | null = null;
+
 }
 

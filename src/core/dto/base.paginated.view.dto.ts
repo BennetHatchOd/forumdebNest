@@ -5,7 +5,6 @@ export abstract class PaginatedViewDto<T> {
     page: number;
     pageSize: number;
 
-    //статический метод-утилита для мапинга
     public static mapToView<T>(data: {
         items: T[];
         page: number;

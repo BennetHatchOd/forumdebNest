@@ -7,6 +7,7 @@ class PaginationParams {
     @IsNumber()
     @Min(1)
     pageNumber: number = 1;
+
     @Type(() => Number)
     @Min(1)
     @IsNumber()
@@ -25,7 +26,9 @@ export enum SortDirection {
 //базовый класс для query параметров с сортировкой и пагинацией
 //поле sortBy должно быть реализовано в наследниках
 export abstract class BaseSortablePaginationParams<T> extends PaginationParams {
+
     @IsEnum(SortDirection)
     sortDirection: SortDirection = SortDirection.Desc;
+
     abstract sortBy: T;
 }
