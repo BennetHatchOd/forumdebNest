@@ -1,6 +1,9 @@
-import { IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNumber, Min } from 'class-validator';
 
 export class IdInputDto {
-    @IsString()
-    id: string;
+    @Type(() => Number) // 👈 важно!
+    @IsNumber()
+    @Min(1)
+    id: number;
 }
