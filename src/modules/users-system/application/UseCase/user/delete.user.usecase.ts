@@ -6,7 +6,7 @@ import { User } from '@modules/users-system/domain/user.entity';
 
 export class DeleteUserCommand extends Command<void> {
     constructor(
-        public userId: string,
+        public userId: number,
     ) {
         super()}
 }
@@ -26,7 +26,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
                 message: 'user with id-${userId} not found',
                 code: DomainExceptionCode.NotFound});
         user.delete();
-        this.userRepository.saveUser(user);
+        this.userRepository.save(user);
         return;
     }
 }
