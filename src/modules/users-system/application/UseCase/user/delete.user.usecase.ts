@@ -26,7 +26,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
                 message: 'user with id-${userId} not found',
                 code: DomainExceptionCode.NotFound});
         user.delete();
-        this.userRepository.save(user);
+        await this.userRepository.save(user);
         return;
     }
 }
