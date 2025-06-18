@@ -8,7 +8,7 @@ async function bootstrap() {
     const DynamicAppModule = await initAppModule();
     const app = await NestFactory.create<NestExpressApplication>(DynamicAppModule);
     const coreConfig = app.get<CoreConfig>(CoreConfig);
-    appSetup(app, coreConfig.isSwaggerEnabled, coreConfig.globalPrefix);
+    appSetup(app, coreConfig.isSwaggerEnabled, coreConfig.globalPrefix, DynamicAppModule.module);
 
     const port = coreConfig.port;
     await app.listen(port);
