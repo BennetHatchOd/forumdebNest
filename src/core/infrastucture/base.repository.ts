@@ -11,16 +11,13 @@ export class BaseRepository {
     constructor(@Inject(DATA_SOURCE) protected dataSource: DataSource) {}
 
     async findEntityById<T>(
-        id: string|number,
+        id: number,
         tableName: string,
         entityClass: new () => T
     ): Promise<T | null> {
-        const numericId = Number(id);
-        if (!Number.isInteger(numericId) || numericId < 1)
-            return null;
 
         const { clause, values } = new FilterQuery({
-            id: numericId,
+            id: id,
             deletedAt: null
         }).buildWhereClause();
 

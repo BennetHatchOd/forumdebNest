@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Blog } from '../domain/blog.entity';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
-import { BaseRepository } from '@core/repository/base.repository';
+import { BaseRepository } from '@core/infrastucture/base.repository';
 import console from 'node:console';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class BlogRepository extends BaseRepository{
         super(dataSource);
     }
 
-    async findById(id: string|number): Promise<Blog | null> {
+    async findById(id: number): Promise<Blog | null> {
 
         return this.findEntityById<Blog>(id, 'blogs', Blog);
     }
@@ -22,15 +22,13 @@ export class BlogRepository extends BaseRepository{
 
              const result = await this.dataSource.query(`
                     INSERT INTO public."blogs"(
-                        name, description, "createdAt", "isMembership", "websiteUrl", "deletedAt")
-                    VALUES($1, $2, $3, $4, $5, $6)
+                        name, description, "isMembership", "websiteUrl")
+                    VALUES($1, $2, $3, $4)
                 RETURNING id;`,
                 [   savedItem.name,
                     savedItem.description,
-                    savedItem.createdAt,
                     savedItem.isMembership,
                     savedItem.websiteUrl,
-                    savedItem.deletedAt
                 ])
             savedItem.id = result[0].id;
             return ;

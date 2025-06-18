@@ -5,7 +5,7 @@ import { User } from '@modules/users-system/domain/user.entity';
 import { UserEntityAssociated } from '@modules/users-system/dto/user.entity.associated';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { FilterQuery } from '@core/infrastucture/filter.query';
-import { BaseRepository } from '@core/repository/base.repository';
+import { BaseRepository } from '@core/infrastucture/base.repository';
 
 @Injectable()
 export class UserRepository extends BaseRepository{
@@ -13,7 +13,7 @@ export class UserRepository extends BaseRepository{
         super(dataSource);
     }
 
-    async findById(id: string|number): Promise<User | null> {
+    async findById(id: number): Promise<User | null> {
 
         return this.findEntityById<User>(id, 'Users', User);
     }
@@ -44,10 +44,10 @@ export class UserRepository extends BaseRepository{
 
     }
 
-    async getIdAndPasswordByLoginEmail(loginOrEmail: string): Promise<{id:string, passHash:string}|null> {
+    async getIdAndPasswordByLoginEmail(loginOrEmail: string): Promise<{id:number, passHash:string}|null> {
 
         const checkedUser: User[] = await this.dataSource.query(`
-            SELECT * 
+            SELECT id, "passwordHash" 
                 FROM public."Users"
                 WHERE (login = $1 OR email = $2) AND "isConfirmEmail" AND "deletedAt" IS NULL
                 LIMIT 1;`,
@@ -58,7 +58,7 @@ export class UserRepository extends BaseRepository{
 
         return checkedUser.length == 0
             ? null
-            : {id: checkedUser[0].id.toString(),
+            : {id: checkedUser[0].id,
                passHash: checkedUser[0].passwordHash};
     }
 
