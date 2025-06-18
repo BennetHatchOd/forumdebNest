@@ -313,14 +313,15 @@ describe('PostController (e2e)', () => {
                 title: "nalo3aLk",
                 shortDescription: "string2",
                 content: "https://google.com",
-                blogId: "3",
+                blogId: "1",
         }
 
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberPosts = 1;
+            testData.numberBlogs = 1;
             await testData.createManyPosts();
-            await deleteAllData(app, globalPrefix);
         })
 
         afterAll(async () => {
@@ -331,7 +332,7 @@ describe('PostController (e2e)', () => {
                 .post(URL_PATH.posts)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
-                    title: "n12345678901234567890123456789",
+                    title: "n123456789012345678901234567890",
                     shortDescription: "string2",
                     content: "https://google.com",
                     blogId: "752"})
@@ -340,11 +341,11 @@ describe('PostController (e2e)', () => {
             expect(response.body.errorsMessages.length).toBe(2)
             expect(response.body.errorsMessages).toEqual([{
                   message: expect.any(String),
-                  field: "title"
+                  field: "blogId"
                 },
                 {
                   message: expect.any(String),
-                  field: "blogId"
+                  field: "title"
                 }])
         })
 
@@ -356,7 +357,7 @@ describe('PostController (e2e)', () => {
         })
 
         it('should return 404 if post not exist', async () => {
-            await request(app.getHttpServer())
+            const  y = await request(app.getHttpServer())
                 .put(join(URL_PATH.posts, "2jh45"))
                 .set("Authorization", testData.authLoginPassword)
                 .send(post)
