@@ -25,16 +25,16 @@ export class CreatePostHandler implements ICommandHandler<CreatePostCommand> {
 
     async execute({ createDto }: CreatePostCommand): Promise<number> {
 
-        const blog: Blog | null = await this.blogRepository.findById(Number(createDto.blogId))
-        if(!blog)
-            throw new DomainException({
-                message: `blog with id-${createDto.blogId} not found`,
-                code: DomainExceptionCode.BlogIdNotCorrect,
-                extension: [{
-                    message:`blog with id-${createDto.blogId} not found`,
-                    field: 'blogId'
-                }]
-            });
+        // const blog: Blog | null = await this.blogRepository.findById(Number(createDto.blogId))
+        // if(!blog)
+        //     throw new DomainException({
+        //         message: `blog with id-${createDto.blogId} not found`,
+        //         code: DomainExceptionCode.BlogIdNotCorrect,
+        //         extension: [{
+        //             message:`blog with id-${createDto.blogId} not found`,
+        //             field: 'blogId'
+        //         }]
+        //     });
         const post = Post.createInstance(createDto);
 
      await this.postRepository.save(post);
