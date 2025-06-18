@@ -1,7 +1,7 @@
 import { PostByBlogInputDto } from './post.by.blog.input.dto';
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsBlogId } from '@core/decorators/is.blog.id';
 
 export class PostInputDto extends PostByBlogInputDto{
-    @IsString()
+    @IsBlogId()
     public blogId: string;
     }

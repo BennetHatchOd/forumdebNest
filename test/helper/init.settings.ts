@@ -40,7 +40,7 @@ export const initSettings = async (
     const coreConfig = app.get<CoreConfig>(CoreConfig);
     const userConfig = app.get<UserConfig>(UserConfig);
     const globalPrefix = coreConfig.globalPrefix
-    appSetup(app, coreConfig.isSwaggerEnabled, globalPrefix);
+    appSetup(app, coreConfig.isSwaggerEnabled, globalPrefix, DynamicAppModule.module);
 
     await app.init();
 

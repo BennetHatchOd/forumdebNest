@@ -13,6 +13,7 @@ import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { DatabaseModule } from '@core/database.module';
 import { BlogQueryController } from '@modules/blogging.platform/api/blog.query.controller';
 import { PostQueryController } from '@modules/blogging.platform/api/post.query.controler';
+import { IsBlogIdConstraint } from '@core/decorators/is.blog.id.constraint';
 
 @Module({
     imports: [
@@ -29,6 +30,7 @@ import { PostQueryController } from '@modules/blogging.platform/api/post.query.c
     ],
     providers: [
         ...CommandHandlers,
+        IsBlogIdConstraint,
         ReadUserIdGuard,
         BlogQueryRepository,
         BlogRepository,

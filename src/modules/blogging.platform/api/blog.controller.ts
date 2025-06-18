@@ -31,7 +31,7 @@ import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/
 import { BlogEditDto } from '@modules/blogging.platform/dto/edit/blog.edit.dto';
 import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/blog/delete.blog.usecase';
 import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/post/create.post.usecase';
-import { convertToId } from '@core/infrastucture/is.id';
+import { convertToId } from '@core/infrastucture/convert.to.id';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -109,7 +109,7 @@ export class BlogController {
                 message: 'blog not found',
                 code: DomainExceptionCode.NotFound,
             });
-        const createDto: PostInputDto = { ...createPartDto, blogId: blogId };
+        const createDto: PostInputDto = { ...createPartDto, blogId: blogId.toString() };
         const createId: number = await this.commandBus.execute(new CreatePostCommand(createDto));
         const postView: PostViewDto =
             await this.postQueryRepository.findByIdWithCheck(createId, user);

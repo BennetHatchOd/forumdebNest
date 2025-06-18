@@ -22,7 +22,7 @@ import { ConfirmationEmailCommand } from '@modules/users-system/application/UseC
 import {
     CreateCodeConfirmationEmailCommand
 } from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
-import { convertToId } from '@core/infrastucture/is.id';
+import { convertToId } from '@core/infrastucture/convert.to.id';
 
 
 @Controller(URL_PATH.auth)

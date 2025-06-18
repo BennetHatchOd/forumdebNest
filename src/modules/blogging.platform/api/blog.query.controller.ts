@@ -15,7 +15,7 @@ import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
-import { convertToId } from '@core/infrastucture/is.id';
+import { convertToId } from '@core/infrastucture/convert.to.id';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 

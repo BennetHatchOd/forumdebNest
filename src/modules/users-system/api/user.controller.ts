@@ -23,7 +23,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
 import { DeleteUserCommand } from '@modules/users-system/application/UseCase/user/delete.user.usecase';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/user/create.user.usecase';
-import { convertToId } from '@core/infrastucture/is.id';
+import { convertToId } from '@core/infrastucture/convert.to.id';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 

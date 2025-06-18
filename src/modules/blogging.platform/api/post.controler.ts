@@ -22,7 +22,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/post/create.post.usecase';
 import { EditPostCommand } from '@modules/blogging.platform/application/UseCase/post/edit.post.usecase';
 import { DeletePostCommand } from '@modules/blogging.platform/application/UseCase/post/delete.post.usecase';
-import { convertToId } from '@core/infrastucture/is.id';
+import { convertToId } from '@core/infrastucture/convert.to.id';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 

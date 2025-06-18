@@ -73,12 +73,12 @@ export class TestDataBuilderByDb {
                 title: `post ${i}`,
                 shortDescription: `shortdescription for post ${i}`,
                 content: `content for post ${i}`,
-                blogId: this.blogs[0].id!,
+                blogId: this.blogs[0].id!.toString(),
             };
             const result = await this.dataSource.query(`
                 INSERT INTO public.posts(
                     title, content, "shortDescription", "blogId")
-                VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${post.blogId}')
+                VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${this.blogs[0].id!}')
                 RETURNING id;`);
 
             const postInstance: Post = Post.createInstance(post);
