@@ -26,12 +26,12 @@ export class EditPostHandler implements ICommandHandler<EditPostCommand> {
 
     async execute({id, editDto }: EditPostCommand): Promise<void> {
 
-        if(!await this.postRepository.findById(editDto.blogId))
+        if(!await this.postRepository.findById(Number(editDto.blogId)))
             throw new DomainException({
-                message: 'blog with id-${editDto.blogId} not found',
+                message: `blog with id-${editDto.blogId} not found`,
                 code: DomainExceptionCode.BlogIdNotCorrect,
                 extension: [{
-                    message:'blog with id-${editDto.blogId} not found',
+                    message:`blog with id-${editDto.blogId} not found`,
                     field: 'blogId'
                 }]
             });
@@ -39,7 +39,7 @@ export class EditPostHandler implements ICommandHandler<EditPostCommand> {
         const post = await this.postRepository.findById(id);
         if(!post)
             throw new DomainException({
-                message: 'post with id-${id} not found',
+                message: `post with id-${id} not found`,
                 code: DomainExceptionCode.NotFound,
             });
 
