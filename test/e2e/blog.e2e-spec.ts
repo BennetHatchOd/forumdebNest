@@ -148,7 +148,7 @@ describe('BlogController (e2e)', () => {
                 websiteUrl: "https://google2.com"
             },
             {
-                name: "f3ALHtT",
+                name: "f3ALztT",
                 description: "fgh3AhLHtT",
                 websiteUrl: "https://google3.com"
             },
@@ -222,7 +222,7 @@ describe('BlogController (e2e)', () => {
                     pageNumber: 15,
                     searchNameTerm: '3al',
                     sortBy: 'name',
-                    ortDirection: 'desc'
+                    sortDirection: 'asc'
                 })
                 .expect(HttpStatus.OK);
             expect(response.body).toEqual({
@@ -235,7 +235,7 @@ describe('BlogController (e2e)', () => {
             expect(response.body.items.length).toBe(4)
             const names = response.body.items.map(item => item.name);
             expect(names).toEqual(
-                ['nalo3aLk', 'F3pa3alnar', 'f3Alnalo3aLm', 'f3ALHtT'])
+                ['F3pa3alnar', 'f3ALztT', 'f3Alnalo3aLm', 'nalo3aLk'])
         })
     })
 

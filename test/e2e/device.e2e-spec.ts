@@ -54,7 +54,6 @@ describe('DeviceController (e2e)', () => {
             // .compile();
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
         accessJwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
@@ -99,9 +98,9 @@ describe('DeviceController (e2e)', () => {
             refresh0 = parsedCookie['refreshToken']!;
 
             let payload = accessJwtService.verify(response.body.accessToken);
-            expect(payload.user).toBe(testData.users[0].id.toString());
+            expect(payload.user).toBe(testData.users[0].id);
             payload = refreshJwtService.verify(refresh0);
-            expect(payload.userId).toBe(testData.users[0].id.toString());
+            expect(payload.userId).toBe(testData.users[0].id);
 
             response = await request(app.getHttpServer())
                 .post(join(URL_PATH.auth, AUTH_PATH.login))
@@ -113,13 +112,13 @@ describe('DeviceController (e2e)', () => {
                 })
                 .expect(HttpStatus.OK)
             payload = accessJwtService.verify(response.body.accessToken);
-            expect(payload.user).toBe(testData.users[1].id.toString());
+            expect(payload.user).toBe(testData.users[1].id);
 
             setCookieHeader = response.headers['set-cookie'][0];
             parsedCookie = cookie.parse(setCookieHeader);
             refresh1 = parsedCookie['refreshToken']!;
             payload = refreshJwtService.verify(refresh1);
-            expect(payload.userId).toBe(testData.users[1].id.toString());
+            expect(payload.userId).toBe(testData.users[1].id);
         });
 
         it('should return 200 and objects with users\' session info', async () => {
@@ -222,9 +221,9 @@ describe('DeviceController (e2e)', () => {
                 refreshTokens.push(refreshToken);
 
                 const payload = accessJwtService.verify(accessToken);
-                expect(payload.user).toBe(testData.users[0].id.toString());
+                expect(payload.user).toBe(testData.users[0].id);
                 const payloadRT = refreshJwtService.verify(refreshToken);
-                expect(payloadRT.userId).toBe(testData.users[0].id.toString());
+                expect(payloadRT.userId).toBe(testData.users[0].id);
             }
         });
 

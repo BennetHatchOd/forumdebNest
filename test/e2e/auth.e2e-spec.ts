@@ -57,7 +57,6 @@ describe('AuthController (e2e)', () => {
                 // }),
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
         emailServiceMock = result.emailServiceMock;
@@ -93,7 +92,7 @@ describe('AuthController (e2e)', () => {
             const jwtServiceAT = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
             const jwtServiceRT = app.get<JwtService>(INJECT_TOKEN.REFRESH_TOKEN);
             const payload = jwtServiceAT.verify(accessToken);
-            expect(payload.user).toBe(testData.users[0].id.toString());
+            expect(payload.user).toBe(testData.users[0].id);
 
             const setCookieHeader = response.headers['set-cookie'][0];
             const parsedCookie = cookie.parse(setCookieHeader);
@@ -101,7 +100,7 @@ describe('AuthController (e2e)', () => {
 
             const payloadRT = jwtServiceRT.verify(refreshToken);
             expect(payloadRT).toEqual({
-                userId: testData.users[0].id.toString(),
+                userId: testData.users[0].id,
                 version: expect.any(String),
                 iat: expect.any(Number),
                 deviceId: expect.any(String),
@@ -122,7 +121,7 @@ describe('AuthController (e2e)', () => {
             const accessToken = response.body.accessToken;
             const jwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
             const payload = jwtService.verify(accessToken); // <— проверит подпись и вернёт payload
-            expect(payload.user).toBe(testData.users[1].id.toString());
+            expect(payload.user).toBe(testData.users[1].id);
         });
 
     });

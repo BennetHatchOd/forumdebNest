@@ -7,6 +7,7 @@ import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
 import { join } from 'path';
 import { deleteAllData } from '../helper/delete.all.data';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import console from 'node:console';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
@@ -25,7 +26,6 @@ describe('UserAppController (e2e)', () => {
             // .compile();
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
     //});
@@ -140,11 +140,13 @@ describe('UserAppController (e2e)', () => {
         });
 
         it('should delete created users and return 204', async () => {
+            console.log(join(URL_PATH.users, id1))
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, id1))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NO_CONTENT)
 
+            console.log(join(URL_PATH.users, id2))
             await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, id2))
                 .set("Authorization", testData.authLoginPassword)
@@ -287,14 +289,14 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to delete fake user", async () => {
 
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .delete(join(URL_PATH.users, '452'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
         });
 
-        it("should return 400 by attempt to delete user by not valide id.", async () => {
+        it("should return 404 by attempt to delete user by not valide id.", async () => {
 
-            await request(app.getHttpServer())
+            const dd = await request(app.getHttpServer())
                 .delete(join(URL_PATH.users, '681896da2168245826d049'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
