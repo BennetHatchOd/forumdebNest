@@ -8,7 +8,7 @@ import { UserRepository } from '@modules/users-system/infrastucture/user.reposit
 import { User } from '@modules/users-system/domain/user.entity';
 import { CreateCodeConfirmationEmailCommand} from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
 
-export class CreateUserCommand extends Command<string> {
+export class CreateUserCommand extends Command<number> {
     constructor(
         public userDto: UserInputDto,
         public isConfirmedEmail: boolean = true,
@@ -26,7 +26,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
         private readonly commandBus: CommandBus,
     ) {}
 
-    async execute({userDto, isConfirmedEmail, toSentEmail}: CreateUserCommand):Promise<string> {
+    async execute({
+                      userDto,
+                      isConfirmedEmail,
+                      toSentEmail}: CreateUserCommand):Promise<number> {
 
         // check the uniqueness of the login and email
         const checkUniq: string[] | null = await this.userRepository.checkUniq(
@@ -63,7 +66,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
 
         if(toSentEmail && !isConfirmedEmail)
             await this.commandBus.execute(new CreateCodeConfirmationEmailCommand(createdUser.email, createdUser.id))
-        return createdUser.id.toString();
+        return createdUser.id;
     }
 }
 
