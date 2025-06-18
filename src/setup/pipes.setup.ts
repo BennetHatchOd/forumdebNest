@@ -33,6 +33,9 @@ export function pipesSetup(app: INestApplication) {
         new ValidationPipe({
             transform: true,
             whitelist: true,
+            transformOptions: {
+                enableImplicitConversion: true,
+            },
             stopAtFirstError: true,
             exceptionFactory: (errors) => {
                 const formattedErrors = errorFormatter(errors);

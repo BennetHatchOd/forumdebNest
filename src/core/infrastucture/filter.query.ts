@@ -21,14 +21,14 @@ export class FilterQuery<T extends Record<string, any>> {
                 continue;
             }
 
-            if (typeof value === 'object' && value !== null && '$ne' in value) {
+            if (typeof value === 'object' && '$ne' in value) {
                 conditions.push(`"${String(key)}" <> $${index}`);
                 values.push(value.$ne);
                 index++;
                 continue;
             }
 
-            if (typeof value === 'object' && value !== null  && '$like' in value ) {
+            if (typeof value === 'object'  && '$like' in value ) {
                 if(value.$like === null)
                     continue;
                 conditions.push(`"${String(key)}" ILIKE $${index}`);

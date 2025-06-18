@@ -15,14 +15,6 @@ import { DatabaseModule } from '@core/database.module';
     imports: [
         configModule,
         DatabaseModule,
-        MongooseModule.forRootAsync({
-            useFactory: (coreConfig:CoreConfig) =>{
-                const  url = new URL(coreConfig.mongoURI)
-                url.pathname = '/' + coreConfig.dbName
-                return { uri: url.toString()}
-            },
-            inject:[CoreConfig],
-         }),
         BloggingPlatformModule,
         UserSystemModule,
         TestingModule,

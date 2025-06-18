@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BlogViewDto } from '../../dto/view/blog.view.dto';
 import { Blog } from '../../domain/blog.entity';
-import { GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
+import { BlogSortBy, GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
@@ -12,6 +12,7 @@ import { BlogRepository } from '@modules/blogging.platform/infrastucture/blog.re
 import { User } from '@modules/users-system/domain/user.entity';
 import { FilterQuery } from '@core/infrastucture/filter.query';
 import { UserViewDto } from '@modules/users-system/dto/view/user.view.dto';
+import { UserSortBy } from '@modules/users-system/dto/input/get.user.query.params.input.dto';
 
 @Injectable()
 export class BlogQueryRepository {
@@ -20,8 +21,9 @@ export class BlogQueryRepository {
         @Inject(DATA_SOURCE) protected dataSource: DataSource,
         private blogRepository: BlogRepository
     ){}
-    
-    async  findByIdWithCheck(id: number): Promise<BlogViewDto> {
+
+    async  findById(id: number): Promise<BlogViewDto> {
+
 
         const blog = await this.blogRepository.findById(id);
         if (!blog)
@@ -38,19 +40,23 @@ export class BlogQueryRepository {
             name: {$like: queryReq.searchNameTerm},
             deletedAt: null}).buildWhereClause();
 
+
         const sqlRequest = `FROM public.blogs ${clause}`;
+
         const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
-        const totalCount = await this.dataSource.query(sqlCount + ';', values);
-        if(queryReq.pageNumber > Math.ceil(+totalCount[0].count / queryReq.pageSize))
-                queryReq.pageNumber = Math.ceil(+totalCount[0].count / queryReq.pageSize);
+        const totalCount = +(await this.dataSource.query(sqlCount + ';', values))[0].count;
+
+        if(queryReq.pageNumber > Math.ceil(totalCount / queryReq.pageSize))
+                queryReq.pageNumber = Math.ceil(totalCount / queryReq.pageSize);
+        const collate = [BlogSortBy.Name, BlogSortBy.Description, BlogSortBy.WebsiteUrl].includes(queryReq.sortBy)
+            ? ' COLLATE "C"'
+            : '';
 
         const sql = ` SELECT * ${sqlRequest}
-            ORDER BY "${queryReq.sortBy}" ${queryReq.sortDirection} 
+            ORDER BY "${queryReq.sortBy}" ${collate} ${queryReq.sortDirection} 
             LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
 
-
-
-        if(+totalCount[0].count === 0)
+        if(totalCount === 0)
             return new EmptyPaginator<BlogViewDto>();
 
         const blogs: Blog[] = await this.dataSource.query(sql, values);
@@ -61,7 +67,7 @@ export class BlogQueryRepository {
             items: items,
             page: queryReq.pageNumber,
             size: queryReq.pageSize,
-            totalCount: +totalCount[0].count
+            totalCount: totalCount
         })
     }
 }

@@ -32,7 +32,7 @@ export class ConfirmationEmailHandler implements ICommandHandler<ConfirmationEma
         ) {
             foundUserInfo.isConfirmEmail = true;
             const changedUser: User = foundUserInfo.mapToUser();
-            await this.userRepository.saveUser(changedUser)
+            await this.userRepository.save(changedUser)
             return;
         }
         throw new DomainException({

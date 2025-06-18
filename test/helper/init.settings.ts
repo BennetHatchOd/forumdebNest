@@ -6,15 +6,9 @@ import { appSetup } from '@src/setup/app.setup';
 import { deleteAllData } from './delete.all.data';
 import { CoreConfig } from '@core/core.config';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
-import {
-    Blog,
-    BlogModelType,
-} from '@src/modules/blogging.platform/domain/blog.entity';
-import {
-    Post,
-    PostModelType,
-} from '@src/modules/blogging.platform/domain/post.entity';
-import { Comment, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
+import { Blog } from '@src/modules/blogging.platform/domain/blog.entity';
+import { Post } from '@src/modules/blogging.platform/domain/post.entity';
+import { Comment } from '@src/modules/blogging.platform/domain/comment.entity';
 import { TestDataBuilderByDb } from './test.data.builder.by.db';
 import { EmailService } from '@src/modules/notifications/application/email.service';
 import { EmailServiceMock } from '../mock/email.service.mock';
@@ -50,30 +44,22 @@ export const initSettings = async (
 
     await app.init();
 
-    const databaseConnection = app.get<Connection>(getConnectionToken());
     const httpServer = app.getHttpServer();
     await deleteAllData(app, coreConfig.globalPrefix);
 
     const passwordHashService = app.get<PasswordHashService>(PasswordHashService);
-    const blogModel = app.get<BlogModelType>(getModelToken(Blog.name));
-    const postModel = app.get<PostModelType>(getModelToken(Post.name));
-    const commentModel = app.get<CommentModelType>(getModelToken(Comment.name));
     const dataSource = app.get<DataSource>(DATA_SOURCE);
     const testData = await TestDataBuilderByDb.createTestData(app,
                                                                         userConfig,
-                                                                        blogModel,
-                                                                        postModel,
-                                                                        commentModel,
                                                                         dataSource,
                                                                         passwordHashService,
                                                                         );
 
     return {
         app,
-        databaseConnection,
         httpServer,
         testData,
         globalPrefix,
-        emailServiceMock,
+        emailServiceMock
     };
 };

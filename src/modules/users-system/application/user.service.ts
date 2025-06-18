@@ -34,11 +34,11 @@ export class UserService {
     async validateUserForLocalAuth(
         loginOrEmail: string,
         passHash: string,
-    ): Promise<string | null> {
+    ): Promise<number | null> {
         // проверяет по полям логин И емайл пользователя, если он найден,
         // проверяет совпадение хеша пароля и
         // возвращает ид найденного пользователя
-        const foundUser: { id: string; passHash: string } | null =
+        const foundUser: { id: number; passHash: string } | null =
             await this.userRepository.getIdAndPasswordByLoginEmail(loginOrEmail);
 
         if (
@@ -111,7 +111,7 @@ export class UserService {
         return;
     }
 
-    async aboutMe(userId: string): Promise<UserAboutViewDto> {
+    async aboutMe(userId: number): Promise<UserAboutViewDto> {
         const user = (await this.userRepository.findById(userId));
         const userView = UserAboutViewDto.mapToView(user!);
         return userView;

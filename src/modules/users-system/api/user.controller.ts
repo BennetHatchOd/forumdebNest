@@ -7,7 +7,8 @@ import {
     HttpStatus,
     Param,
     Post,
-    Query, UseGuards,
+    Query,
+    UseGuards,
 } from '@nestjs/common';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { UserViewDto } from '../dto/view/user.view.dto';
@@ -16,13 +17,15 @@ import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetUserQueryParams } from '../dto/input/get.user.query.params.input.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { URL_PATH } from '@core/url.path.setting';
-import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
 import { DeleteUserCommand } from '@modules/users-system/application/UseCase/user/delete.user.usecase';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/user/create.user.usecase';
+import { convertToId } from '@core/infrastucture/is.id';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))
@@ -37,27 +40,34 @@ export class UserControllers {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    async createUser(@Body() inputUserDto: UserInputDto):Promise<UserViewDto> {
-
-        const createId: string = await this.commandBus.execute(new CreateUserCommand(inputUserDto, true));
-        const userView: UserViewDto = await this.userQueryRepository.findById(createId);
+    async createUser(@Body() inputUserDto: UserInputDto): Promise<UserViewDto> {
+        const createId: number = await this.commandBus.execute(
+            new CreateUserCommand(inputUserDto, true),
+        );
+        const userView: UserViewDto =
+            await this.userQueryRepository.findById(createId);
         return userView;
     }
 
     @Get()
-    async getAll(@Query() query: GetUserQueryParams,)
-        : Promise<PaginatedViewDto<UserViewDto>> {
-
-        const userPaginator: PaginatedViewDto<UserViewDto>
-            = await this.userQueryRepository.find(query);
+    async getAll(
+        @Query() query: GetUserQueryParams,
+    ): Promise<PaginatedViewDto<UserViewDto>> {
+        const userPaginator: PaginatedViewDto<UserViewDto> =
+            await this.userQueryRepository.find(query);
 
         return userPaginator;
-
     }
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteUser(@Param() { id }: IdInputDto): Promise<void>{
-        return await this.commandBus.execute(new DeleteUserCommand(id));
+    async deleteUser(@Param('id') id: string): Promise<void> {
+        const userId = convertToId(id);
+        if (!userId)
+            throw new DomainException({
+                message: 'user not found',
+                code: DomainExceptionCode.NotFound,
+            });
+        return await this.commandBus.execute(new DeleteUserCommand(userId));
     }
 }

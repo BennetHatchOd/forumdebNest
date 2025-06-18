@@ -22,6 +22,7 @@ import { ConfirmationEmailCommand } from '@modules/users-system/application/UseC
 import {
     CreateCodeConfirmationEmailCommand
 } from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
+import { convertToId } from '@core/infrastucture/is.id';
 
 
 @Controller(URL_PATH.auth)
@@ -35,7 +36,7 @@ export class AuthController {
     @Post(AUTH_PATH.login)
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
-    async authorization(
+    async logIn(
         @CurrentUserId() user: number,
         @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
@@ -100,8 +101,8 @@ export class AuthController {
     @UseGuards(AuthGuard('jwt'))
     async getMe(@CurrentUserId() user: string)//: Promise<UserAboutViewDto>
      {
-               const answer: UserAboutViewDto = await this.userService.aboutMe(user)
-            return answer;
+         const answer: UserAboutViewDto = await this.userService.aboutMe(convertToId(user) as number)
+         return answer;
     }
 
     @Post(AUTH_PATH.logout)

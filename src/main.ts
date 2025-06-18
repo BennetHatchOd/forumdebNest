@@ -12,7 +12,7 @@ async function bootstrap() {
 
     const port = coreConfig.port;
     await app.listen(port);
-    console.log(`Server running on port: ${port}, on the dataBase: ${coreConfig.mongoURI}`);
+    console.log(`Server running on port: ${port}`);
 }
 bootstrap();
 

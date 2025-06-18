@@ -1,14 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserViewDto } from '../../dto/view/user.view.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
-import { GetUserQueryParams } from '../../dto/input/get.user.query.params.input.dto';
+import { GetUserQueryParams, UserSortBy } from '../../dto/input/get.user.query.params.input.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
 import { DataSource } from 'typeorm';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { User } from '@modules/users-system/domain/user.entity';
-import { FilterQuery } from '@core/infrastucture/filter.query';
+import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
+import { PostSortBy } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
 
 @Injectable()
@@ -16,32 +17,19 @@ export class UserQueryRepository {
 
     constructor(
         @Inject(DATA_SOURCE)private readonly dataSource: DataSource,
+        private userRepository: UserRepository
     ){}
 
-    async  findById(id: string): Promise<UserViewDto> {
+    async  findById(id: number): Promise<UserViewDto> {
         // если пост не найден, выкидываем ошибку 404 прямо в репозитории
 
-        const numericId = Number(id);
-        if( !Number.isInteger(numericId) || numericId < 1)
-            throw new DomainException({
-                message: 'user not found',
-                code: DomainExceptionCode.NotFound,
-            });
-
-        const {clause} = new FilterQuery<User>({
-                id: numericId,
-                deletedAt: null}).buildWhereClause();
-        const user: User[] = await this.dataSource.query(`
-            SELECT * FROM public."Users" ${clause}
-                LIMIT 1;`,
-            [numericId]);
-
-        if(user.length == 0){
+        const user = await this.userRepository.findById(id);
+        if (!user)
             throw new DomainException({
                 message: 'user not found',
                 code: DomainExceptionCode.NotFound});
-        }
-        return UserViewDto.mapToView(user[0]);
+
+        return UserViewDto.mapToView(user);
     }
 
     async find(queryReq: GetUserQueryParams): Promise<PaginatedViewDto<UserViewDto>> {
@@ -62,18 +50,24 @@ export class UserQueryRepository {
             const whereSqlOR = whereClausesOR.join(' OR ');
             whereClausesAND.push(`(${whereSqlOR})`);
         }
+        const clause = 'WHERE ' + whereClausesAND.join(' AND ');
 
-        const clause = whereClausesAND.join(' AND ');
-
-        const sqlRequest = `FROM public."Users" WHERE ${clause}`;
+        const sqlRequest = `FROM public."Users" ${clause}`;
         const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
+
+        const totalCount = +(await this.dataSource.query(sqlCount + ';', values))[0].count;
+        if(queryReq.pageNumber > Math.ceil(totalCount / queryReq.pageSize))
+            queryReq.pageNumber = Math.ceil(totalCount / queryReq.pageSize);
+
+        const collate = [UserSortBy.email, UserSortBy.login].includes(queryReq.sortBy)
+            ? ' COLLATE "C"'
+            : '';
+
         const sql = ` SELECT * ${sqlRequest}
-            ORDER BY "${queryReq.sortBy}" ${queryReq.sortDirection} 
+            ORDER BY "${queryReq.sortBy}" ${collate} ${queryReq.sortDirection} 
             LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
 
-        const totalCount = await this.dataSource.query(sqlCount + ';', values);
-
-        if(+totalCount[0].count === 0)
+        if(totalCount === 0)
             return new EmptyPaginator<UserViewDto>();
 
         const users: User[] = await this.dataSource.query(sql, values);
@@ -84,7 +78,7 @@ export class UserQueryRepository {
             items: items,
             page: queryReq.pageNumber,
             size: queryReq.pageSize,
-            totalCount: +totalCount[0].count
+            totalCount: totalCount
         })
 
     }

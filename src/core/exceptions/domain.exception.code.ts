@@ -7,6 +7,7 @@ export enum DomainExceptionCode {
     ValidationError = 12,
     Unauthorized = 15,
     EmailNotConfirmed = 18,
+    BlogIdNotCorrect = 19,
     EmailNotExist = 21,
     RefreshTokenNotVerify = 22,
     ConfirmationCodeExpired = 24,

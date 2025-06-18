@@ -24,6 +24,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
             case DomainExceptionCode.BadRequest:
             case DomainExceptionCode.ValidationError:
             case DomainExceptionCode.EmailNotConfirmed:
+            case DomainExceptionCode.BlogIdNotCorrect:
             case DomainExceptionCode.EmailNotExist:
             case DomainExceptionCode.ConfirmationCodeExpired:
             case DomainExceptionCode.PasswordRecoveryCodeExpired:

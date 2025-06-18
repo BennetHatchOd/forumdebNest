@@ -31,6 +31,9 @@ import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/
 import { BlogEditDto } from '@modules/blogging.platform/dto/edit/blog.edit.dto';
 import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/blog/delete.blog.usecase';
 import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/post/create.post.usecase';
+import { convertToId } from '@core/infrastucture/is.id';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 
 
@@ -52,7 +55,7 @@ export class BlogController {
 
         const createId: number = await this.commandBus.execute(new CreateBlogCommand(blog));
         const blogView: BlogViewDto =
-            await this.blogQueryRepository.findByIdWithCheck(createId);
+            await this.blogQueryRepository.findById(createId);
         return blogView;
     }
 
@@ -60,12 +63,18 @@ export class BlogController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(AuthGuard('basic'))
     async correctBlog(
-        @Param() {id}: IdInputDto,
+        @Param('id') id: string,
         @Body() blog: BlogInputDto,
     ): Promise<void> {
         //
         // Update existing Blog by id with InputModel
-        const blogDto: BlogEditDto = {...blog, id: id}
+        const blogId = convertToId(id);
+        if (!blogId)
+            throw new DomainException({
+                message: 'blog not found',
+                code: DomainExceptionCode.NotFound,
+            });
+        const blogDto: BlogEditDto = {...blog, id: blogId}
         return await this.commandBus.execute(new EditBlogCommand(blogDto));
     }
 
@@ -73,11 +82,16 @@ export class BlogController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(AuthGuard('basic'))
     async deleteBlog(
-        @Param() {id}: IdInputDto, ): Promise<void> {
+        @Param('id') id: string, ): Promise<void> {
         //
         // Delete blog specified by id
-
-        return await this.commandBus.execute(new DeleteBlogCommand(id));
+        const blogId = convertToId(id);
+        if (!blogId)
+            throw new DomainException({
+                message: 'blog not found',
+                code: DomainExceptionCode.NotFound,
+            });
+        return await this.commandBus.execute(new DeleteBlogCommand(blogId));
     }
 
     @Post(':id/posts')
@@ -85,11 +99,17 @@ export class BlogController {
     @UseGuards(AuthGuard('basic'))
     async createPostByBlog(
         @CurrentUserId() user: number,
-        @Param() {id}: IdInputDto,
+        @Param('id') id: string,
         @Body() createPartDto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
         // Create new post for specific blog
-        const createDto: PostInputDto = { ...createPartDto, blogId: id };
+        const blogId = convertToId(id);
+        if (!blogId)
+            throw new DomainException({
+                message: 'blog not found',
+                code: DomainExceptionCode.NotFound,
+            });
+        const createDto: PostInputDto = { ...createPartDto, blogId: blogId };
         const createId: number = await this.commandBus.execute(new CreatePostCommand(createDto));
         const postView: PostViewDto =
             await this.postQueryRepository.findByIdWithCheck(createId, user);

@@ -1,11 +1,11 @@
 import { User } from '@modules/users-system/domain/user.entity';
 
 export class CommentatorInfoViewDto {
-        userId:          string;
+        userId:          number;
         login:           string;
 
     constructor(user: User) {
-        this.userId = user.id.toString();
+        this.userId = user.id;
         this.login = user.login;
     }
 

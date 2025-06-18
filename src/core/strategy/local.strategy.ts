@@ -11,8 +11,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         super({ usernameField: "loginOrEmail" });
     }
 
-    async validate(loginOrEmail: string, password: string): Promise<string> {
-        const userId: string | null = await this.authService.validateUserForLocalAuth(loginOrEmail, password);
+    async validate(loginOrEmail: string, password: string): Promise<number> {
+        const userId: number | null = await this.authService.validateUserForLocalAuth(loginOrEmail, password);
         if (!userId) {
             throw new DomainException({
                 message: '',
