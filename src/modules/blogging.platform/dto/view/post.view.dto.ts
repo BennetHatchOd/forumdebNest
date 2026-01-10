@@ -2,7 +2,7 @@ import { Rating } from '../enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 import { Post } from '@modules/blogging.platform/domain/post.entity';
-import { PostTupleDto } from '@modules/blogging.platform/dto/post.tuple.dto';
+import { PostTupleDto } from '@modules/blogging.platform/dto/tuple/post.tuple.dto';
 
 export class PostViewDto {
     id: string;

@@ -15,13 +15,13 @@ export async function setCheckLikePost(
 ): Promise<ExtendedLikesInfoViewDto>{
 
     const response = await request(app.getHttpServer())
-        .put(join(URL_PATH.posts, targetId, 'like-status'))
+        .put(join(URL_PATH.postsQuery, targetId, 'like-status'))
         .set("Authorization", 'Bearer ' + accessToken)
         .send({likeStatus: likeStatus })
         .expect(HttpStatus.NO_CONTENT);
 
     let entityResponce = await request(app.getHttpServer())
-                                .get(join(URL_PATH.posts, targetId))
+                                .get(join(URL_PATH.postsQuery, targetId))
                                 .set("Authorization", 'Bearer ' + accessToken)
                                 .expect(HttpStatus.OK);
 

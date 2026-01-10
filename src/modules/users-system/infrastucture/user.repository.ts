@@ -41,7 +41,6 @@ export class UserRepository extends BaseRepository{
             arrayErrors.push('email')
 
         return arrayErrors;
-
     }
 
     async getIdAndPasswordByLoginEmail(loginOrEmail: string): Promise<{id:number, passHash:string}|null> {

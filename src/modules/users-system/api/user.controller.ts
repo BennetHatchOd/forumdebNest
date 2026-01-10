@@ -23,7 +23,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
 import { DeleteUserCommand } from '@modules/users-system/application/UseCase/user/delete.user.usecase';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/user/create.user.usecase';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -41,11 +41,10 @@ export class UserControllers {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     async createUser(@Body() inputUserDto: UserInputDto): Promise<UserViewDto> {
-        const createId: number = await this.commandBus.execute(
-            new CreateUserCommand(inputUserDto, true),
-        );
-        const userView: UserViewDto =
-            await this.userQueryRepository.findById(createId);
+        const createId: number
+            = await this.commandBus.execute(new CreateUserCommand(inputUserDto, true));
+        const userView: UserViewDto
+            = await this.userQueryRepository.findById(createId);
         return userView;
     }
 
@@ -53,8 +52,8 @@ export class UserControllers {
     async getAll(
         @Query() query: GetUserQueryParams,
     ): Promise<PaginatedViewDto<UserViewDto>> {
-        const userPaginator: PaginatedViewDto<UserViewDto> =
-            await this.userQueryRepository.find(query);
+        const userPaginator: PaginatedViewDto<UserViewDto>
+            = await this.userQueryRepository.find(query);
 
         return userPaginator;
     }
@@ -62,7 +61,7 @@ export class UserControllers {
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteUser(@Param('id') id: string): Promise<void> {
-        const userId = convertToId(id);
+        const userId = convertToIdNumber(id);
         if (!userId)
             throw new DomainException({
                 message: 'user not found',

@@ -1,15 +1,17 @@
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
-import { IsEnum, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, Min } from 'class-validator';
 import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 
 export class LikeCreateDto {
     @IsNotEmpty()
-    @IsMongoId()
-    targetId: string;
+    @IsNumber()
+    @Min(1)
+    targetId: number;
 
     @IsNotEmpty()
-    @IsMongoId()
-    ownerId: string;
+    @IsNumber()
+    @Min(1)
+    ownerId: number;
 
     @IsNotEmpty()
     @IsEnum(Rating)

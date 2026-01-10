@@ -31,7 +31,7 @@ import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/
 import { BlogEditDto } from '@modules/blogging.platform/dto/edit/blog.edit.dto';
 import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/blog/delete.blog.usecase';
 import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/post/create.post.usecase';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -68,7 +68,7 @@ export class BlogController {
     ): Promise<void> {
         //
         // Update existing Blog by id with InputModel
-        const blogId = convertToId(id);
+        const blogId = convertToIdNumber(id);
         if (!blogId)
             throw new DomainException({
                 message: 'blog not found',
@@ -85,7 +85,7 @@ export class BlogController {
         @Param('id') id: string, ): Promise<void> {
         //
         // Delete blog specified by id
-        const blogId = convertToId(id);
+        const blogId = convertToIdNumber(id);
         if (!blogId)
             throw new DomainException({
                 message: 'blog not found',
@@ -103,7 +103,7 @@ export class BlogController {
         @Body() createPartDto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
         // Create new post for specific blog
-        const blogId = convertToId(id);
+        const blogId = convertToIdNumber(id);
         if (!blogId)
             throw new DomainException({
                 message: 'blog not found',

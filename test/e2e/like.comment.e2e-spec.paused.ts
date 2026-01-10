@@ -43,7 +43,6 @@ describe('LikeCommentController (e2e)', () => {
             })
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
         emailServiceMock = result.emailServiceMock;
@@ -276,7 +275,7 @@ describe('LikeCommentController (e2e)', () => {
         it('Get all comments', async() => {
 
             const commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.posts, testData.posts[0]._id.toString(), "comments"))
+                .get(join(URL_PATH.postsQuery, testData.posts[0]._id.toString(), "comments"))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[2])
                 .expect(HttpStatus.OK)
 

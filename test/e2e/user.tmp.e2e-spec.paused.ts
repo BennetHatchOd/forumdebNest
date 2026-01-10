@@ -40,14 +40,15 @@ describe('UserAppController (e2e)', () => {
 
     describe('Testing api/users with mistakes.', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             await testData.createManyUsers();
         })
 
         afterAll(async () => {
-            await deleteAllData(app, globalPrefix);
         })
+
         it("should return 400 and an array of mistakes by attempt to create new " +
             "user with validation error", async () => {
 

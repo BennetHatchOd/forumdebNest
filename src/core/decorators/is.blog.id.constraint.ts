@@ -6,7 +6,7 @@ import {
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
 import { BlogRepository } from '@modules/blogging.platform/infrastucture/blog.repository';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 
 @ValidatorConstraint({ name: 'IsBlogId', async: true })
 @Injectable()
@@ -14,7 +14,7 @@ export class IsBlogIdConstraint implements ValidatorConstraintInterface {
     constructor(private readonly blogRepository: BlogRepository) {}
 
     async validate(blogId: string, _args: ValidationArguments): Promise<boolean> {
-        const numericId = convertToId(blogId);
+        const numericId = convertToIdNumber(blogId);
         if (!numericId) return false;
 
         const exists = await this.blogRepository.findById(numericId);

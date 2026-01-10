@@ -9,6 +9,8 @@ import { User } from '@modules/users-system/domain/user.entity';
 import { CreateCodeConfirmationEmailCommand} from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
 
 export class CreateUserCommand extends Command<number> {
+    // A new user is created, the isConfirmedEmail flag is copied to the database,
+    // and the toSentEmail flag specifies whether to send an email with a verification code.
     constructor(
         public userDto: UserInputDto,
         public isConfirmedEmail: boolean = true,
@@ -51,7 +53,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, str
             });
         }
 
-        // create a password hash
+        // create a hash instead of a password and save it in the database
         const passwordHash: string = await this.passwordHashService.createHash(
             userDto.password,
             this.userConfig.saltRound,

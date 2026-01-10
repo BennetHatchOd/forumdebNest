@@ -22,8 +22,7 @@ import { ConfirmationEmailCommand } from '@modules/users-system/application/UseC
 import {
     CreateCodeConfirmationEmailCommand
 } from '@modules/users-system/application/UseCase/auth/create.code.confirmation.email.usecase';
-import { convertToId } from '@core/infrastucture/convert.to.id';
-
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 
 @Controller(URL_PATH.auth)
 @UseGuards(ThrottlerGuard)
@@ -101,7 +100,7 @@ export class AuthController {
     @UseGuards(AuthGuard('jwt'))
     async getMe(@CurrentUserId() user: string)//: Promise<UserAboutViewDto>
      {
-         const answer: UserAboutViewDto = await this.userService.aboutMe(convertToId(user) as number)
+         const answer: UserAboutViewDto = await this.userService.aboutMe(convertToIdNumber(user) as number)
          return answer;
     }
 

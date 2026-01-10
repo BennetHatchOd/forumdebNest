@@ -15,16 +15,19 @@ import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
 import { URL_PATH } from '@core/url.path.setting';
-import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/post/create.post.usecase';
 import { EditPostCommand } from '@modules/blogging.platform/application/UseCase/post/edit.post.usecase';
 import { DeletePostCommand } from '@modules/blogging.platform/application/UseCase/post/delete.post.usecase';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
+//import { CommentInputDto } from '@modules/blogging.platform/dto/input/comment.input.dto';
+//import { CommentViewDto } from '@modules/blogging.platform/dto/view/comment.view.dto';
+//import { CreateCommentCommand } from '@modules/blogging.platform/application/UseCase/comment/create.comment.usecase';
+//import { CommentQueryRepository } from '@modules/blogging.platform/infrastucture/query/comment.query.repository';
 
 @Controller(URL_PATH.posts)
 export class PostController {
@@ -60,7 +63,7 @@ export class PostController {
         //
         // Update existing Post by id with InputModel
 
-        const postId = convertToId(id);
+        const postId = convertToIdNumber(id);
         if (!postId)
             throw new DomainException({
                 message: 'post not found',
@@ -97,7 +100,7 @@ export class PostController {
         //
         // Delete post specified by id
 
-        const postId = convertToId(id);
+        const postId = convertToIdNumber(id);
         if (!postId)
             throw new DomainException({
                 message: 'post not found',
@@ -107,22 +110,28 @@ export class PostController {
 
     }
 
-    //
+
     // @Post(':id/comments')
     // @UseGuards(AuthGuard('jwt'))
     // async createCommentByPost(
-    //     @CurrentUserId() user: string,
-    //     @Param() {id}: IdInputDto,
+    //     @CurrentUserId() user: number,
+    //     @Param('id') id: string,
     //     @Body() comment: CommentInputDto
     // ): Promise<CommentViewDto> {
     //     // Create comment for specified post, if the post isn't found,
     //     // throw the exception "not found"
     //
-    //     await this.postQueryRepository.findByIdWithCheck(id, user)
+    //     const numericId = convertToId(id);
+    //     if(!numericId)
+    //         throw new DomainException({
+    //             message: "post not found",
+    //             code: DomainExceptionCode.NotFound,
+    //         });
+    //
     //     // check the existence of the post
     //
-    //     const createdComment: string = await this.commentService.create(id, comment, user);
-    //     return this.commentQueryRepository.findByIdWithCheck(createdComment, user);
+    //     const createdComment: number = await this.commandBus.execute(new CreateCommentCommand(numericId, comment, user));
+    //     return this.commentQueryRepository.findById(createdComment, user);
     //
     // }
 

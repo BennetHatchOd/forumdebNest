@@ -15,7 +15,7 @@ import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -42,7 +42,7 @@ export class BlogQueryController {
         //
         // Returns blog by id
 
-        const blogId = convertToId(id);
+        const blogId = convertToIdNumber(id);
         if (!blogId)
             throw new DomainException({
                 message: 'blog not found',
@@ -63,7 +63,7 @@ export class BlogQueryController {
     ): Promise<PaginatedViewDto<PostViewDto>> {
         //
         // Returns all posts for specified blog
-        const blogId = convertToId(id);
+        const blogId = convertToIdNumber(id);
         if (!blogId)
             throw new DomainException({
                 message: 'blog not found',

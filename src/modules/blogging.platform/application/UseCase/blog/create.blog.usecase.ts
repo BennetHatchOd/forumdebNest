@@ -7,7 +7,8 @@ export class CreateBlogCommand extends Command<number> {
     constructor(
         public createDto: BlogInputDto,
     ) {
-        super()}
+        super();
+    }
 }
 
 @CommandHandler(CreateBlogCommand)

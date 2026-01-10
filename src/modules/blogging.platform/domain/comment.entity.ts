@@ -1,37 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { CommentatorInfo, CommentatorInfoSchema } from './commentator.info';
-import { CommentFieldRestrict } from '../dto/field.restrictions';
 import { CreateCommentDto } from '../dto/create/create.comment.dto';
 
-
-
-@Schema({timestamps: true })
 export class Comment {
-    @Prop({
-        required: true,
-        maxlength: CommentFieldRestrict.contentMax,
-        minlength: CommentFieldRestrict.contentMin,
-    })
+    id?: number;
     content: string;
-
-    @Prop({
-        required: true,
-    })
-    parentPostId: string;
-
+    postId: number; // post id for which the comment was written
     createdAt: Date;
-
-    @Prop({
-        type: CommentatorInfoSchema,
-        required: true,
-    })
-    commentatorInfo: CommentatorInfo;
-
-     @Prop({
-         type: Date,
-         default: null,
-     })
+    userId: number; // user id who wrote the comment
     deletedAt:  Date | null;
 
     delete() {
@@ -45,24 +19,14 @@ export class Comment {
         this.content = change;
     }
 
-    static createInstance(createDto: CreateCommentDto): CommentDocument {
+    static createInstance(createDto: CreateCommentDto): Comment {
 
         const comment = new this();
         comment.content = createDto.content;
-        comment.parentPostId = createDto.postId;
-        comment.commentatorInfo = new CommentatorInfo();
-        comment.commentatorInfo.userLogin = createDto.login;
-        comment.commentatorInfo.userId = createDto.userId;
+        comment.postId = createDto.postId;
+        comment.userId = createDto.userId;
+        comment.deletedAt = null;
 
-        return comment as CommentDocument;
+        return comment;
     }
 }
-
-export const CommentSchema = SchemaFactory.createForClass(Comment);
-
-CommentSchema.loadClass(Comment);
-
-export type CommentDocument = HydratedDocument<Comment>;
-
-export type CommentModelType = Model<CommentDocument> & typeof Comment;
-

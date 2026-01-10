@@ -3,16 +3,17 @@ import { CommentatorInfoViewDto } from '../../../users-system/dto/view/commentat
 
 export class CreateCommentDto{
     constructor(
-        public postId: string,
+        public postId: number,
         public content: string,
-        public userId: string,
-        public login: string
+        public userId: number,
     ){}
 
-    static createInstance(id: string,
+    static createInstance(postId: number,
                           createDto: CommentInputDto,
-                          commentatorInfo: CommentatorInfoViewDto){
-        const newComment = new this(id, createDto.content, commentatorInfo.userId, commentatorInfo.login);
+                          userId: number
+    ){
+
+        const newComment = new this(postId, createDto.content, userId);
         return newComment;
     }
 }

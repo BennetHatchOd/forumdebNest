@@ -11,7 +11,7 @@ import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
 import { PostRepository } from '@modules/blogging.platform/infrastucture/post.repository';
 import { FilterQuery } from '@core/infrastucture/filter.query';
-import { PostTupleDto } from '@modules/blogging.platform/dto/post.tuple.dto';
+import { PostTupleDto } from '@modules/blogging.platform/dto/tuple/post.tuple.dto';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { BlogSortBy } from '@modules/blogging.platform/dto/input/get.blog.query.params.input.dto';
 

@@ -14,7 +14,7 @@ import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { CommandBus } from '@nestjs/cqrs';
-import { convertToId } from '@core/infrastucture/convert.to.id';
+import { convertToIdNumber } from '@core/infrastucture/convert.to.id.number';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
@@ -48,7 +48,7 @@ export class PostQueryController {
         //
         // Returns post by id
 
-        const postId = convertToId(id);
+        const postId = convertToIdNumber(id);
         if (!postId)
             throw new DomainException({
                 message: 'blog not found',

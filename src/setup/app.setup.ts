@@ -24,7 +24,7 @@ export function appSetup(
     app.use(cookieParser());
 
     if (rootModule) {
-        useContainer(app, { fallbackOnErrors: true });
+        useContainer(app.select(rootModule), { fallbackOnErrors: true });
     }
     app.useGlobalFilters(new DomainExceptionFilter(), new HttpExceptionFilter());
 }
