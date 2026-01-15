@@ -2,11 +2,14 @@ import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
+import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '@modules/users-system/domain/new.password';
 
 @Injectable()
 export class UserRepository {
 
-    constructor(@InjectModel(User.name) private UserModel: UserModelType) {
+    constructor(@InjectModel(User.name) private UserModel: UserModelType,
+                @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
+                ) {
     }
 
     async findById(id: string): Promise<UserDocument | null> {
@@ -90,5 +93,18 @@ export class UserRepository {
 
     async save(changedItem: UserDocument): Promise<void> {
         await changedItem.save();
+    }
+
+    async saveNewPassword(changedItem: NewPasswordDocument): Promise<void> {
+        await changedItem.save();
+    }
+
+    async findPasswordRecovery(recoveryCode: string): Promise<NewPasswordDocument|null> {
+        return  await this.NewPasswordModel.findOne({code: recoveryCode})
+    }
+
+    async deleteUsedPasswordRecovery(userId: string) {
+        // delete all recovery codes for the user if the password has already been recovered
+        return  await this.NewPasswordModel.deleteMany({userId: userId})
     }
 }

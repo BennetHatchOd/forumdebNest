@@ -10,7 +10,6 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from '@src/core/strategy/local.strategy';
 import { PasswordHashService } from './application/password.hash.service';
 import { AuthService } from './application/auth.service';
-import { AuthRepository } from './infrastucture/auth.repository';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
@@ -68,7 +67,6 @@ import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-option
         UserQueryExternalRepository,
         UserRepository,
         AuthService,
-        AuthRepository,
         PasswordHashService,
         EmailService,
         LocalStrategy,

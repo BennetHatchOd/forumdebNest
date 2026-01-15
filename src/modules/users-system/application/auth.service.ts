@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AuthRepository } from '../infrastucture/auth.repository';
 import { PasswordHashService } from './password.hash.service';
 import { isBefore} from 'date-fns';
 import { UserInputDto } from '../dto/input/user.input.dto';
@@ -23,7 +22,6 @@ export class AuthService {
         private readonly accessJwtService: JwtService,
         @Inject(INJECT_TOKEN.REFRESH_TOKEN)
         private readonly refreshJwtService: JwtService,
-        private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
         private readonly passwordHashService: PasswordHashService,
         private readonly mailService: EmailService,
@@ -154,7 +152,7 @@ export class AuthService {
                 foundedUser,
                 this.userConfig.timeLifeEmailCode,
             );
-        await this.authRepository.save(newPassword);
+        await this.userRepository.saveNewPassword(newPassword);
 
         await this.mailService.createPasswordRecovery(email, newPassword.code);
 
@@ -165,7 +163,7 @@ export class AuthService {
         // Sets a new password if a valid recovery code was received
 
         const newPasswordObj: NewPasswordDocument | null =
-            await this.authRepository.findPasswordRecovery(recoveryPassword.recoveryCode);
+            await this.userRepository.findPasswordRecovery(recoveryPassword.recoveryCode);
 
         if (!newPasswordObj)
             throw new DomainException({
@@ -192,7 +190,7 @@ export class AuthService {
         user.passwordHash = hash;
         await this.userRepository.save(user);
 
-        await this.authRepository.deleteUsedPasswordRecovery(newPasswordObj.userId);
+        await this.userRepository.deleteUsedPasswordRecovery(newPasswordObj.userId);
 
         return;
     }
