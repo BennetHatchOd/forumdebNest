@@ -1,13 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber } from 'class-validator';
+import { IsEnum, IsNumber, Min } from 'class-validator';
 
 class PaginationParams {
 
     @Type(() => Number)
     @IsNumber()
+    @Min(1)
     pageNumber: number = 1;
     @Type(() => Number)
     @IsNumber()
+    @Min(1)
     pageSize: number = 10;
 
     calculateSkip() {
