@@ -1,17 +1,19 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { UserInputDto } from '@modules/users-system/dto/input/user.input.dto';
+import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 
-@Schema()
 export class ConfirmEmail {
-    @Prop({ })
+    id: number;
     code: string;
-
-    @Prop({
-        type: Date,
-    })
     expirationTime: Date;
+    userId: number;
+
+
+    static createInstance(dto: CreateCodeDto): ConfirmEmail {
+        const codeTuple = new this();
+        codeTuple.code = dto.code;
+        codeTuple.expirationTime = dto.expirationTime;
+        codeTuple.userId = dto.userId;
+
+        return codeTuple;
+    }
 }
-
-export const ConfirmEmailSchema = SchemaFactory.createForClass(ConfirmEmail);
-
-//регистрирует методы сущности в схеме
-ConfirmEmailSchema.loadClass(ConfirmEmail);

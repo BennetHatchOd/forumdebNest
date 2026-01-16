@@ -1,110 +1,150 @@
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
-import { Types } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
-import { NewPassword, NewPasswordDocument, NewPasswordModelType } from '@modules/users-system/domain/new.password';
+import { User } from '../domain/user.entity';
+import { Inject, Injectable } from '@nestjs/common';
+import { DATA_SOURCE } from '@core/constans/data.source';
+import { DataSource } from 'typeorm';
+import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
+import { UserWithTime } from '@modules/users-system/dto/user.with.time';
 
 @Injectable()
 export class UserRepository {
 
-    constructor(@InjectModel(User.name) private UserModel: UserModelType,
-                @InjectModel(NewPassword.name) private NewPasswordModel: NewPasswordModelType,
-                ) {
-    }
+    constructor(@Inject(DATA_SOURCE) private dataSource: DataSource) {}
 
-    async findById(id: string): Promise<UserDocument | null> {
-        if (!Types.ObjectId.isValid(id)) return null;
-        const searchItem: UserDocument | null
-            = await this.UserModel.findOne({
-                                            _id: new Types.ObjectId(id),
-                                            deleteAt: null
-                                        });
-        return searchItem
+    async findById(id: string): Promise<User | null> {
+         const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1) return null;
+
+        const searchItem: User[] = await this.dataSource.query(`
+            SELECT * 
+            FROM public."Users"
+            WHERE id = $1 AND "deletedAt" IS NULL
+            LIMIT 1`,
+            [numericId]
+        );
+        if (searchItem.length == 0)
+            return null;
+
+        return searchItem[0];
     }
 
     async checkUniq(loginCheck: string, emailCheck: string):Promise<string[]|null>  {
         // checks the uniqueness of the entered login and email, in case of duplication,
         // returns an array indicating the duplicated field
 
-        const existEmail = await this.UserModel.countDocuments({ email: emailCheck })
-        const existLogin = await this.UserModel.countDocuments({ login: loginCheck })
+        const existLoginEmail = await this.dataSource.query(`
+        SELECT
+            MAX(CASE WHEN login = $1 THEN 'login' END) AS login_conflict,
+            MAX(CASE WHEN email = $2 THEN 'email' END) AS email_conflict
+        FROM public."Users"
+        WHERE login = $1 OR email = $2`,
+            [loginCheck, emailCheck]);
 
-        if(existEmail > 0 || existLogin > 0) {
-            const arrayErrors: Array<string> = []
-            if(existEmail > 0)
-                arrayErrors.push('email')
-            if(existLogin > 0)
-                arrayErrors.push('login')
-            return arrayErrors;
-        }
-        return null;
-    }
+        if(!existLoginEmail[0].login_conflict && !existLoginEmail[0].email_conflict )
+            return null;
 
-    async findByConfirmCode(code: string): Promise<UserDocument|null> {
-        // search user with not verifed email
+        const arrayErrors: string[] = [];
 
-        const searchItem: UserDocument | null
-            = await this.UserModel.findOne({
-            'confirmEmail.code': code,
-            isConfirmEmail: false,
-            deletedAt: null})
-        return searchItem;
+        if(existLoginEmail[0].login_conflict)
+            arrayErrors.push('login')
+        if(existLoginEmail[0].email_conflict)
+            arrayErrors.push('email')
+
+        return arrayErrors;
+
     }
 
     async getPartUserByLoginEmail(loginOrEmail: string): Promise<{id:string, passHash:string}|null> {
+        // returns id and hash of password by the user who has
+        // a login or email that matches the passed value
 
-        const checkedUser: UserDocument|null = await this.UserModel.findOne(
-            // returns information about the user who has
-            // a login or email that matches the passed value
+        const checkedUser: User[] = await this.dataSource.query(`
+            SELECT * 
+                FROM public."Users"
+                WHERE (login = $1 OR email = $2) AND "isConfirmEmail" AND "deletedAt" IS NULL
+                LIMIT 1;`,
+            [loginOrEmail, loginOrEmail]
+        );
 
-            {$and:[
-                    {isConfirmEmail: true},
-                    {$or: [
-                            {login: loginOrEmail},
-                            {email: loginOrEmail}]
-                    }]
-            })
-
-        return checkedUser === null
+        return checkedUser.length == 0
             ? null
-            : {id: checkedUser._id.toString(), passHash: checkedUser.passwordHash};
+            : {id: checkedUser[0].id.toString(),
+                passHash: checkedUser[0].passwordHash};
     }
 
-    async foundUserWithOutEmail(email: string):Promise <UserDocument|null>{
-        // search user with not verifed email
+    async findUserIdByEmail(email: string, isConfirm: boolean):Promise <number|null>{
+        // search user with unconfirmed email
 
-        const searchItem: UserDocument | null
-            = await this.UserModel.findOne({
-            email: email,
-            isConfirmEmail: false,
-            deletedAt: null})
+        const searchItem: number[] = await this.dataSource.query(`
+            SELECT id 
+                FROM public."Users"
+                WHERE email = $1 AND "isConfirmEmail" = $2 AND "deletedAt" IS NULL
+                LIMIT 1;`,
+            [email, isConfirm]
+        );
 
-        return searchItem;
+        return searchItem.length == 0
+            ? null
+            : searchItem[0];
     }
 
-    async foundUserIdByEmail(mail: string):Promise <string|null>{
-        // search user with verifed email
+    async saveUser(savedItem: User): Promise<void> {
 
-        const searchItem: UserDocument | null
-            = await this.UserModel.findOne({email: mail,
-            isConfirmEmail: true})
-        return searchItem ? searchItem._id.toString() : null;
+        const result = await this.dataSource.query(`
+                INSERT INTO public."Users"(
+                    login, email, "passwordHash", "isConfirmEmail", "deletedAt")
+                VALUES($1, $2, $3, $4, $5)
+                ON CONFLICT (login)
+                    DO UPDATE SET
+                    "passwordHash" = EXCLUDED."passwordHash",
+                    "isConfirmEmail" = EXCLUDED."isConfirmEmail",
+                    "deletedAt"= EXCLUDED."deletedAt"
+                RETURNING id;`,
+            [   savedItem.login,
+                savedItem.email,
+                savedItem.passwordHash,
+                savedItem.isConfirmEmail,
+                savedItem.deletedAt,
+            ])
+        savedItem.id = result[0].id;
+        return ;
     }
 
-    async save(changedItem: UserDocument): Promise<void> {
-        await changedItem.save();
+    async saveCode(createDto: CreateCodeDto, table: CodeTable): Promise<void>   {
+
+        await this.dataSource.query(`
+            INSERT INTO public."${table}" 
+                ("userId", code, "expirationTime")
+            VALUES ($1, $2, $3)
+                ON CONFLICT ("userId")
+                DO UPDATE SET
+                code = EXCLUDED.code,
+                "expirationTime" = EXCLUDED."expirationTime";`,
+            [   createDto.userId,
+                createDto.code,
+                createDto.expirationTime]);
+        return;
     }
 
-    async saveNewPassword(changedItem: NewPasswordDocument): Promise<void> {
-        await changedItem.save();
+    async findAndDeleteAuthCode(code: string, table: CodeTable): Promise<UserWithTime|null> {
+        // Find a user by an unverified email address or recoverable password
+        // using the code in the corresponding table.
+        // After finding the user, delete the code entry from the table.
+
+        const result = await this.dataSource.query(`
+            DELETE FROM public."${table}"
+            USING public."Users"
+            WHERE "${table}".code = $1 
+            AND "Users".id = "${table}"."userId"
+            RETURNING 
+                "Users".id AS "userId",  
+                "Users".email,  
+                "Users"."passwordHash",  
+                "Users"."isConfirmEmail",  
+                "Users"."deletedAt",  
+                "${table}".expiredTime;`,
+            [code]
+        );
+        return result[0] || null;
     }
 
-    async findPasswordRecovery(recoveryCode: string): Promise<NewPasswordDocument|null> {
-        return  await this.NewPasswordModel.findOne({code: recoveryCode})
-    }
-
-    async deleteUsedPasswordRecovery(userId: string) {
-        // delete all recovery codes for the user if the password has already been recovered
-        return  await this.NewPasswordModel.deleteMany({userId: userId})
-    }
 }

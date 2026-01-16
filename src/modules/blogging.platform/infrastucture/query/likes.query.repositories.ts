@@ -1,11 +1,9 @@
-import { InjectModel, Prop } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Like, LikeDocument, LikeModelType } from '@modules/blogging.platform/domain/like.entity';
 import { LikesDescriptionDto } from '@modules/blogging.platform/dto/likes.description.dto';
-import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { LikesDescriptionManyDto } from '@modules/blogging.platform/dto/likes.description.many.dto';
-import console from 'node:console';
 import { LikesCountDto } from '@modules/blogging.platform/infrastucture/query/dto/like.counts';
 import { LikesStatusDto } from '@modules/blogging.platform/infrastucture/query/dto/like.status';
 import { UserQueryExternalRepository } from '@modules/users-system/infrastucture/query/user.query.external.repository';
@@ -59,7 +57,7 @@ export class LikesQueryRepositories{
         // return 3 last likes for one entity
 
         const likeUserId: string[] = likes.map((like: LikeDocument) => like.ownerId.toString())
-        const usersLogins = await this.userQueryExternalRepository.getUsersLogins(likeUserId);
+        const usersLogins = await this.userQueryExternalRepository.getManyLoginsByUserIds(likeUserId);
         // получаем логин юзеров, поставивших последние 3 лайка
 
         const extendedInfo: NewestLikesDto = {newestLikes:
@@ -97,7 +95,7 @@ export class LikesQueryRepositories{
         const userIds: string[] = [];
         lastLikes.forEach(likeInfo => likeInfo.likes.forEach(like => userIds.push(like.userId)));
         const uniqUserId = Array.from(new Set(userIds));
-        const usersLogins = await this.userQueryExternalRepository.getUsersLogins(uniqUserId);
+        const usersLogins = await this.userQueryExternalRepository.getManyLoginsByUserIds(uniqUserId);
 
         const extendedPartInfo
             = lastLikes.map(entityInfo => ({

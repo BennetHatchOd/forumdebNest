@@ -17,7 +17,6 @@ import {
 import { Comment, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
 import {
     User,
-    UserModelType,
 } from '@src/modules/users-system/domain/user.entity';
 import { TestDataBuilderByDb } from './test.data.builder.by.db';
 import { EmailService } from '@src/modules/notifications/application/email.service';

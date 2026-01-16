@@ -1,4 +1,5 @@
 import { Body, Controller, Post, UseGuards, HttpCode, HttpStatus, Get, Req, Res } from '@nestjs/common';
+import { UserService } from '../application/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInputDto } from '../dto/input/user.input.dto';
 import { AUTH_PATH, URL_PATH } from '@core/url.path.setting';
@@ -8,7 +9,6 @@ import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.pas
 import { CurrentUserId } from '@core/decorators/current.user';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CreateSessionCommand } from '@modules/users-system/application/UseCase/create.session.usecase';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 import { Request, Response } from 'express';
@@ -17,7 +17,11 @@ import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { DeleteMySessionCommand } from '@modules/users-system/application/UseCase/delete.my.session.usecase';
 import { UpdateSessionCommand } from '@modules/users-system/application/UseCase/update.session.usecase';
 import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
-import { UserService } from '@modules/users-system/application/user.service';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { ConfirmationEmailCommand } from '@modules/users-system/application/UseCase/confirmation.email.usecase';
+import {
+    CreateCodeConfirmationEmailCommand
+} from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
 
 
 @Controller(URL_PATH.auth)
@@ -46,10 +50,10 @@ export class AuthController {
             ip: ip
         }
         const refreshToken: string = await this.commandBus.execute(new CreateSessionCommand(session))
-        const accessTokens: string = await this.userService.authorization(user)
+        const accessTokens: string = await this.userService.createAccessToken(user)
         res.cookie('refreshToken', refreshToken,
             {httpOnly: true,
-             secure: true,})
+                secure: true,})
         return {
             accessToken: accessTokens};
     }
@@ -58,7 +62,7 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async registration(@Body() inputUserDto: UserInputDto) : Promise<void> {
 
-        await this.commandBus.execute(new CreateUserCommand(inputUserDto, false));
+        await this.commandBus.execute(new CreateUserCommand(inputUserDto, false, true));
         return;
     }
 
@@ -66,36 +70,38 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async confirmation(@Body() inputCode: ConfirmCodeInputDto): Promise<void> {
 
-            return  await this.userService.confirmationEmail(inputCode.code);
+        await this.commandBus.execute(new ConfirmationEmailCommand(inputCode.code));
+        return;
     }
 
     @Post(AUTH_PATH.resentEmail)
     @HttpCode(HttpStatus.NO_CONTENT)
     async reSendMail(@Body() inputEmail:EmailInputDto): Promise<void> {
 
-        return  await this.userService.reSendEmail(inputEmail.email)
+        await this.commandBus.execute(new CreateCodeConfirmationEmailCommand(inputEmail.email));
+        return;
     }
 
     @Post(AUTH_PATH.askNewPassword)
     @HttpCode(HttpStatus.NO_CONTENT)
     async askNewPassword(@Body() inputEmail:EmailInputDto):Promise<void> {
-            return await this.userService.askNewPassword(inputEmail.email)
+        return await this.userService.resetPassword(inputEmail.email)
     }
 
     @Post(AUTH_PATH.confirmNewPassword)
     @HttpCode(HttpStatus.NO_CONTENT)
     async resentPassword(@Body()recoveryPassport: NewPasswordInputDto):Promise<void> {
 
-            return await this.userService.setNewPassword(recoveryPassport)
+        return await this.userService.setNewPassword(recoveryPassport)
     }
 
     @Get(AUTH_PATH.aboutMe)
     @SkipThrottle()
     @UseGuards(AuthGuard('jwt'))
     async getMe(@CurrentUserId() user: string)//: Promise<UserAboutViewDto>
-     {
-               const answer: UserAboutViewDto = await this.userService.aboutMe(user)
-            return answer;
+    {
+        const answer: UserAboutViewDto = await this.userService.aboutMe(user)
+        return answer;
     }
 
     @Post(AUTH_PATH.logout)
@@ -122,7 +128,7 @@ export class AuthController {
     ):Promise<{accessToken: string}>{
 
         const refreshToken: string = await this.commandBus.execute(new UpdateSessionCommand(user))
-        const accessTokens: string = await this.userService.authorization(user.userId)
+        const accessTokens: string = await this.userService.createAccessToken(user.userId)
         res.cookie('refreshToken', refreshToken,
             {httpOnly: true,
                 secure: true,})
@@ -130,4 +136,3 @@ export class AuthController {
             accessToken: accessTokens};
     }
 }
-

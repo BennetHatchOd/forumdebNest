@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './domain/user.entity';
+import { User } from './domain/user.entity';
 import { UserControllers } from './api/user.controller';
 import { UserService } from './application/user.service';
 import { UserQueryRepository } from './infrastucture/query/user.query.repository';
@@ -12,7 +12,7 @@ import { PasswordHashService } from './application/password.hash.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
-import { NewPassword, NewPasswordSchema } from './domain/new.password';
+import { NewPassword } from './domain/new.password';
 import { UserConfig } from './config/user.config';
 import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
@@ -36,9 +36,7 @@ import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-option
         AuthModule,
         DatabaseModule,
         MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema },
             { name: Session.name, schema: SessionSchema },
-            { name: NewPassword.name, schema: NewPasswordSchema },
         ]),
         ThrottlerModule.forRootAsync({
             imports:[UserSystemModule],
