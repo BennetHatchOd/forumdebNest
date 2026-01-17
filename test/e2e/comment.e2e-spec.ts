@@ -82,7 +82,7 @@ describe('CommentController (e2e)', () => {
                 id: expect.any(String),
                 content: content[0],
                 commentatorInfo: {
-                    userId: testData.users[1]._id.toString(),
+                    userId: testData.users[1].id.toString(),
                     userLogin: testData.users[1].login
                 },
                 createdAt: expect.any(String),
@@ -99,7 +99,7 @@ describe('CommentController (e2e)', () => {
                 id: expect.any(String),
                 content: content[0],
                 commentatorInfo: {
-                    userId: testData.users[1]._id.toString(),
+                    userId: testData.users[1].id.toString(),
                     userLogin: testData.users[1].login
                 },
                 createdAt: expect.any(String),
