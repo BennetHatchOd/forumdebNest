@@ -15,14 +15,13 @@ import {
     PostModelType,
 } from '@src/modules/blogging.platform/domain/post.entity';
 import { Comment, CommentModelType } from '@src/modules/blogging.platform/domain/comment.entity';
-import {
-    User,
-} from '@src/modules/users-system/domain/user.entity';
 import { TestDataBuilderByDb } from './test.data.builder.by.db';
 import { EmailService } from '@src/modules/notifications/application/email.service';
 import { EmailServiceMock } from '../mock/email.service.mock';
 import { PasswordHashService } from '@src/modules/users-system/application/password.hash.service';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DataSource } from 'typeorm';
+import { DATA_SOURCE } from '@core/constans/data.source';
 
 export const initSettings = async (
     //передаем callback, который получает ModuleBuilder, если хотим изменить настройку тестового модуля
@@ -32,7 +31,7 @@ export const initSettings = async (
     const emailServiceMock = new EmailServiceMock();
     const testingModuleBuilder: TestingModuleBuilder = Test.createTestingModule({
         imports: [DynamicAppModule],
-        })
+    })
         .overrideProvider(EmailService)
         .useValue(emailServiceMock);
 
@@ -59,15 +58,15 @@ export const initSettings = async (
     const blogModel = app.get<BlogModelType>(getModelToken(Blog.name));
     const postModel = app.get<PostModelType>(getModelToken(Post.name));
     const commentModel = app.get<CommentModelType>(getModelToken(Comment.name));
-    const userModel = app.get<UserModelType>(getModelToken(User.name));
+    const dataSource = app.get<DataSource>(DATA_SOURCE);
     const testData = await TestDataBuilderByDb.createTestData(app,
-                                                                        userConfig,
-                                                                        blogModel,
-                                                                        postModel,
-                                                                        commentModel,
-                                                                        userModel,
-                                                                        passwordHashService,
-                                                                        );
+        userConfig,
+        blogModel,
+        postModel,
+        commentModel,
+        dataSource,
+        passwordHashService,
+    );
 
     return {
         app,
