@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CommentRepository } from '../infrastucture/comment.repository';
-import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentInputDto } from '../dto/input/comment.input.dto';
 import { Comment, CommentDocument, CommentModelType } from '../domain/comment.entity';
 import { UserQueryExternalRepository } from '../../users-system/infrastucture/query/user.query.external.repository';

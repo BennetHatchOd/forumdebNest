@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User } from './domain/user.entity';
 import { UserControllers } from './api/user.controller';
 import { UserService } from './application/user.service';
 import { UserQueryRepository } from './infrastucture/query/user.query.repository';
@@ -12,7 +11,6 @@ import { PasswordHashService } from './application/password.hash.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
-import { NewPassword } from './domain/new.password';
 import { UserConfig } from './config/user.config';
 import { EmailService } from '../notifications/application/email.service';
 import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
@@ -28,7 +26,6 @@ import { DeviceController } from '@modules/users-system/api/device.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from '@core/database.module';
 import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-options.interface';
-//import { UserSQLRepository } from '@modules/users-system/infrastucture/user.sql.repository';
 
 @Module({
     imports: [

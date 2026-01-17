@@ -1,4 +1,3 @@
-import { UserInputDto } from '@modules/users-system/dto/input/user.input.dto';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 
 export class ConfirmEmail {
