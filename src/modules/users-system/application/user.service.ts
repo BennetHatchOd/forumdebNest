@@ -12,6 +12,7 @@ import { UserRepository } from '@modules/users-system/infrastucture/user.reposit
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { UserWithTime } from '@modules/users-system/dto/user.with.time';
+import { CodeTable } from '@modules/users-system/infrastucture/code.type';
 
 @Injectable()
 export class UserService {

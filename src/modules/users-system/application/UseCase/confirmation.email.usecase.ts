@@ -5,6 +5,7 @@ import { User } from '@modules/users-system/domain/user.entity';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { UserWithTime } from '@modules/users-system/dto/user.with.time';
+import { CodeTable } from '@modules/users-system/infrastucture/code.type';
 
 export class ConfirmationEmailCommand extends Command<void> {
     constructor(
