@@ -6,7 +6,11 @@ import { DomainExceptionFilter } from '@core/exceptions/filters/domain.exception
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 
-export function appSetup(app: NestExpressApplication, isSwaggerEnable: boolean, globalPrefix: string) {
+export function appSetup(
+    app: NestExpressApplication,
+    isSwaggerEnable: boolean,
+    globalPrefix: string
+){
     pipesSetup(app);
     app.setGlobalPrefix(globalPrefix);
     swaggerSetup(app, isSwaggerEnable, globalPrefix);
