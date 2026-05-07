@@ -75,7 +75,7 @@ export class UserRepository {
     async findUserIdByEmail(email: string, isConfirm: boolean):Promise <number|null>{
         // search user with unconfirmed email
 
-        const searchItem: number[] = await this.dataSource.query(`
+        const searchItem: { id: number }[] = await this.dataSource.query(`
             SELECT id 
                 FROM public."Users"
                 WHERE email = $1 AND "isConfirmEmail" = $2 AND "deletedAt" IS NULL
@@ -85,7 +85,7 @@ export class UserRepository {
 
         return searchItem.length == 0
             ? null
-            : searchItem[0];
+            : searchItem[0].id;
     }
 
     async saveUser(savedItem: User): Promise<void> {
