@@ -71,10 +71,15 @@ export class UserQueryRepository {
 
         const whereSql = whereClausesAND.join(' AND ');
 
+        const orderBy =
+            queryReq.sortBy === 'login' || queryReq.sortBy === 'email'
+                ? `"${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
+                : `"${queryReq.sortBy}" ${queryReq.sortDirection}`;
+
         const sqlRequest = `FROM public."Users" WHERE ${whereSql}`;
         const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
         const sql = ` SELECT * ${sqlRequest}
-            ORDER BY "${queryReq.sortBy}" ${queryReq.sortDirection} 
+            ORDER BY ${orderBy} 
             LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
 
         const totalCount: number = await this.dataSource.query(sqlCount + ';', queryParams);
