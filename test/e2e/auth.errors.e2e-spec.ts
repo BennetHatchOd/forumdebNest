@@ -36,7 +36,6 @@ describe('AuthAppController with Errors (e2e)', () => {
                 }),
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
         emailServiceMock = result.emailServiceMock;
