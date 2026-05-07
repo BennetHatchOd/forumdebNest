@@ -137,8 +137,9 @@ export class UserRepository {
             WHERE "${table}".code = $1 
             AND "Users".id = "${table}"."userId"
             RETURNING 
-                "Users".id AS "userId",  
-                "Users".email,  
+                "Users".id AS "userId",
+                "Users".email,
+                "Users".login,
                 "Users"."passwordHash",  
                 "Users"."isConfirmEmail",  
                 "Users"."deletedAt",  
