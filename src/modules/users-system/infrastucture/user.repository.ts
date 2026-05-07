@@ -131,7 +131,7 @@ export class UserRepository {
         // using the code in the corresponding table.
         // After finding the user, delete the code entry from the table.
 
-        const result = await this.dataSource.query(`
+        const result: UserWithTime[][] = await this.dataSource.query(`
             DELETE FROM public."${table}"
             USING public."Users"
             WHERE "${table}".code = $1 
@@ -146,7 +146,8 @@ export class UserRepository {
                 "${table}"."expirationTime";`,
             [code]
         );
-        return result[0] || null;
+
+        return result[0][0] ?? null;
     }
 
 }
