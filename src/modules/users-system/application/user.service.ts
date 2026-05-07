@@ -65,26 +65,6 @@ export class UserService {
     }
 
 
-    async resetPassword(email: string): Promise<void> {
-        // Only for verified users!
-        // Generates a new recovery code and sends it via email without deleting the previous ones.
-        // Delete the old codes ONLY after any of the codes are triggered.
-
-        let foundedUser: number | null =
-            await this.userRepository.findUserIdByEmail(email, true);
-        if (!foundedUser)
-            return;
-        // Even if the current email address is not registered,
-        // do not throw an error (to prevent detection of the user's email address)
-
-        const code = uuidv4();
-        const expirationTime = add(new Date(), {hours: this.userConfig.timeLifePasswordCode});
-        const resetPasswordDto = new CreateCodeDto(foundedUser, code, expirationTime);
-        await this.userRepository.saveCode(resetPasswordDto, CodeTable.RESET_PASSWORD);
-
-        return;
-    }
-
     async setNewPassword(recoveryPassword: NewPasswordInputDto): Promise<void> {
         // Sets a new password if a valid recovery code was received
 

@@ -22,6 +22,7 @@ import { ConfirmationEmailCommand } from '@modules/users-system/application/UseC
 import {
     CreateCodeConfirmationEmailCommand
 } from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
+import { ResetPasswordCommand } from '@modules/users-system/application/UseCase/reset.password.usecase';
 
 
 @Controller(URL_PATH.auth)
@@ -85,7 +86,8 @@ export class AuthController {
     @Post(AUTH_PATH.askNewPassword)
     @HttpCode(HttpStatus.NO_CONTENT)
     async askNewPassword(@Body() inputEmail:EmailInputDto):Promise<void> {
-        return await this.userService.resetPassword(inputEmail.email)
+        await this.commandBus.execute(new ResetPasswordCommand(inputEmail.email));
+        return;
     }
 
     @Post(AUTH_PATH.confirmNewPassword)

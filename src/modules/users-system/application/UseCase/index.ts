@@ -9,6 +9,7 @@ import {
     CreateCodeConfirmationEmailHandler
 } from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
 import { DeleteUserHandler } from '@modules/users-system/application/UseCase/delete.user.usecase';
+import { ResetPasswordHandler } from '@modules/users-system/application/UseCase/reset.password.usecase';
 
 export const CommandHandlers = [
     CreateUserHandler,
@@ -19,5 +20,6 @@ export const CommandHandlers = [
     UpdateSessionHandler,
     DeleteOneSessionHandler,
     DeleteMySessionHandler,
-    DeleteOthersSessionHandler
+    DeleteOthersSessionHandler,
+    ResetPasswordHandler,
 ];
