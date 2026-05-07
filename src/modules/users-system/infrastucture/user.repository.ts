@@ -143,7 +143,7 @@ export class UserRepository {
                 "Users"."passwordHash",  
                 "Users"."isConfirmEmail",  
                 "Users"."deletedAt",  
-                "${table}".expiredTime;`,
+                "${table}"."expirationTime";`,
             [code]
         );
         return result[0] || null;

@@ -92,7 +92,7 @@ export class UserService {
             await this.userRepository.findAndDeleteAuthCode(recoveryPassword.recoveryCode,
                                                             CodeTable.RESET_PASSWORD);
 
-        if (!userNewPassword || isBefore(userNewPassword.expiredTime, new Date()))
+        if (!userNewPassword || isBefore(userNewPassword.expirationTime, new Date()))
             throw new DomainException({
                 message: "a valid recovery code wasn't received or expired",
                 code: DomainExceptionCode.PasswordRecoveryCodeNotFound,

@@ -29,7 +29,7 @@ export class ConfirmationEmailHandler implements ICommandHandler<ConfirmationEma
         if ( !!foundUserInfo
             && !foundUserInfo.isConfirmEmail
             && !foundUserInfo.deletedAt
-            && isBefore(new Date(), foundUserInfo.expiredTime)
+            && isBefore(new Date(), foundUserInfo.expirationTime)
         ) {
             foundUserInfo.isConfirmEmail = true;
             const changedUser: User = foundUserInfo.mapToUser();
