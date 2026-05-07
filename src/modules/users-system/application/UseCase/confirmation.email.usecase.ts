@@ -32,7 +32,7 @@ export class ConfirmationEmailHandler implements ICommandHandler<ConfirmationEma
             && isBefore(new Date(), foundUserInfo.expirationTime)
         ) {
             foundUserInfo.isConfirmEmail = true;
-            const changedUser: User = foundUserInfo.mapToUser();
+            const changedUser: User = UserWithTime.mapToUser(foundUserInfo);
             await this.userRepository.saveUser(changedUser)
             return;
         }

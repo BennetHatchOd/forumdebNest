@@ -85,7 +85,7 @@ export class UserService {
             this.userConfig.saltRound,
         );
         userNewPassword.passwordHash = hash;
-        const user = userNewPassword.mapToUser()
+        const user = UserWithTime.mapToUser(userNewPassword)
         await this.userRepository.saveUser(user);
 
         return;
