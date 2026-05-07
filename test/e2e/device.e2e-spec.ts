@@ -54,7 +54,6 @@ describe('DeviceController (e2e)', () => {
             // .compile();
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
         accessJwtService = app.get<JwtService>(INJECT_TOKEN.ACCESS_TOKEN);
