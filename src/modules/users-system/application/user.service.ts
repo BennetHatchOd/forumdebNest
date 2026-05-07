@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PasswordHashService } from './password.hash.service';
-import { add, isBefore } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { UserAboutViewDto } from '../dto/view/user.about.view.dto';
 import { UserConfig } from '../config/user.config';
 import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
@@ -9,8 +9,6 @@ import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { NewPasswordInputDto } from '@src/modules/users-system/dto/input/new.password.input.dto';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { UserWithTime } from '@modules/users-system/dto/user.with.time';
 import { CodeTable } from '@modules/users-system/infrastucture/code.type';
 

@@ -1,8 +1,6 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { add } from 'date-fns';
 import { UserRepository } from '@modules/users-system/infrastucture/user.repository';
-import { DomainException } from '@core/exceptions/domain.exception';
-import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCodeDto } from '@modules/users-system/dto/create/create.code.dto';
 import { UserConfig } from '@modules/users-system/config/user.config';
@@ -12,7 +10,6 @@ import { CodeTable } from '@modules/users-system/infrastucture/code.type';
 export class ResetPasswordCommand extends Command<void> {
     constructor(
         public email: string,
-        public userId: number | null = null,
     ) {
         super()}
 }
@@ -26,7 +23,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
 
     ) {}
 
-    async execute({email, userId }: ResetPasswordCommand):Promise<void> {
+    async execute({email }: ResetPasswordCommand):Promise<void> {
 
         // Only for verified users!
         // Generates a new recovery code and sends it via email without deleting the previous ones.
