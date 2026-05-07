@@ -27,4 +27,18 @@ export class User {
 
         return user;
     }
+
+    static copyInstance(dto: User): User {
+        const user = new this();
+       
+        user.id! = dto.id;
+        user.login = dto.login;
+        user.email = dto.email;
+        user.passwordHash = dto.passwordHash;
+        user.isConfirmEmail = dto.isConfirmEmail;
+        user.createdAt = dto.createdAt;
+        user.deletedAt = dto.deletedAt;
+
+        return user;
+    }
 }

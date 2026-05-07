@@ -25,7 +25,9 @@ export class UserRepository {
         if (searchItem.length == 0)
             return null;
 
-        return searchItem[0];
+        const user = User.copyInstance(searchItem[0]);
+
+        return user;
     }
 
     async checkUniq(loginCheck: string, emailCheck: string):Promise<string[]|null>  {
