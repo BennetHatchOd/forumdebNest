@@ -14,7 +14,6 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('DeviceController (e2e)', () => {
     let app: INestApplication;
-    let connection: Connection;
     let testData: TestDataBuilderByDb;
     let globalPrefix;
 
@@ -51,7 +50,6 @@ describe('DeviceController (e2e)', () => {
                     .useValue({
                         canActivate: () => true,
                     }),
-            // .compile();
         );
         app = result.app;
         testData = result.testData;

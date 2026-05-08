@@ -11,7 +11,6 @@ import console from 'node:console';
 
 describe('UserAppController (e2e)', () => {
     let app: INestApplication;
-    let connection: Connection;
     let testData: TestDataBuilderByDb;
     let globalPrefix;
 
@@ -23,12 +22,10 @@ describe('UserAppController (e2e)', () => {
                     .useValue({
                         canActivate: () => true,
                     }),
-            // .compile();
         );
         app = result.app;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
-    //});
     });
 
     afterAll(async () => {

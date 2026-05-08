@@ -17,7 +17,6 @@ import { TestingModuleBuilder } from '@nestjs/testing';
 
 describe('AuthController (e2e)', () => {
     let app: INestApplication;
-    let connection: Connection;
     let testData: TestDataBuilderByDb;
     let globalPrefix;
     let emailServiceMock: EmailServiceMock;
@@ -51,10 +50,7 @@ describe('AuthController (e2e)', () => {
                     timeRateLimiting: 10000,
                     countRateLimiting: 55,
                 })
-                // .overrideProvider(ThrottlerGuard)
-                // .useValue({
-                //     canActivate: () => true,
-                // }),
+
         );
         app = result.app;
         testData = result.testData;
