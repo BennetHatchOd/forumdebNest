@@ -23,7 +23,7 @@ export class User {
         user.passwordHash = dto.password;
         user.isConfirmEmail = isConfirmEmail;
         user.deletedAt = null;
-        user.createdAt = new Date();
+       // user.createdAt = new Date();
 
         return user;
     }
@@ -31,7 +31,7 @@ export class User {
     static copyInstance(dto: User): User {
         const user = new this();
        
-        user.id! = dto.id;
+        user.id = dto.id;
         user.login = dto.login;
         user.email = dto.email;
         user.passwordHash = dto.passwordHash;

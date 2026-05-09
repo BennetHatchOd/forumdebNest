@@ -101,7 +101,7 @@ export class UserRepository {
                     "passwordHash" = EXCLUDED."passwordHash",
                     "isConfirmEmail" = EXCLUDED."isConfirmEmail",
                     "deletedAt"= EXCLUDED."deletedAt"
-                RETURNING id;`,
+                RETURNING id, "createdAt";`,
             [   savedItem.login,
                 savedItem.email,
                 savedItem.passwordHash,
@@ -109,6 +109,7 @@ export class UserRepository {
                 savedItem.deletedAt,
             ])
         savedItem.id = result[0].id;
+        savedItem.createdAt = result[0].createdAt;
         return ;
     }
 
