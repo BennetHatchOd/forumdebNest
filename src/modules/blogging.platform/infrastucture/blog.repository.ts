@@ -52,7 +52,7 @@ export class BlogRepository {
         "websiteUrl" = $3, 
         "isMembership" = $4, 
         "deletedAt" = $5
-        WHERE id = $6;`
+        WHERE id = $6;`,
             [   savedItem.name,
             savedItem.description,
             savedItem.websiteUrl,
