@@ -78,11 +78,13 @@ export class UserQueryRepository {
 
         const sqlRequest = `FROM public."Users" WHERE ${whereSql}`;
         const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
+        const totalCount: number = await this.dataSource.query(sqlCount + ';', queryParams);
+        queryReq.calculateSkip(+totalCount[0].count);
+
         const sql = ` SELECT * ${sqlRequest}
             ORDER BY ${orderBy} 
-            LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
+            LIMIT ${queryReq.pageSize} OFFSET ${queryReq.skip};`;
 
-        const totalCount: number = await this.dataSource.query(sqlCount + ';', queryParams);
 
         if(+totalCount[0].count === 0)
             return new EmptyPaginator<UserViewDto>();
