@@ -14,7 +14,7 @@ export class BlogRepository {
 
         const searchItem: Blog[] = await this.dataSource.query(`
             SELECT * 
-            FROM public.blog
+            FROM public.blogs
             WHERE id = $1 AND "deletedAt" IS NULL
             LIMIT 1`,
             [numericId]
