@@ -1,40 +1,12 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { BlogInputDto } from '../dto/input/blog.input.dto';
-import { BlogFieldRestrict } from '../dto/field.restrictions';
+import { BlogInputDto } from '@modules/blogging.platform/dto/input/blog.input.dto';
 
-@Schema({ timestamps: true,
-})
 export class Blog {
-    @Prop({
-        required: true,
-        minlength: BlogFieldRestrict.nameMin,
-        maxlength: BlogFieldRestrict.nameMax,
-    })
+    id!: number ;
     name: string;
-
-    @Prop({
-        required: true,
-        maxlength: BlogFieldRestrict.descriptionMax,
-        minlength: BlogFieldRestrict.descriptionMin,
-    })
     description: string;
-
-    createdAt: Date;
-
-    @Prop({
-        default: false,
-    })
-    isMembership: boolean;
-
-    @Prop({
-        required: true,
-        maxlength: BlogFieldRestrict.websiteUrlMax,
-        minlength: BlogFieldRestrict.websiteUrlMin,
-    })
     websiteUrl: string;
-
-    @Prop({ type: Date, default: null, })
+    isMembership: boolean;
+    createdAt: Date;
     deletedAt:  Date | null;
 
     delete() {
@@ -50,23 +22,29 @@ export class Blog {
         this.websiteUrl = change.websiteUrl;
     }
 
-    static createInstance(dto: BlogInputDto): BlogDocument {
+    static createInstance(dto: BlogInputDto): Blog {
         const blog = new this();
         blog.name = dto.name;
         blog.description = dto.description;
         blog.websiteUrl = dto.websiteUrl;
+        blog.isMembership = true;
+        blog.createdAt = new Date();
+        blog.deletedAt = null;
 
-        return blog as BlogDocument;
+        return blog;
       }
+
+    static copyInstance(dto: Blog): Blog {
+        const blog = new this();
+
+        blog.id = dto.id;
+        blog.description = dto.description;
+        blog.websiteUrl = dto.websiteUrl;
+        blog.isMembership = dto.isMembership;
+        blog.name = dto.name;
+        blog.createdAt = dto.createdAt;
+        blog.deletedAt = dto.deletedAt;
+
+        return blog;
+    }
 }
-
-export const BlogSchema = SchemaFactory.createForClass(Blog);
-
-//регистрирует методы сущности в схеме
-BlogSchema.loadClass(Blog);
-
-//Типизация документа
-export type BlogDocument = HydratedDocument<Blog>;
-
-//Типизация модели + статические методы
-export type BlogModelType = Model<BlogDocument> & typeof Blog;

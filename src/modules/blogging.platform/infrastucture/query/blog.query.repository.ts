@@ -1,54 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { BlogViewDto } from '../../dto/view/blog.view.dto';
-import { Blog, BlogDocument, BlogModelType } from '../../domain/blog.entity';
-import { FilterQuery, Types } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import { Blog } from '../../domain/blog.entity';
 import { GetBlogQueryParams } from '../../dto/input/get.blog.query.params.input.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
-import { UserViewDto } from '@modules/users-system/dto/view/user.view.dto';
+import { DATA_SOURCE } from '@core/constans/data.source';
+import { DataSource } from 'typeorm';
+
 
 @Injectable()
 export class BlogQueryRepository {
 
-    constructor(
-        @InjectModel(Blog.name) private BlogModel: BlogModelType, 
-    ){}
-    
+    constructor(@Inject(DATA_SOURCE) private dataSource: DataSource) {}
+
     async  findByIdWithCheck(id: string): Promise<BlogViewDto> {
-        if (!Types.ObjectId.isValid(id)) 
+        const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1)
             throw new DomainException({
                 message: 'blog not found',
                 code: DomainExceptionCode.NotFound});
 
-        const searchItem: BlogDocument | null = await this.BlogModel.findOne({
-                                                    _id: new Types.ObjectId(id),
-                                                    deletedAt: null
-                                                });
-        if(!searchItem)
+
+        const blog: Blog[] = await this.dataSource.query(`
+            SELECT * 
+                FROM public.blogs 
+                WHERE 
+                      id = $1 
+                  AND "deletedAt" IS NULL 
+                LIMIT 1;`,
+            [numericId]);
+
+        if(blog.length == 0){
             throw new DomainException({
                 message: 'blog not found',
                 code: DomainExceptionCode.NotFound});
+        }
 
-        return BlogViewDto.mapToView(searchItem);
+        return BlogViewDto.mapToView(blog[0]);
     }
 
     async find(queryReq: GetBlogQueryParams): Promise<PaginatedViewDto<BlogViewDto>> {
+        let whereSql: string = `"deletedAt" IS NULL`;
+        const queryParams: any[] = [];
 
-        const nameSearch = queryReq.searchNameTerm
-            ? { name: { $regex: queryReq.searchNameTerm, $options: 'i' } }
-            : {};
-        const queryFilter: FilterQuery<Blog> = { ...nameSearch, deletedAt: null };
-        const totalCount: number = await this.BlogModel.countDocuments(queryFilter);
-        if(totalCount === 0)
+        if (queryReq.searchNameTerm) {
+            whereSql += ` AND name ILIKE $1`;
+            queryParams.push(`%${queryReq.searchNameTerm}%`);
+        }
+
+        const orderBy =
+            queryReq.sortBy === 'name' || queryReq.sortBy === 'description'
+            || queryReq.sortBy === 'websiteUrl'
+                ? `"${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
+                : `"${queryReq.sortBy}" ${queryReq.sortDirection}`;
+
+        const sqlRequest = `FROM public.blogs WHERE ${whereSql}`;
+        const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
+        const sqlQuery = ` SELECT * ${sqlRequest}
+            ORDER BY ${orderBy} 
+            LIMIT ${queryReq.pageSize} OFFSET ${(queryReq.pageNumber - 1) * queryReq.pageSize};`;
+
+        const totalCount: number = await this.dataSource.query(sqlCount + ';', queryParams);
+
+        if(+totalCount[0].count === 0)
             return new EmptyPaginator<BlogViewDto>();
 
-        const blogs: Array<BlogDocument> = await this.BlogModel.find(queryFilter)
-            .limit(queryReq.pageSize)
-            .skip((queryReq.pageNumber - 1) * queryReq.pageSize)
-            .sort({ [queryReq.sortBy]: queryReq.sortDirection });
+        const blogs: Blog[] = await this.dataSource.query(sqlQuery, queryParams);
 
         const items = blogs.map(BlogViewDto.mapToView);
 
