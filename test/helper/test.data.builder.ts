@@ -89,7 +89,7 @@ export class TestDataBuilder {
 
         for(let i =0; i < this.numberUsers; i++){
             const createResponse = await request(this.app.getHttpServer())
-                .post(`${URL_PATH.users}`)
+                .post(`${URL_PATH.usersAdmin}`)
                 .set("Authorization", this.authLoginPassword)
                 .send(this.users[i])
                 .expect(HttpStatus.CREATED);

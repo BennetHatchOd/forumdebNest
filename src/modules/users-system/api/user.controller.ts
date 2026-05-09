@@ -26,7 +26,7 @@ import { CreateUserCommand } from '@modules/users-system/application/UseCase/cre
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))
 @ApiBasicAuth()
-@Controller(URL_PATH.users)
+@Controller(URL_PATH.usersAdmin)
 export class UserControllers {
     constructor(
         private commandBus: CommandBus,

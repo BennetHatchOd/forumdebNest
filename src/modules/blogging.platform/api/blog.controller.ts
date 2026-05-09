@@ -29,7 +29,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 
-@Controller(URL_PATH.blogs)
+@Controller(URL_PATH.blogsQuery)
 export class BlogController {
     constructor(
         private blogService: BlogService,

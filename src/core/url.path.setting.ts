@@ -6,9 +6,9 @@ export const URL_PATH = {
     devices: '/security/devices',
     comments: '/comments',
     testing: '/testing/all-data',
-    blogs: '/sa/blogs',
-    posts: '/sa/posts',
-    users: '/sa/users',
+    blogsAdmin: '/sa/blogs',
+    postsAdmin: '/sa/posts',
+    usersAdmin: '/sa/users',
 };
 
 export const AUTH_PATH = {

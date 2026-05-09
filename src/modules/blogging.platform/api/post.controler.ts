@@ -33,7 +33,7 @@ import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum
 import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
 import { CommandBus } from '@nestjs/cqrs';
 
-@Controller(URL_PATH.posts)
+@Controller(URL_PATH.postsAdmin)
 export class PostController {
     constructor(
         private postService: PostService,

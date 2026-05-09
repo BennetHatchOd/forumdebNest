@@ -56,7 +56,7 @@ describe('UserAppController (e2e)', () => {
         })
         it('should return 200 status and a paginator initially', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.OK)
 
@@ -71,7 +71,7 @@ describe('UserAppController (e2e)', () => {
 
         it('should return 201 status and create new users', async () => {
             let response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send(newUser)
                 .expect(HttpStatus.CREATED)
@@ -85,7 +85,7 @@ describe('UserAppController (e2e)', () => {
             id1 = response.body.id;
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send(newUser2)
                 .expect(HttpStatus.CREATED)
@@ -94,7 +94,7 @@ describe('UserAppController (e2e)', () => {
 
         it("should return users filtered by login/email search", async () => {
             let response = await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .query({searchLoginTerm: 'io'})
                 .expect(HttpStatus.OK)
@@ -113,7 +113,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .query({searchEmailTerm: 'pTk', sortDirection: 'asc'})
                 .expect(HttpStatus.OK)
@@ -138,19 +138,19 @@ describe('UserAppController (e2e)', () => {
 
         it('should delete created users and return 204', async () => {
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, id1))
+                .delete(join(URL_PATH.usersAdmin, id1))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NO_CONTENT)
 
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, id2))
+                .delete(join(URL_PATH.usersAdmin, id2))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NO_CONTENT)
         })
 
         it('should return 200 status and a paginator initially too', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.OK)
 
@@ -178,7 +178,7 @@ describe('UserAppController (e2e)', () => {
             "user with validation error", async () => {
 
             const response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({ login: 'hj',
                     email: 'hjuh@hjuh.com',
@@ -207,7 +207,7 @@ describe('UserAppController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
 
             let response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: testData.users[0].login,
@@ -221,7 +221,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: 'hjws5',
@@ -235,7 +235,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: user.login,
@@ -249,7 +249,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: 'hjsd52',
@@ -266,17 +266,17 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to access user's endpoint with authorization error.", async () => {
 
             await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .send({ login: 'hj',
                     email: 'hjuh@hjuh.com',
                     password: 'gtghhTgg6ytghujikutghikkk'})
                 .expect(HttpStatus.UNAUTHORIZED)
             await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .expect(HttpStatus.UNAUTHORIZED)
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .delete(join(URL_PATH.usersAdmin, '6814e896da2168245826d049'))
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .expect(HttpStatus.UNAUTHORIZED)
         });
@@ -284,7 +284,7 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to delete fake user", async () => {
 
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '452'))
+                .delete(join(URL_PATH.usersAdmin, '452'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
         });
@@ -292,7 +292,7 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to delete user by not valide id.", async () => {
 
             const dd = await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '681896da2168245826d049'))
+                .delete(join(URL_PATH.usersAdmin, '681896da2168245826d049'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
         });
@@ -313,7 +313,7 @@ describe('UserAppController (e2e)', () => {
             "user with validation error", async () => {
 
             const response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({ login: 'hj',
                     email: 'hjuh@hjuh.com',
@@ -342,7 +342,7 @@ describe('UserAppController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
 
             let response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: testData.users[0].login,
@@ -356,7 +356,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: 'hjws5',
@@ -370,7 +370,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: user.login,
@@ -384,7 +384,7 @@ describe('UserAppController (e2e)', () => {
             });
 
             response = await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", testData.authLoginPassword)
                 .send({
                     login: 'hjsd52',
@@ -401,17 +401,17 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to access user's endpoint with authorization error.", async () => {
 
             await request(app.getHttpServer())
-                .post(URL_PATH.users)
+                .post(URL_PATH.usersAdmin)
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .send({ login: 'hj',
                     email: 'hjuh@hjuh.com',
                     password: 'gtghhTgg6ytghujikutghikkk'})
                 .expect(HttpStatus.UNAUTHORIZED)
             await request(app.getHttpServer())
-                .get(URL_PATH.users)
+                .get(URL_PATH.usersAdmin)
                 .expect(HttpStatus.UNAUTHORIZED)
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .delete(join(URL_PATH.usersAdmin, '6814e896da2168245826d049'))
                 .set("Authorization", "Bearer FGRFdfsfdf")
                 .expect(HttpStatus.UNAUTHORIZED)
         });
@@ -419,7 +419,7 @@ describe('UserAppController (e2e)', () => {
         it("should return 404 by attempt to delete fake user", async () => {
 
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '6814e896da2168245826d049'))
+                .delete(join(URL_PATH.usersAdmin, '6814e896da2168245826d049'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
         });
@@ -427,7 +427,7 @@ describe('UserAppController (e2e)', () => {
         it("should return 400 by attempt to delete user by not valide id.", async () => {
 
             await request(app.getHttpServer())
-                .delete(join(URL_PATH.users, '681896da2168245826d049'))
+                .delete(join(URL_PATH.usersAdmin, '681896da2168245826d049'))
                 .set("Authorization", testData.authLoginPassword)
                 .expect(HttpStatus.NOT_FOUND)
         });

@@ -72,7 +72,7 @@ describe('CommentController (e2e)', () => {
         it('should return 201 and a created comment', async () => {
 
             const response = await request(app.getHttpServer())
-                .post(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
+                .post(join(URL_PATH.postsAdmin, testData.posts[1]._id.toString(), "comments"))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[1])
                 .send({
                     content: content[0],
@@ -153,7 +153,7 @@ describe('CommentController (e2e)', () => {
         it('should return 200 and create many comments for the second post', async () => {
             for (let i = 0; i <= 5; i++)
                 await request(app.getHttpServer())
-                    .post(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
+                    .post(join(URL_PATH.postsAdmin, testData.posts[1]._id.toString(), "comments"))
                     .set("Authorization", 'Bearer ' + testData.accessTokens[1])
                     .send({
                         content: 'this text not have any sense ' + `${i}`,
@@ -162,7 +162,7 @@ describe('CommentController (e2e)', () => {
         })
         it('should return 200 and a paginator', async () => {
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.posts, testData.posts[0]._id.toString(), "comments"))
+                .get(join(URL_PATH.postsAdmin, testData.posts[0]._id.toString(), "comments"))
                 .query({ pageSize: 4 })
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
@@ -176,7 +176,7 @@ describe('CommentController (e2e)', () => {
         })
         it('should return 204 and a paginator', async () => {
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.posts, testData.posts[1]._id.toString(), "comments"))
+                .get(join(URL_PATH.postsAdmin, testData.posts[1]._id.toString(), "comments"))
                 .query({ pageSize: 12 })
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
