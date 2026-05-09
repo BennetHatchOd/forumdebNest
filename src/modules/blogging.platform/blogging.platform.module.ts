@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './domain/blog.entity';
-import { BlogController } from './api/blog.controller';
+import { BlogAdminController } from './api/blog.admin.controller';
 import { BlogService } from './application/blog.service';
 import { BlogQueryRepository } from './infrastucture/query/blog.query.repository';
 import { BlogRepository } from './infrastucture/blog.repository';
@@ -24,6 +23,7 @@ import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture
 import { AuthModule } from '@core/auth.module';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { DatabaseModule } from '@core/database.module';
+import { BlogController } from '@modules/blogging.platform/api/blog.controller';
 
 @Module({
     imports: [
@@ -31,13 +31,13 @@ import { DatabaseModule } from '@core/database.module';
         AuthModule,
         DatabaseModule,
         MongooseModule.forFeature([
-            { name: Blog.name, schema: BlogSchema },
             { name: Comment.name, schema: CommentSchema },
             { name: Post.name, schema: PostSchema },
             { name: Like.name, schema: LikeSchema },
         ]),
     ],
     controllers: [
+        BlogAdminController,
         BlogController,
         PostController,
         CommentController],

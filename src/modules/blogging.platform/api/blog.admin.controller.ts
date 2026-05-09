@@ -13,7 +13,7 @@ import {
 import { BlogService } from '../application/blog.service';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 import { BlogViewDto } from '../dto/view/blog.view.dto';
-import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
+import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
 import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
 import { BlogInputDto } from '../dto/input/blog.input.dto';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
@@ -27,10 +27,12 @@ import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
+import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
 
 
-@Controller(URL_PATH.blogsQuery)
-export class BlogController {
+@Controller(URL_PATH.blogsAdmin)
+@UseGuards(AuthGuard('basic'))
+export class BlogAdminController {
     constructor(
         private blogService: BlogService,
         private postService: PostService,
@@ -48,14 +50,54 @@ export class BlogController {
         return blogPaginator;
     }
 
-    @Get(':id')
-    async getById(@Param() {id}: IdInputDto): Promise<BlogViewDto> {
+    @Post()
+    @HttpCode(HttpStatus.CREATED)
+    async createBlog(
+        @Body() blog: BlogInputDto): Promise<BlogViewDto> {
         //
-        // Returns blog by id
+        // Create new blog
 
-        const foundBlog: BlogViewDto =
-            await this.blogQueryRepository.findByIdWithCheck(id);
-        return foundBlog;
+        const createId: string = await this.blogService.create(blog);
+        const blogView: BlogViewDto =
+            await this.blogQueryRepository.findByIdWithCheck(createId);
+        return blogView;
+    }
+
+    @Put(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async correctBlog(
+        @Param() {id}: IdInputDto,
+        @Body() blog: BlogInputDto,
+    ): Promise<void> {
+        //
+        // Update existing Blog by id with InputModel
+
+        return await this.blogService.edit(id, blog);
+    }
+
+    @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteBlog(
+        @Param() {id}: IdInputDto, ): Promise<void> {
+        //
+        // Delete blog specified by id
+
+        return await this.blogService.delete(id);
+    }
+
+    @Post(':id/posts')
+    @HttpCode(HttpStatus.CREATED)
+    async createPostByBlog(
+        @CurrentUserId() user: string,
+        @Param() {id}: IdInputDto,
+        @Body() createPartDto: PostByBlogInputDto,
+    ): Promise<PostViewDto> {
+        // Create new post for specific blog
+        const createDto: PostInputDto = { ...createPartDto, blogId: id };
+        const createId: string = await this.postService.create(createDto);
+        const postView: PostViewDto =
+            await this.postQueryRepository.findByIdWithCheck(createId, user);
+        return postView;
     }
 
     @Get(':id/posts')
@@ -75,5 +117,30 @@ export class BlogController {
             await this.postQueryRepository.find(query, user);
         return postPaginator;
     }
+
+    @Put(':blogId/posts/:id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async correctPost(
+        @Param() dto: PostParamsIdInputDto,
+        @Body() post: PostInputDto
+    ): Promise<void>{
+        //
+        // Update existing Post by id with InputModel
+
+        return await this.postService.edit(dto.id, post)
+    }
+
+    @Delete(':blogId/posts/:id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deletePost(
+        @Param() dto: PostParamsIdInputDto
+    ): Promise<void>{
+        //
+        // Delete post specified by id
+
+        return await this.postService.delete(dto.id)
+
+    }
+
 }
 
