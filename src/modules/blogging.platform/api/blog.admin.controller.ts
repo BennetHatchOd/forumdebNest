@@ -20,26 +20,25 @@ import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
-import { PostService } from '../application/post.service';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
-import console from 'node:console';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CreateBlogCommand } from '@modules/blogging.platform/application/UseCase/create.blog.usecase';
 import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/edit.blog.usecase';
 import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/delete.blog.usecase';
+import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/create.post.usecase';
+import { EditPostCommand } from '@modules/blogging.platform/application/UseCase/edit.post.usecase';
+import { DeletePostCommand } from '@modules/blogging.platform/application/UseCase/delete.post.usecase';
 
 
 @Controller(URL_PATH.blogsAdmin)
 @UseGuards(AuthGuard('basic'))
 export class BlogAdminController {
     constructor(
-        private postService: PostService,
         private commandBus: CommandBus,
         private blogQueryRepository: BlogQueryRepository,
         private postQueryRepository: PostQueryRepository,
@@ -98,7 +97,7 @@ export class BlogAdminController {
     ): Promise<PostViewDto> {
         // Create new post for specific blog
         const createDto: PostInputDto = { ...dto, blogId: id };
-        const createId: string = await this.postService.create(createDto);
+        const createId: string = await this.commandBus.execute(new CreatePostCommand(createDto));
         const postView: PostViewDto =
             await this.postQueryRepository.findByIdWithCheck(createId, user);
         return postView;
@@ -132,7 +131,7 @@ export class BlogAdminController {
         // Update existing Post by id with InputModel
 
         await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
-        return await this.postService.edit(dto, post);
+        return await this.commandBus.execute(new EditPostCommand(dto, post));
     }
 
     @Delete(':blogId/posts/:id')
@@ -142,8 +141,7 @@ export class BlogAdminController {
     ): Promise<void>{
         // Delete post specified by id
         await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
-        return await this.postService.delete(dto)
-
+        return await this.commandBus.execute(new DeletePostCommand(dto));
     }
 
 }

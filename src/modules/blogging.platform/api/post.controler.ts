@@ -14,30 +14,18 @@ import {
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
-import { PostInputDto } from '../dto/input/post.input.dto';
-import { GetCommentQueryParams } from '../dto/input/get.comment.query.params.input.dto';
-import { CommentViewDto } from '../dto/view/comment.view.dto';
 import { CommentQueryRepository } from '../infrastucture/query/comment.query.repository';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
-import { PostService } from '../application/post.service';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
-import { CommentInputDto } from '../dto/input/comment.input.dto';
 import { CommentService } from '../application/comment.service';
 import { CurrentUserId } from '@core/decorators/current.user';
-import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
-import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
-import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
-import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
-import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
 import { CommandBus } from '@nestjs/cqrs';
-import console from 'node:console';
 
 @Controller(URL_PATH.postsQuery)
 export class PostController {
     constructor(
-        private postService: PostService,
         private commentService: CommentService,
         private postQueryRepository: PostQueryRepository,
         private commandBus: CommandBus,
