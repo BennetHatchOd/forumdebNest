@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BlogAdminController } from './api/blog.admin.controller';
-import { BlogService } from './application/blog.service';
 import { BlogQueryRepository } from './infrastucture/query/blog.query.repository';
 import { BlogRepository } from './infrastucture/blog.repository';
 import { Post } from './domain/post.entity';
@@ -43,7 +42,6 @@ import { BlogController } from '@modules/blogging.platform/api/blog.controller';
     providers: [
         ...CommandHandlers,
         ReadUserIdGuard,
-        BlogService,
         BlogQueryRepository,
         BlogRepository,
         PostService,

@@ -1,39 +1,25 @@
 import {
-    Body,
     Controller,
-    Delete,
     Get,
-    HttpCode,
-    HttpStatus,
     Param,
-    Post,
-    Put,
     Query, UseGuards,
 } from '@nestjs/common';
-import { BlogService } from '../application/blog.service';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 import { BlogViewDto } from '../dto/view/blog.view.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
-import { BlogInputDto } from '../dto/input/blog.input.dto';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
 import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
-import { PostInputDto } from '../dto/input/post.input.dto';
-import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
-import { PostService } from '../application/post.service';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
-import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 
 
 @Controller(URL_PATH.blogsQuery)
 export class BlogController {
     constructor(
-        private blogService: BlogService,
-        private postService: PostService,
         private blogQueryRepository: BlogQueryRepository,
         private postQueryRepository: PostQueryRepository,
     ) {}

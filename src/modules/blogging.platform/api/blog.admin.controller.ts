@@ -10,7 +10,6 @@ import {
     Put,
     Query, UseGuards,
 } from '@nestjs/common';
-import { BlogService } from '../application/blog.service';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 import { BlogViewDto } from '../dto/view/blog.view.dto';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
@@ -33,13 +32,13 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
 import { CreateBlogCommand } from '@modules/blogging.platform/application/UseCase/create.blog.usecase';
 import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/edit.blog.usecase';
+import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/delete.blog.usecase';
 
 
 @Controller(URL_PATH.blogsAdmin)
 @UseGuards(AuthGuard('basic'))
 export class BlogAdminController {
     constructor(
-        private blogService: BlogService,
         private postService: PostService,
         private commandBus: CommandBus,
         private blogQueryRepository: BlogQueryRepository,
@@ -87,7 +86,7 @@ export class BlogAdminController {
         //
         // Delete blog specified by id
 
-        return await this.blogService.delete(id);
+        return await this.commandBus.execute(new DeleteBlogCommand(id));
     }
 
     @Post(':id/posts')
