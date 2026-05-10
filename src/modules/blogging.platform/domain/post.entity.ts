@@ -2,40 +2,17 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostFieldRestrict } from '../dto/field.restrictions';
+import { PostByBlogInputDto } from '@modules/blogging.platform/dto/input/post.by.blog.input.dto';
 
-@Schema({timestamps: true})
+
 export class Post {
-    @Prop({
-        required: true,
-        maxlength: PostFieldRestrict.titleMax,
-        minlength: PostFieldRestrict.titleMin,
-    })
+    id: number;
     title: string;
-
-    @Prop({
-        required: true,
-        maxlength: PostFieldRestrict.shortDescriptionMax,
-    })
     shortDescription: string;
-
-    @Prop({
-        required: true,
-        maxlength: PostFieldRestrict.contentMax,
-    })
     content: string;
-
-    createdAt: Date;
-
-    @Prop({ required: true,})
-    blogId: string;
-
-    @Prop({ required: true,})
+    blogId: number;
     blogName: string;
-
-    @Prop({
-        type: Date,
-        default: null,
-    })
+    createdAt: Date;
     deletedAt:  Date | null;
 
     delete() {
@@ -45,34 +22,36 @@ export class Post {
         this.deletedAt = new Date();
     }
 
-    async update(change: PostInputDto,
-           blogName: string,) {
+    async update(change: PostByBlogInputDto) {
         this.title = change.title;
         this.shortDescription = change.shortDescription;
         this.content = change.content;
-        this.blogId = change.blogId;
-        this.blogName = blogName;
     }
 
     static createInstance(createDto: PostInputDto,
-                                blogName: string,): PostDocument {
-
+                          blogName: string,): Post {
         const post = new this();
         post.title = createDto.title;
         post.shortDescription = createDto.shortDescription;
         post.content = createDto.content;
-        post.blogId = createDto.blogId;
+        post.blogId = +createDto.blogId;
         post.blogName = blogName;
 
-        return post as PostDocument;
+        return post;
+    }
+
+    static copyInstance(dto: Post): Post {
+        const post = new this();
+
+        post.id = dto.id;
+        post.content = dto.content;
+        post.title = dto.title;
+        post.shortDescription = dto.shortDescription;
+        post.blogId = dto.blogId;
+        post.blogName = dto.blogName;
+        post.createdAt = dto.createdAt;
+        post.deletedAt = dto.deletedAt;
+
+        return post;
     }
 }
-
-export const PostSchema = SchemaFactory.createForClass(Post);
-
-PostSchema.loadClass(Post);
-
-export type PostDocument = HydratedDocument<Post>;
-
-export type PostModelType = Model<PostDocument> & typeof Post;
-

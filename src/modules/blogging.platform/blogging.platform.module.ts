@@ -4,7 +4,7 @@ import { BlogAdminController } from './api/blog.admin.controller';
 import { BlogService } from './application/blog.service';
 import { BlogQueryRepository } from './infrastucture/query/blog.query.repository';
 import { BlogRepository } from './infrastucture/blog.repository';
-import { Post, PostSchema } from './domain/post.entity';
+import { Post } from './domain/post.entity';
 import { PostService } from './application/post.service';
 import { PostRepository } from './infrastucture/post.repository';
 import { PostQueryRepository } from './infrastucture/query/post.query.repository';
@@ -32,7 +32,6 @@ import { BlogController } from '@modules/blogging.platform/api/blog.controller';
         DatabaseModule,
         MongooseModule.forFeature([
             { name: Comment.name, schema: CommentSchema },
-            { name: Post.name, schema: PostSchema },
             { name: Like.name, schema: LikeSchema },
         ]),
     ],
