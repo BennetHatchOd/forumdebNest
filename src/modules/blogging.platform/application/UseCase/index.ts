@@ -7,9 +7,11 @@ import { DeleteBlogHandler } from '@modules/blogging.platform/application/UseCas
 import { CreatePostHandler } from '@modules/blogging.platform/application/UseCase/create.post.usecase';
 import { EditPostHandler } from '@modules/blogging.platform/application/UseCase/edit.post.usecase';
 import { DeletePostHandler } from '@modules/blogging.platform/application/UseCase/delete.post.usecase';
+import { CreateCommentHandler } from '@modules/blogging.platform/application/UseCase/create.comment.usecase';
 
 export const CommandHandlers = [
     MakeLikeHandler,
+    CreateCommentHandler,
     DeleteCommentHandler,
     EditCommentHandler,
     CreateBlogHandler,
