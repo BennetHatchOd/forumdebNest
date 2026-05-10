@@ -77,7 +77,7 @@ export class BlogAdminController {
         //
         // Update existing Blog by id with InputModel
 
-        return await this.blogService.edit(id, blog);
+        return await this.commandBus.execute(new EditBlogCommand(id, blog));
     }
 
     @Delete(':id')
