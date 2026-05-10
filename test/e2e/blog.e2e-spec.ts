@@ -76,7 +76,7 @@ describe('BlogController (e2e)', () => {
                 description: blog.description,
                 websiteUrl: blog.websiteUrl,
                 createdAt: expect.any(String),
-                isMembership: true
+                isMembership: false
             })
             blogId = response.body.id;
         });
@@ -91,7 +91,7 @@ describe('BlogController (e2e)', () => {
                 description: blog.description,
                 websiteUrl: blog.websiteUrl,
                 createdAt: expect.any(String),
-                isMembership: true
+                isMembership: false
             })
         })
 
@@ -116,7 +116,7 @@ describe('BlogController (e2e)', () => {
                 description: blog.description,
                 websiteUrl: blog.websiteUrl,
                 createdAt: expect.any(String),
-                isMembership: true
+                isMembership: false
             })
         })
 
@@ -194,7 +194,7 @@ describe('BlogController (e2e)', () => {
                 description: blogs.at(-1)!.description,
                 websiteUrl: blogs.at(-1)!.websiteUrl,
                 createdAt: expect.any(String),
-                isMembership: true
+                isMembership: false
             })
 
         })
