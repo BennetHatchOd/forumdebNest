@@ -7,7 +7,7 @@ export const URL_PATH = {
     comments: '/comments',
     testing: '/testing/all-data',
     blogsAdmin: '/sa/blogs',
-    postsAdmin: '/sa/posts',
+   // postsAdmin: '/sa/posts',
     usersAdmin: '/sa/users',
 };
 
