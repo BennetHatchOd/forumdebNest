@@ -32,8 +32,9 @@ import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create
 import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
 import { CommandBus } from '@nestjs/cqrs';
+import console from 'node:console';
 
-@Controller(URL_PATH.postsAdmin)
+@Controller(URL_PATH.postsQuery)
 export class PostController {
     constructor(
         private postService: PostService,
@@ -42,55 +43,6 @@ export class PostController {
         private commandBus: CommandBus,
         private commentQueryRepository: CommentQueryRepository,
     ){}
-
-    @Post()
-    @UseGuards(AuthGuard('basic'))
-    @HttpCode(HttpStatus.CREATED)
-    async createPost(
-        @Body() postDto: PostInputDto,
-        @CurrentUserId() user: string,):Promise<PostViewDto> {
-        //
-        // Create new post
-
-        const createdId: string = await this.postService.create(postDto);
-        const postView: PostViewDto = await this.postQueryRepository.findByIdWithCheck(createdId, user);
-        return postView;
-    }
-
-    @Put(':id')
-    @UseGuards(AuthGuard('basic'))
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async correctPost(
-        @Param() {id}: IdInputDto,
-        @Body() post: PostInputDto
-    ): Promise<void>{
-        //
-        // Update existing Post by id with InputModel
-
-        return await this.postService.edit(id, post)
-
-    }
-
-    @Put(':id/like-status')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard('jwt'))
-    async setLikeStatus(
-        @CurrentUserId() user: string,
-        @Param() {id}: IdInputDto,
-        @Body() likeStatus: LikeInputDto,
-    ) {
-
-        const createLike: LikeCreateDto = {
-            targetId: id,
-            ownerId: user,
-            rating: likeStatus.likeStatus,
-            targetType: LikeTarget.Post,
-        };
-
-        await this.commandBus.execute(new MakeLikeCommand(createLike));
-    }
-
-
     @Get()
     @UseGuards(ReadUserIdGuard)
     async getAll(
@@ -112,60 +64,67 @@ export class PostController {
         //
         // Returns post by id
 
+
         const foundPost: PostViewDto = await this.postQueryRepository.findByIdWithCheck(id, user);
         return foundPost;
     }
 
-    @Delete(':id')
-    @UseGuards(AuthGuard('basic'))
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePost(
-        @Param() {id}: IdInputDto,
-        @CurrentUserId() user: string,
-    ): Promise<void>{
-        //
-        // Delete post specified by id
+    // @Put(':id/like-status')
+    // @HttpCode(HttpStatus.NO_CONTENT)
+    // @UseGuards(AuthGuard('jwt'))
+    // async setLikeStatus(
+    //     @CurrentUserId() user: string,
+    //     @Param() {id}: IdInputDto,
+    //     @Body() likeStatus: LikeInputDto,
+    // ) {
+    //
+    //     const createLike: LikeCreateDto = {
+    //         targetId: id,
+    //         ownerId: user,
+    //         rating: likeStatus.likeStatus,
+    //         targetType: LikeTarget.Post,
+    //     };
+    //
+    //     await this.commandBus.execute(new MakeLikeCommand(createLike));
+    // }
+    //
 
-        return await this.postService.delete(id)
+    // @Get(':id/comments')
+    // @UseGuards(ReadUserIdGuard)
+    // async getCommentsByPost(
+    //     @CurrentUserId() user: string,
+    //     @Param() {id}: IdInputDto,
+    //     @Query() query: GetCommentQueryParams
+    //  ): Promise<PaginatedViewDto<CommentViewDto>> {
+    //     // Returns all comments for specified post, if the post isn't found,
+    //     // return "not found"
+    //
+    //     await this.postQueryRepository.findByIdWithCheck(id, user)
+    //     // check the existence of the post and throw the exception "not found"
+    //
+    //     query.setParentPostIdSearchParams(id)
+    //     const commentPaginator: PaginatedViewDto<CommentViewDto>
+    //          = await this.commentQueryRepository.find(query, user);
+    //     return commentPaginator;
+    //
+    // }
 
-    }
-
-    @Get(':id/comments')
-    @UseGuards(ReadUserIdGuard)
-    async getCommentsByPost(
-        @CurrentUserId() user: string,
-        @Param() {id}: IdInputDto,
-        @Query() query: GetCommentQueryParams
-     ): Promise<PaginatedViewDto<CommentViewDto>> {
-        // Returns all comments for specified post, if the post isn't found,
-        // return "not found"
-
-        await this.postQueryRepository.findByIdWithCheck(id, user)
-        // check the existence of the post and throw the exception "not found"
-
-        query.setParentPostIdSearchParams(id)
-        const commentPaginator: PaginatedViewDto<CommentViewDto>
-             = await this.commentQueryRepository.find(query, user);
-        return commentPaginator;
-
-    }
-
-    @Post(':id/comments')
-    @UseGuards(AuthGuard('jwt'))
-    async createCommentByPost(
-        @CurrentUserId() user: string,
-        @Param() {id}: IdInputDto,
-        @Body() comment: CommentInputDto
-    ): Promise<CommentViewDto> {
-        // Create comment for specified post, if the post isn't found,
-        // throw the exception "not found"
-
-        await this.postQueryRepository.findByIdWithCheck(id, user)
-        // check the existence of the post
-
-        const createdComment: string = await this.commentService.create(id, comment, user);
-        return this.commentQueryRepository.findByIdWithCheck(createdComment, user);
-
-    }
+    // @Post(':id/comments')
+    // @UseGuards(AuthGuard('jwt'))
+    // async createCommentByPost(
+    //     @CurrentUserId() user: string,
+    //     @Param() {id}: IdInputDto,
+    //     @Body() comment: CommentInputDto
+    // ): Promise<CommentViewDto> {
+    //     // Create comment for specified post, if the post isn't found,
+    //     // throw the exception "not found"
+    //
+    //     await this.postQueryRepository.findByIdWithCheck(id, user)
+    //     // check the existence of the post
+    //
+    //     const createdComment: string = await this.commentService.create(id, comment, user);
+    //     return this.commentQueryRepository.findByIdWithCheck(createdComment, user);
+    //
+    // }
 
 }

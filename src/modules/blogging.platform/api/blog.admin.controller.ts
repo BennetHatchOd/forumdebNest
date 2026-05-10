@@ -28,6 +28,7 @@ import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
+import console from 'node:console';
 
 
 @Controller(URL_PATH.blogsAdmin)
@@ -90,10 +91,10 @@ export class BlogAdminController {
     async createPostByBlog(
         @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
-        @Body() createPartDto: PostByBlogInputDto,
+        @Body() dto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
         // Create new post for specific blog
-        const createDto: PostInputDto = { ...createPartDto, blogId: id };
+        const createDto: PostInputDto = { ...dto, blogId: id };
         const createId: string = await this.postService.create(createDto);
         const postView: PostViewDto =
             await this.postQueryRepository.findByIdWithCheck(createId, user);
@@ -122,12 +123,13 @@ export class BlogAdminController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async correctPost(
         @Param() dto: PostParamsIdInputDto,
-        @Body() post: PostInputDto
+        @Body() post: PostByBlogInputDto
     ): Promise<void>{
         //
         // Update existing Post by id with InputModel
 
-        return await this.postService.edit(dto.id, post)
+        await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
+        return await this.postService.edit(dto, post);
     }
 
     @Delete(':blogId/posts/:id')
@@ -135,10 +137,9 @@ export class BlogAdminController {
     async deletePost(
         @Param() dto: PostParamsIdInputDto
     ): Promise<void>{
-        //
         // Delete post specified by id
-
-        return await this.postService.delete(dto.id)
+        await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
+        return await this.postService.delete(dto)
 
     }
 
