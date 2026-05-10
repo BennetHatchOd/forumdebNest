@@ -88,12 +88,28 @@ export class PostQueryRepository {
         // AND b."deletedAt" IS NULL
         // LIMIT 1`,
 
+        let orderBy: string;
+        switch (queryReq.sortBy) {
+            case 'title':
+            case 'shortDescription':
+            case 'content':
+                orderBy =
+                    `p."${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
+                break;
+            case 'blogName':
+                orderBy =
+                    `b."name" COLLATE "C" ${queryReq.sortDirection}`
+                break;
+                default:
+                    orderBy =
+                    `p."${queryReq.sortBy}" ${queryReq.sortDirection}`
+        }
 
-        const orderBy =
-            queryReq.sortBy === 'title' || queryReq.sortBy === 'shortDescription'
-            || queryReq.sortBy === 'content' || queryReq.sortBy === 'blogName'
-                ? `"${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
-                : `"${queryReq.sortBy}" ${queryReq.sortDirection}`;
+        // const orderBy =
+        //     queryReq.sortBy === 'title' || queryReq.sortBy === 'shortDescription'
+        //     || queryReq.sortBy === 'content' || queryReq.sortBy === 'blogName'
+        //         ? `p."${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
+        //         : `"${queryReq.sortBy}" ${queryReq.sortDirection}`;
 
         const sqlRequest = `FROM public.posts p 
             JOIN public.blogs b on b.id = p."blogId" 
@@ -104,7 +120,7 @@ export class PostQueryRepository {
         queryReq.calculateSkip(totalCount);
 
         const sqlQuery = ` SELECT p.*, b.name AS "blogName" ${sqlRequest}
-            ORDER BY p.${orderBy} 
+            ORDER BY ${orderBy} 
             LIMIT ${queryReq.pageSize} OFFSET ${queryReq.skip};`;
 
 
