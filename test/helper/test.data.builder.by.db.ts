@@ -42,50 +42,50 @@ export class TestDataBuilderByDb {
                 public numberComments : number = 1,
     ) {}
 
-    // async createManyBlogs() {
-    //     this.isCreate.blog = true;
-    //
-    //     for (let i = 0; i < this.numberBlogs; i++) {
-    //         const blog = {
-    //             name: `Blog_${i}`,
-    //             description: `description for blog ${i}`,
-    //             websiteUrl:	`https://dff${i}.com`
-    //         }
-    //         const result = await this.dataSource.query(`
-    //             INSERT INTO public.blogs(
-    //                 name, description, "websiteUrl")
-    //             VALUES('${blog.name}', '${blog.description}', '${blog.websiteUrl}')
-    //             RETURNING id;`)
-    //
-    //         const blogInstance: Blog = Blog.createInstance(blog);
-    //         blogInstance.id = result[0].id;
-    //         this.blogs.push(blogInstance);
-    //     }
-    // }
-    //
-    // async createManyPosts(){
-    //     // create many posts for blog with id in this.blogIds[0]
-    //     await this.checkBlog();
-    //     this.isCreate.post = true;
-    //
-    //     for(let i = 0; i < this.numberPosts; i++){
-    //         const post ={
-    //             title: `post ${i}`,
-    //             shortDescription: `shortdescription for post ${i}`,
-    //             content: `content for post ${i}`,
-    //             blogId: this.blogs[0].id!.toString(),
-    //         };
-    //         const result = await this.dataSource.query(`
-    //             INSERT INTO public.posts(
-    //                 title, content, "shortDescription", "blogId")
-    //             VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${this.blogs[0].id!}')
-    //             RETURNING id;`);
-    //
-    //         const postInstance: Post = Post.createInstance(post);
-    //         postInstance.id = result[0].id;
-    //         this.posts.push(postInstance);
-    //     }
-    // }
+    async createManyBlogs() {
+        this.isCreate.blog = true;
+
+        for (let i = 0; i < this.numberBlogs; i++) {
+            const blog = {
+                name: `Blog_${i}`,
+                description: `description for blog ${i}`,
+                websiteUrl:	`https://dff${i}.com`
+            }
+            const result:number = await this.dataSource.query(`
+                INSERT INTO public.blogs(
+                    name, description, "websiteUrl")
+                VALUES('${blog.name}', '${blog.description}', '${blog.websiteUrl}')
+                RETURNING id;`)
+
+            const blogInstance: Blog = Blog.createInstance(blog);
+            blogInstance.id = result[0].id;
+            this.blogs.push(blogInstance);
+        }
+    }
+
+    async createManyPosts(){
+        // create many posts for blog with id in this.blogIds[0]
+        this.isCreate.post = true;
+        await this.checkBlog();
+
+        for(let i = 0; i < this.numberPosts; i++){
+            const post ={
+                title: `post ${i}`,
+                shortDescription: `shortdescription for post ${i}`,
+                content: `content for post ${i}`,
+                blogId: this.blogs[0].id!.toString(),
+            };
+            const result = await this.dataSource.query(`
+                INSERT INTO public.posts(
+                    title, content, "shortDescription", "blogId")
+                VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${this.blogs[0].id!}')
+                RETURNING id;`);
+
+            const postInstance: Post = Post.createInstance(post, this.blogs[0].name);
+            postInstance.id = result[0].id;
+            this.posts.push(postInstance);
+        }
+    }
 
     async createManyUsers(){
         this.isCreate.user = true;
@@ -198,12 +198,12 @@ export class TestDataBuilderByDb {
         return value.toString();
     }
 
-    // private async checkBlog(){
-    //     if (!this.isCreate.blog) {
-    //         await this.createManyBlogs();
-    //         this.isCreate.blog = true;
-    //     }
-    // }
+    private async checkBlog(){
+        if (!this.isCreate.blog) {
+            await this.createManyBlogs();
+            this.isCreate.blog = true;
+        }
+    }
     // private async checkPost(){
     //     if(!this.isCreate.post){
     //         await this.createManyPosts();
