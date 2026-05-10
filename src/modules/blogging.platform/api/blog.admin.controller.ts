@@ -29,6 +29,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
 import console from 'node:console';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { CreateBlogCommand } from '@modules/blogging.platform/application/UseCase/create.blog.usecase';
+import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/edit.blog.usecase';
 
 
 @Controller(URL_PATH.blogsAdmin)
@@ -37,6 +41,7 @@ export class BlogAdminController {
     constructor(
         private blogService: BlogService,
         private postService: PostService,
+        private commandBus: CommandBus,
         private blogQueryRepository: BlogQueryRepository,
         private postQueryRepository: PostQueryRepository,
     ) {}
@@ -57,8 +62,7 @@ export class BlogAdminController {
         @Body() blog: BlogInputDto): Promise<BlogViewDto> {
         //
         // Create new blog
-
-        const createId: string = await this.blogService.create(blog);
+        const createId: string = await this.commandBus.execute(new CreateBlogCommand(blog));
         const blogView: BlogViewDto =
             await this.blogQueryRepository.findByIdWithCheck(createId);
         return blogView;

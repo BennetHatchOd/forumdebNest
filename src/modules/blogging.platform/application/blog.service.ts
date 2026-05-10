@@ -11,12 +11,6 @@ export class BlogService {
         private blogRepository: BlogRepository,
     ) {}
 
-    async create(inputItem: BlogInputDto): Promise<string> {
-        const blog: Blog = Blog.createInstance(inputItem);
-        await this.blogRepository.saveBlog(blog);
-        return blog.id.toString();
-    }
-
     async edit(id: string, editData: BlogInputDto): Promise<void> {
 
         const blog: Blog | null = await this.blogRepository.findById(id);
