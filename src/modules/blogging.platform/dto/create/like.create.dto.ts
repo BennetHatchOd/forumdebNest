@@ -9,7 +9,7 @@ export class LikeCreateDto {
 
     @IsNotEmpty()
     @IsMongoId()
-    ownerId: string;
+    userId: string;
 
     @IsNotEmpty()
     @IsEnum(Rating)
