@@ -1,6 +1,5 @@
-import { CommentDocument } from '../../domain/comment.entity';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
-import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
+import { CommentRowViewDto } from '@modules/blogging.platform/dto/view/row/comment.row.view.dto';
 
 export class CommentViewDto {
         public id: string;
@@ -16,23 +15,23 @@ export class CommentViewDto {
             myStatus: Rating,
         };
 
-    constructor(item: CommentDocument, likeInfo: LikesInfoViewDto) {
-        this.id = item._id.toString();
-        this.content = item.content;
-        this.createdAt = item.createdAt.toISOString();
-        this.commentatorInfo = {
-            userId: item.commentatorInfo.userId,
-            userLogin: item.commentatorInfo.userLogin,
-        };
-        this.likesInfo =  {
-            likesCount: likeInfo.likesCount,
-            dislikesCount: likeInfo.dislikesCount,
-            myStatus: likeInfo.myStatus,
-        }
-    }
 
-     public static mapToView(item: CommentDocument, likeInfo: LikesInfoViewDto): CommentViewDto {
-        return new CommentViewDto(item, likeInfo)
-    }
+        public static mapToView(item: CommentRowViewDto): CommentViewDto {
+            const view = new CommentViewDto();
+            view.id = item.id.toString();
+            view.content = item.content;
+            view.createdAt = item.createdAt.toISOString();
+            view.commentatorInfo = {
+                 userId: item.userId.toString(),
+                 userLogin: item.userLogin,
+            };
+            view.likesInfo =  {
+                 likesCount: item.likesCount,
+                 dislikesCount: item.dislikesCount,
+                 myStatus: item.myStatus,
+            }
+            return view;
+
+        }
 }
 
