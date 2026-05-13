@@ -17,7 +17,7 @@ import { UserQueryExternalRepository } from './infrastucture/query/user.query.ex
 import { ConfigService } from '@nestjs/config';
 import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CommandHandlers } from '@modules/users-system/application/UseCase';
+import { CommandHandlers } from 'src/modules/users-system/application/commands';
 import { AuthModule } from '@core/auth.module';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
 import { Session, SessionSchema } from '@modules/users-system/domain/session.entity';

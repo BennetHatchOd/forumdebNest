@@ -12,7 +12,7 @@ import { CommentQueryRepository } from './infrastucture/query/comment.query.repo
 import { CommentRepository } from './infrastucture/comment.repository';
 import { PostController } from './api/post.controler';
 import { UserQueryExternalRepository } from '../users-system/infrastucture/query/user.query.external.repository';
-import { CommandHandlers } from '@modules/blogging.platform/application/UseCase';
+import { CommandHandlers } from 'src/modules/blogging.platform/application/commands';
 import { CqrsModule } from '@nestjs/cqrs';
 import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.repository';
 import { Like, LikeSchema } from '@modules/blogging.platform/domain/like.entity';

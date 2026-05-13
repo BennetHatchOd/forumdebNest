@@ -20,8 +20,8 @@ import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { ApiBasicAuth } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { SkipThrottle } from '@nestjs/throttler';
-import { DeleteUserCommand } from '@modules/users-system/application/UseCase/delete.user.usecase';
-import { CreateUserCommand } from '@modules/users-system/application/UseCase/create.user.usecase';
+import { DeleteUserCommand } from '@modules/users-system/application/commands/delete.user.usecase';
+import { CreateUserCommand } from '@modules/users-system/application/commands/create.user.usecase';
 
 @SkipThrottle()
 @UseGuards(AuthGuard('basic'))

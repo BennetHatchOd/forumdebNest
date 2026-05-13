@@ -8,7 +8,7 @@ import { UserRepository } from '@modules/users-system/infrastucture/user.reposit
 import { User } from '@modules/users-system/domain/user.entity';
 import {
     CreateCodeConfirmationEmailCommand
-} from '@modules/users-system/application/UseCase/create.code.confirmation.email.usecase';
+} from '@modules/users-system/application/commands/create.code.confirmation.email.usecase';
 
 export class CreateUserCommand extends Command<string> {
     constructor(

@@ -27,12 +27,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateBlogCommand } from '@modules/blogging.platform/application/UseCase/create.blog.usecase';
-import { EditBlogCommand } from '@modules/blogging.platform/application/UseCase/edit.blog.usecase';
-import { DeleteBlogCommand } from '@modules/blogging.platform/application/UseCase/delete.blog.usecase';
-import { CreatePostCommand } from '@modules/blogging.platform/application/UseCase/create.post.usecase';
-import { EditPostCommand } from '@modules/blogging.platform/application/UseCase/edit.post.usecase';
-import { DeletePostCommand } from '@modules/blogging.platform/application/UseCase/delete.post.usecase';
+import { CreateBlogCommand } from '@modules/blogging.platform/application/commands/create.blog.usecase';
+import { EditBlogCommand } from '@modules/blogging.platform/application/commands/edit.blog.usecase';
+import { DeleteBlogCommand } from '@modules/blogging.platform/application/commands/delete.blog.usecase';
+import { CreatePostCommand } from '@modules/blogging.platform/application/commands/create.post.usecase';
+import { EditPostCommand } from '@modules/blogging.platform/application/commands/edit.post.usecase';
+import { DeletePostCommand } from '@modules/blogging.platform/application/commands/delete.post.usecase';
+import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
 
 @Controller(URL_PATH.blogsAdmin)
