@@ -6,6 +6,8 @@ import { PostByBlogInputDto } from '@modules/blogging.platform/dto/input/post.by
 import { Post } from '@modules/blogging.platform/domain/post.entity';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
+import { BlogQueryRepository } from '@modules/blogging.platform/infrastucture/query/blog.query.repository';
+import { BlogRepository } from '@modules/blogging.platform/infrastucture/blog.repository';
 
 export class EditPostCommand extends Command<void> {
     constructor(
@@ -23,11 +25,11 @@ export class EditPostHandler implements ICommandHandler<EditPostCommand, void> {
 
     async execute({inputDto, editData}: EditPostCommand):Promise<void> {
 
-        const post: Post | null = await this.postRepository.findByIdWithoutBlog(inputDto.id);
+        const post: Post | null = await this.postRepository.findByIdBlogId(inputDto);
 
-        if(!post || post.blogId !== +inputDto.blogId)
+        if(!post)
             throw new DomainException({
-                message: 'post with ${id}  not found',
+                message: 'post with ${inputDto.id} by blog with ${inputDto.blogId} not found',
                 code: DomainExceptionCode.NotFound});
 
         post.update(editData);

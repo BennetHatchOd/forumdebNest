@@ -21,9 +21,8 @@ export class CreatePostHandler implements ICommandHandler<CreatePostCommand, str
 
     async execute({inputDto}: CreatePostCommand):Promise<string> {
 
-        const blogName
-            = (await this.blogQueryRepository.findByIdWithCheck(inputDto.blogId)).name
-        const newPost: Post = Post.createInstance(inputDto, blogName);
+        await this.blogQueryRepository.findByIdWithCheck(inputDto.blogId);
+        const newPost: Post = Post.createInstance(inputDto);
         await this.postRepository.savePost(newPost);
         return newPost.id.toString();
     }
