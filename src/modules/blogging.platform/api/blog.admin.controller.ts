@@ -12,11 +12,10 @@ import {
 } from '@nestjs/common';
 import { BlogQueryRepository } from '../infrastucture/query/blog.query.repository';
 import { BlogViewDto } from '../dto/view/blog.view.dto';
-import { PaginatedViewDto } from '../../../core/dto/base.paginated.view.dto';
+import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
 import { BlogInputDto } from '../dto/input/blog.input.dto';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
-import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
@@ -114,8 +113,6 @@ export class BlogAdminController {
         //
         // Returns all posts for specified blog
         query.setBlogIdSearchParams(id);
-        await this.blogQueryRepository.findByIdWithCheck(id);
-        // проверка существования блога
 
         const postPaginator: PaginatedViewDto<PostViewDto> =
             await this.postQueryRepository.find(query, user);
@@ -131,7 +128,6 @@ export class BlogAdminController {
         //
         // Update existing Post by id with InputModel
 
-        await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
         return await this.commandBus.execute(new EditPostCommand(dto, post));
     }
 
@@ -141,7 +137,6 @@ export class BlogAdminController {
         @Param() dto: PostParamsIdInputDto
     ): Promise<void>{
         // Delete post specified by id
-        await this.blogQueryRepository.findByIdWithCheck(dto.blogId);
         return await this.commandBus.execute(new DeletePostCommand(dto));
     }
 

@@ -17,6 +17,11 @@ export class CommentViewDto {
 
 
         public static mapToView(item: CommentRowViewDto): CommentViewDto {
+            let  myStatus = Rating.None;
+            if(item.myStatus == "Like")
+                myStatus = Rating.Like;
+            if(item.myStatus == "Dislike")
+                myStatus = Rating.Dislike;
             const view = new CommentViewDto();
             view.id = item.id.toString();
             view.content = item.content;
@@ -28,7 +33,7 @@ export class CommentViewDto {
             view.likesInfo =  {
                  likesCount: item.likesCount,
                  dislikesCount: item.dislikesCount,
-                 myStatus: item.myStatus,
+                 myStatus: myStatus,
             }
             return view;
 

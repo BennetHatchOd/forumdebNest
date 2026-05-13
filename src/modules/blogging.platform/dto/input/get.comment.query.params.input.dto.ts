@@ -4,6 +4,7 @@ import { IsEnum, IsOptional, IsString } from 'class-validator';
 export enum CommentSortBy {
     CreatedAt = 'createdAt',
     content = 'content',
+    login = 'userLogin',
 }
 
 export class GetCommentQueryParams extends BaseSortablePaginationParams<CommentSortBy> {

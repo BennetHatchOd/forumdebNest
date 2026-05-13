@@ -9,7 +9,6 @@ import { BlogViewDto } from '../dto/view/blog.view.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
 import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
-import { GetPostQueryParams } from '../dto/input/get.post.query.params.input.dto';
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
@@ -38,16 +37,6 @@ export class BlogController {
         return blogPaginator;
     }
 
-    @Get(':id')
-    async getById(@Param() {id}: IdInputDto): Promise<BlogViewDto> {
-        //
-        // Returns blog by id
-
-        const foundBlog: BlogViewDto =
-            await this.blogQueryRepository.findByIdWithCheck(id);
-        return foundBlog;
-    }
-
     @Get(':id/posts')
     @UseGuards(ReadUserIdGuard)
     async getPostByBlog(
@@ -68,5 +57,6 @@ export class BlogController {
             await this.blogQueryRepository.findByIdWithCheck(id);
         return foundBlog;
     }
+
 }
 

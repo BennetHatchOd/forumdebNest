@@ -26,6 +26,7 @@ export class PostQueryRepository {
         id: string,
         userId: string|null = null): Promise<PostViewDto> {
         // returns a post by id, if post isn't found throws an exception
+
         const numericId = Number(id);
         if (!Number.isInteger(numericId) || numericId < 1)
             throw new DomainException({
@@ -79,14 +80,6 @@ export class PostQueryRepository {
             whereSql += ` AND b.id = $1`;
             queryParams.push(`${queryReq.searchBlogId}`);
         }
-
-        //
-        // SELECT p.*, b.name AS "blogId"
-        // FROM public.posts p
-        // JOIN public.blogs b on b.id = p."blogId"
-        // WHERE p.id = $1 AND p."deletedAt" IS NULL
-        // AND b."deletedAt" IS NULL
-        // LIMIT 1`,
 
         let orderBy: string;
         switch (queryReq.sortBy) {

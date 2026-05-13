@@ -1,23 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { FilterQuery, Types } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { Comment, CommentDocument, CommentModelType } from '../../domain/comment.entity';
+import { Inject, Injectable } from '@nestjs/common';
 import { CommentViewDto } from '../../dto/view/comment.view.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
-import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
-import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture/query/likes.query.repositories';
 import { GetCommentQueryParams } from '@modules/blogging.platform/dto/input/get.comment.query.params.input.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
-import { LikesDescriptionManyDto } from '@modules/blogging.platform/dto/likes.description.many.dto';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
+import { DATA_SOURCE } from '@core/constans/data.source';
+import { DataSource } from 'typeorm';
+import { CommentRowViewDto } from '@modules/blogging.platform/dto/view/row/comment.row.view.dto';
 
 @Injectable()
 export class CommentQueryRepository {
     constructor(
-        @InjectModel(Comment.name) private CommentModel: CommentModelType,
-        private likesQueryRepository: LikesQueryRepositories,
+        @Inject(DATA_SOURCE) private dataSource: DataSource,
     ) {}
 
     async findByIdWithCheck(
@@ -26,30 +21,47 @@ export class CommentQueryRepository {
     ): Promise<CommentViewDto> {
         // returns a comment by id, if comment isn't found throws an exception
 
-        if (!Types.ObjectId.isValid(id))
+        const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1)
             throw new DomainException({
                 message: 'comment not found',
                 code: DomainExceptionCode.NotFound,
             });
 
-        const searchItem: CommentDocument | null =
-            await this.CommentModel.findOne({
-                _id: new Types.ObjectId(id),
-                deletedAt: null,
-            });
-        if (!searchItem)
+        const search: CommentRowViewDto[] = await this.dataSource.query(`
+                    SELECT
+                        c.*,
+                        u.login AS "userLogin",
+                        counts.likes_count AS "likesCount",
+                        counts.dislikes_count AS "dislikesCount",
+                        me.my_status AS "myStatus"
+                    FROM public.comments c
+                    JOIN public."Users" u ON c."userId" = u.id
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                        FROM public.like_comment l
+                        WHERE l."targetId" = c.id
+                        ) counts ON true
+                    LEFT JOIN LATERAL (
+                        SELECT l2.status AS my_status
+                        FROM public.like_comment l2
+                        WHERE l2."targetId" = c.id
+                          AND l2."userId" = $2
+                        LIMIT 1
+                        ) me ON true
+                    WHERE c.id = $1
+                      AND c."deletedAt" IS NULL;`,
+            [numericId, userId]
+        );
+        if (search.length == 0)
             throw new DomainException({
                 message: 'comment not found',
                 code: DomainExceptionCode.NotFound,
             });
 
-        const likesInfo: LikesInfoViewDto
-            = await this.likesQueryRepository.findOneLikeInfo({
-                targetId: id,
-                ownerId: userId,
-                targetType: LikeTarget.Comment})
-
-        return CommentViewDto.mapToView(searchItem, likesInfo);
+        return CommentViewDto.mapToView(search[0]);
     }
 
     async find(
@@ -59,44 +71,79 @@ export class CommentQueryRepository {
         // получаем список всех комментариев, принадлежащих посту, Id которого
         // приходит в query запросе и находится в queryReq.searchParentPostId
 
-        const parentPostIdSearch = queryReq.searchParentPostId
-            ? { parentPostId: { $regex: queryReq.searchParentPostId, $options: 'i' } }
-            : {};
-        const queryFilter: FilterQuery<Comment> = {
-            ...parentPostIdSearch,
-            deletedAt: null,
-        };
-        const totalCount: number =
-            await this.CommentModel.countDocuments(queryFilter);
+        let whereSql: string = `c."deletedAt" IS NULL AND c."postId" = $1`;
+        const queryParams: any[] = [];
+        const countParams: any[] = [];
+        queryParams.push(`${queryReq.searchParentPostId}`);
+        queryParams.push(userId);
+        countParams.push(`${queryReq.searchParentPostId}`);
 
+
+        let orderBy: string;
+        switch (queryReq.sortBy) {
+            case 'content':
+                orderBy =
+                    `c."${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
+                break;
+            case 'userLogin':
+                orderBy =
+                    `u."login" COLLATE "C" ${queryReq.sortDirection}`
+                break;
+            default:
+                orderBy =
+                    `c."${queryReq.sortBy}" ${queryReq.sortDirection}`
+        }
+
+        const sqlCount = `
+            SELECT COUNT(*) AS count 
+            FROM public.comments c 
+            WHERE ${whereSql};`;
+
+        const totalCount: number = +(await this.dataSource.query(sqlCount, countParams))[0].count;
         if(totalCount === 0)
             return new EmptyPaginator<CommentViewDto>();
 
-        const comments: CommentDocument[] = await this.CommentModel.find(
-            queryFilter,)
-            .limit(queryReq.pageSize)
-            .skip((queryReq.pageNumber - 1) * queryReq.pageSize)
-            .sort({ [queryReq.sortBy]: queryReq.sortDirection });
+        queryReq.calculateSkip(totalCount);
 
-        const targetIds = comments.map((comment: CommentDocument) => comment._id.toString());
-        const likesDescription: LikesDescriptionManyDto ={
-            targetIds: targetIds,
-            ownerId: userId,
-            targetType: LikeTarget.Comment,
-        }
-        const likes: LikesInfoViewDto[] = await this.likesQueryRepository.findManyLikesInfo(likesDescription);
+        const comments: CommentRowViewDto[] = await this.dataSource.query(`
+                    SELECT
+                        c.*,
+                        u.login AS "userLogin",
+                        counts.likes_count AS "likesCount",
+                        counts.dislikes_count AS "dislikesCount",
+                        me.my_status AS "myStatus"
+                    FROM public.comments c
+                    JOIN public."Users" u ON c."userId" = u.id
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                        FROM public.like_comment l
+                        WHERE l."targetId" = c.id
+                        ) counts ON true
+                    LEFT JOIN LATERAL (
+                        SELECT l2.status AS my_status
+                        FROM public.like_comment l2
+                        WHERE l2."targetId" = c.id
+                          AND l2."userId" = $2
+                        LIMIT 1
+                        ) me ON true
+                    WHERE ${whereSql}
+                    ORDER BY ${orderBy}
+                    LIMIT ${queryReq.pageSize} OFFSET ${queryReq.skip};`,
+            queryParams);
 
         return PaginatedViewDto.mapToView({
-            items: this.mapCommentsView(comments, likes),
+            items: this.mapCommentsView(comments),
             page: queryReq.pageNumber,
             size: queryReq.pageSize,
             totalCount: totalCount,
         });
     }
 
-    private mapCommentsView(comments:CommentDocument[], likeInfo: LikesInfoViewDto[]){
-        const commentView: CommentViewDto[] = comments.map((value, ind) =>
-            (CommentViewDto.mapToView(value,likeInfo[ind])))
+    private mapCommentsView(comments:CommentRowViewDto[]){
+        const commentView: CommentViewDto[] = comments.map((value) =>
+            (CommentViewDto.mapToView(value)))
 
         return commentView;
     }

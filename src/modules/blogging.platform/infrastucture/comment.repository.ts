@@ -1,54 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Comment, CommentDocument, CommentModelType } from '../domain/comment.entity';
+import { Comment } from '../domain/comment.entity';
 import { Types } from 'mongoose';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { PostDocument } from '@modules/blogging.platform/domain/post.entity';
+import { Post } from '@modules/blogging.platform/domain/post.entity';
+import { DATA_SOURCE } from '@core/constans/data.source';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class CommentRepository {
 
-    constructor(@InjectModel(Comment.name) private CommentModel: CommentModelType) {}
+    constructor(
+        @Inject(DATA_SOURCE) private dataSource: DataSource,
+    ) {}
     
 
-    async getCommentById(commentId: string): Promise<CommentDocument> {
-        if (!Types.ObjectId.isValid(commentId))
-            throw new DomainException({
-                message: "Comment not found",
-                code: DomainExceptionCode.NotFound,
-            });
+    async getCommentById(id: string): Promise<Comment | null> {
+        // We're looking for a clean comment,
+        // working with one Comment table in the database.
 
-        const searchItem: CommentDocument | null = await this.CommentModel.findOne({
-                                                                            _id: new Types.ObjectId(commentId),
-                                                                            deleteAt: null
-                                                                        });
-        if(!searchItem)
-            throw new DomainException({
-                message: "Comment not found",
-                code: DomainExceptionCode.NotFound,
-            });
+        const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1) return null;
 
-        return searchItem
+        const searchItem: Comment[] = await this.dataSource.query(`
+                    SELECT *
+                    FROM public.comments
+                    WHERE id = $1 AND "deletedAt" IS NULL 
+                    LIMIT 1`,
+            [numericId]
+        );
+        if (searchItem.length == 0)
+            return null;
+
+        return Comment.copyInstance(searchItem[0]);
     }
 
-    async isExist(id: string): Promise<boolean> {
-        if (!Types.ObjectId.isValid(id))
-            return false;
+    async saveComment(saved: Comment): Promise<void> {
 
-        const searchItem: PostDocument | null = await this.CommentModel.findOne({
-                _id: new Types.ObjectId(id),
-                deleteAt: null},
-            {
-                projection:{ _id: 1}
-            });
-        if (!searchItem)
-            return false;
+        if(!saved.id){
+            const result = await this.dataSource.query(`
+                INSERT INTO public.comments(
+                    content, "postId", "userId", "deletedAt")
+                VALUES($1, $2, $3, $4)
+                RETURNING id, "createdAt";`,
+                [   saved.content,
+                    saved.postId,
+                    saved.userId,
+                    saved.deletedAt,
+                ]);
+            saved.id = result[0].id;
+            saved.createdAt = result[0].createdAt;
+            return;
+        }
 
-        return true;
-    }
-
-    async save(changedItem: CommentDocument): Promise<void> {
-        await changedItem.save();
+        await this.dataSource.query(`UPDATE public.comments
+        SET
+            content = $1,
+            "deletedAt" = $2
+        WHERE id = $5;`,
+            [   saved.content,
+                saved.deletedAt,
+            ]);
+        return;
     }
 }

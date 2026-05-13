@@ -16,15 +16,15 @@ import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { LikeCreateDto } from '@modules/blogging.platform/dto/create/like.create.dto';
 import { CommandBus } from '@nestjs/cqrs';
-import { MakeLikeCommand } from '@modules/blogging.platform/application/UseCase/make.like.usecase';
+import { MakeLikeCommand } from '@modules/blogging.platform/application/commands/make.like.usecase';
 import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum';
 import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
-import { DeleteCommentCommand } from '@modules/blogging.platform/application/UseCase/delete.comment.usecase';
+import { DeleteCommentCommand } from '@modules/blogging.platform/application/commands/delete.comment.usecase';
 import { DeleteEntityDto } from '@modules/blogging.platform/dto/delete.entity.dto';
 import { CommentInputDto } from '@modules/blogging.platform/dto/input/comment.input.dto';
 import { EditCommentDto } from '@modules/blogging.platform/dto/edit.comment.dto';
-import { EditCommentCommand } from '@modules/blogging.platform/application/UseCase/edit.comment.usecase';
+import { EditCommentCommand } from '@modules/blogging.platform/application/commands/edit.comment.usecase';
 
 @Controller(URL_PATH.comments)
 export class CommentController {
@@ -32,20 +32,6 @@ export class CommentController {
         private commandBus: CommandBus,
         private commentQueryRepository: CommentQueryRepository,
     ) {}
-
-    @Get(':id')
-    @UseGuards(ReadUserIdGuard)
-    async getById(
-        @CurrentUserId() user: string,
-        @Param() { id }: IdInputDto,
-    ): Promise<CommentViewDto> {
-        //
-        // Returns comment by id
-
-        const foundComment: CommentViewDto =
-            await this.commentQueryRepository.findByIdWithCheck(id, user);
-        return foundComment;
-    }
 
     @Put(':id/like-status')
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -57,7 +43,7 @@ export class CommentController {
     ) {
         const createLike: LikeCreateDto = {
             targetId: id,
-            ownerId: user,
+            userId: user,
             rating: likeStatus.likeStatus,
             targetType: LikeTarget.Comment,
         };
@@ -95,5 +81,19 @@ export class CommentController {
         };
         await this.commandBus.execute(new DeleteCommentCommand(deleteDto));
         return ;
+    }
+
+    @Get(':id')
+    @UseGuards(ReadUserIdGuard)
+    async getById(
+        @CurrentUserId() user: string,
+        @Param() { id }: IdInputDto,
+    ): Promise<CommentViewDto> {
+        //
+        // Returns comment by id
+
+        const foundComment: CommentViewDto =
+            await this.commentQueryRepository.findByIdWithCheck(id, user);
+        return foundComment;
     }
 }

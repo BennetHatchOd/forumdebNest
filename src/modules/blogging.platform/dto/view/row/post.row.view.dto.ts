@@ -5,7 +5,8 @@ export class PostRowDto {
     title: string;
     shortDescription: string;
     content: string;
-    createdAt: string;
+    createdAt: Date;
+    deletedAt: Date;
     blogId: number;
     blogName: string;
     likesCount: number

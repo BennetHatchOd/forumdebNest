@@ -1,5 +1,4 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Like, LikeDocument, LikeModelType } from '@modules/blogging.platform/domain/like.entity';
 import { LikesDescriptionDto } from '@modules/blogging.platform/dto/likes.description.dto';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';

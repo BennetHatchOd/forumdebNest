@@ -1,7 +1,5 @@
 import { Rating } from '../enum/rating.enum';
-import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
-import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
-import { Post } from '@modules/blogging.platform/domain/post.entity';
+import { PostRowDto } from '@modules/blogging.platform/dto/view/row/post.row.view.dto';
 
 export class PostViewDto {
     id: string;
@@ -22,30 +20,24 @@ export class PostViewDto {
         }[];
     }
 
-    constructor(post: Post,
-                likeInfo: LikesInfoViewDto,
-                newestLikes: NewestLikesDto
-    ) {
-        this.id = post.id.toString();
-        this.title = post.title;
-        this.shortDescription = post.shortDescription;
-        this.createdAt = post.createdAt.toISOString();
-        this.content = post.content;
-        this.blogId = post.blogId.toString();
-        this.blogName = post.blogName;
-        this.extendedLikesInfo = {
-            likesCount: likeInfo.likesCount,
-            dislikesCount: likeInfo.dislikesCount,
-            myStatus: likeInfo.myStatus,
-            newestLikes: newestLikes.newestLikes
-        }
-    }
+     public static mapToView(post: PostRowDto): PostViewDto {
+        const view = new PostViewDto();
 
-    public static mapToView(post: Post,
-                       likeInfo: LikesInfoViewDto,
-                       newestLikes: NewestLikesDto
-    ):PostViewDto {
-        return  new PostViewDto(post, likeInfo, newestLikes);
+        view.id = post.id.toString();
+        view.title = post.title;
+        view.shortDescription = post.shortDescription;
+        view.createdAt = post.createdAt.toISOString();
+        view.content = post.content;
+        view.blogId = post.blogId.toString();
+        view.blogName = post.blogName;
+        view.extendedLikesInfo = {
+            likesCount: post.likesCount,
+            dislikesCount: post.dislikesCount,
+            myStatus: post.myStatus,
+            newestLikes: post.newestLikes
+        }
+
+        return  view;
     }
 }
 

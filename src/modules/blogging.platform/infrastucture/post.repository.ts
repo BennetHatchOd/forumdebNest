@@ -2,13 +2,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Post } from '../domain/post.entity';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
+import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
 
 @Injectable()
 export class PostRepository {
 
-    constructor(@Inject(DATA_SOURCE) private dataSource: DataSource) {}
+    constructor(
+        @Inject(DATA_SOURCE) private dataSource: DataSource
+    ) {}
     
-    async findByIdWithoutBlog(id: string): Promise<Post | null> {
+    async findById(id: string): Promise<Post | null> {
         const numericId = Number(id);
         if (!Number.isInteger(numericId) || numericId < 1) return null;
 
@@ -25,6 +28,43 @@ export class PostRepository {
         const post: Post = Post.copyInstance(searchItem[0]);
 
         return post;
+    }
+
+    async findByIdBlogId(id: PostParamsIdInputDto ): Promise<Post | null> {
+        const numericId = Number(id.id);
+        if (!Number.isInteger(numericId) || numericId < 1) return null;
+
+        const numericBlogId = Number(id.blogId);
+        if (!Number.isInteger(numericId) || numericId < 1) return null;
+
+        const searchItem: Post[] = await this.dataSource.query(`
+                    SELECT *
+                    FROM public.posts
+                    WHERE id = $1 AND "blogId" = $2 AND "deletedAt" IS NULL 
+                    LIMIT 1`,
+            [numericId, numericBlogId]
+        );
+        if (searchItem.length == 0)
+            return null;
+
+        const post: Post = Post.copyInstance(searchItem[0]);
+
+        return post;
+    }
+
+    async existsById(id: string): Promise<boolean> {
+        const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1)
+            return false;
+        const result = await this.dataSource.query(
+            `SELECT EXISTS(
+                SELECT 1 
+                FROM public.posts 
+                WHERE id = $1 AND "deletedAt" IS NULL)`,
+            [id],
+        );
+
+        return result[0].exists;
     }
 
     async savePost(savedItem: Post): Promise<void> {

@@ -11,7 +11,6 @@ export class Post {
     shortDescription: string;
     content: string;
     blogId: number;
-    blogName: string;
     createdAt: Date;
     deletedAt:  Date | null;
 
@@ -28,14 +27,12 @@ export class Post {
         this.content = change.content;
     }
 
-    static createInstance(createDto: PostInputDto,
-                          blogName: string,): Post {
+    static createInstance(createDto: PostInputDto): Post {
         const post = new this();
         post.title = createDto.title;
         post.shortDescription = createDto.shortDescription;
         post.content = createDto.content;
         post.blogId = +createDto.blogId;
-        post.blogName = blogName;
 
         return post;
     }
@@ -48,7 +45,6 @@ export class Post {
         post.title = dto.title;
         post.shortDescription = dto.shortDescription;
         post.blogId = dto.blogId;
-        post.blogName = dto.blogName;
         post.createdAt = dto.createdAt;
         post.deletedAt = dto.deletedAt;
 

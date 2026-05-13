@@ -4,10 +4,11 @@ export class CommentRowViewDto {
         public id: number;
         public content: string;
         public createdAt: Date;
+        public deleteAt: Date;
         userId: number;
         userLogin: string;
         likesCount: number;
         dislikesCount: number;
-        myStatus: Rating
+        myStatus: string | null
 }
 
