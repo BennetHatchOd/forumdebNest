@@ -3,15 +3,15 @@ import { PostViewDto } from '@modules/blogging.platform/dto/view/post.view.dto';
 import { BlogRepository } from '@modules/blogging.platform/infrastucture/blog.repository';
 import { PostQueryRepository } from '@modules/blogging.platform/infrastucture/query/post.query.repository';
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { GetCommentQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
+import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
 export class GetPostsByBlogQuery extends Query<PaginatedViewDto<PostViewDto>> {
     constructor(
         public readonly user: string,
         public readonly blogId: string,
-        public readonly query: GetCommentQueryParams,
+        public readonly query: GetPostQueryParams,
         ) {
         super();
     }
