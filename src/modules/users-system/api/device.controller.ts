@@ -7,8 +7,8 @@ import { SessionViewDto } from '@modules/users-system/dto/view/session.view.dto'
 import { TokenPayloadDto } from '@modules/users-system/dto/token.payload.dto';
 import { SessionQueryRepository } from '@modules/users-system/infrastucture/query/session.query.repository';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
-import { DeleteOthersSessionCommand } from '@modules/users-system/application/UseCase/delete.others.sessions.usecase';
-import { DeleteOneSessionCommand } from '@modules/users-system/application/UseCase/delete.one.session.usecase';
+import { DeleteOthersSessionCommand } from '@modules/users-system/application/commands/delete.others.sessions.usecase';
+import { DeleteOneSessionCommand } from '@modules/users-system/application/commands/delete.one.session.usecase';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { SkipThrottle } from '@nestjs/throttler';
 

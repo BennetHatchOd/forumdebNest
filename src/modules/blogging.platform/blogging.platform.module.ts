@@ -21,6 +21,7 @@ import { AuthModule } from '@core/auth.module';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { DatabaseModule } from '@core/database.module';
 import { BlogController } from '@modules/blogging.platform/api/blog.controller';
+import { QueryHandlers } from '@modules/blogging.platform/application/queries';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { BlogController } from '@modules/blogging.platform/api/blog.controller';
         CommentController],
     providers: [
         ...CommandHandlers,
+        ...QueryHandlers,
         ReadUserIdGuard,
         BlogQueryRepository,
         BlogRepository,

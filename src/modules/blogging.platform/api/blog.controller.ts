@@ -15,6 +15,9 @@ import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
 import { CurrentUserId } from '@core/decorators/current.user';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetPostsByBlogQuery } from '@modules/blogging.platform/application/queries/get.posts.by.blog';
+import { GetCommentQueryParams } from '@modules/blogging.platform/dto/input/get.comment.query.params.input.dto';
 
 
 @Controller(URL_PATH.blogsQuery)
@@ -22,6 +25,7 @@ export class BlogController {
     constructor(
         private blogQueryRepository: BlogQueryRepository,
         private postQueryRepository: PostQueryRepository,
+        private queryBus: QueryBus,
     ) {}
 
     @Get()
@@ -49,17 +53,20 @@ export class BlogController {
     async getPostByBlog(
         @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
-        @Query() query: GetPostQueryParams,
+        @Query() query: GetCommentQueryParams,
     ): Promise<PaginatedViewDto<PostViewDto>> {
-        //
-        // Returns all posts for specified blog
-        query.setBlogIdSearchParams(id);
-        await this.blogQueryRepository.findByIdWithCheck(id);
-        // проверка существования блога
 
-        const postPaginator: PaginatedViewDto<PostViewDto> =
-            await this.postQueryRepository.find(query, user);
-        return postPaginator;
+        return await this.queryBus.execute(new GetPostsByBlogQuery(user, id, query));
+    }
+
+    @Get(':id')
+    async getById(@Param() {id}: IdInputDto): Promise<BlogViewDto> {
+        //
+        // Returns blog by id
+
+        const foundBlog: BlogViewDto =
+            await this.blogQueryRepository.findByIdWithCheck(id);
+        return foundBlog;
     }
 }
 
