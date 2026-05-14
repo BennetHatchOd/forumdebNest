@@ -6,7 +6,6 @@ import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
-import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
