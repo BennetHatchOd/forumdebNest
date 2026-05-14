@@ -20,7 +20,15 @@ export class PostViewDto {
         }[];
     }
 
-     public static mapToView(post: PostRowDto): PostViewDto {
+     public static mapToView(
+         post: PostRowViewDto,
+         likes: { addedAt: string; userId: string; login: string }[]
+     ): PostViewDto {
+         let  myStatus = Rating.None;
+         if(post.myStatus == "Like")
+             myStatus = Rating.Like;
+         if(post.myStatus == "Dislike")
+             myStatus = Rating.Dislike;
         const view = new PostViewDto();
 
         view.id = post.id.toString();
