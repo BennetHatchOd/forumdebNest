@@ -5,7 +5,6 @@ import { GetPostQueryParams } from '../../dto/input/get.post.query.params.input.
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture/query/likes.query.repositories';
 import { LikesInfoViewDto } from '@modules/blogging.platform/dto/view/likes.info.view.dto';
 import { NewestLikesDto } from '@modules/blogging.platform/dto/view/newest.likes';
 import { EmptyPaginator } from '@core/dto/empty.paginator';
@@ -18,8 +17,6 @@ import console from 'node:console';
 export class PostQueryRepository {
     constructor(
         @Inject(DATA_SOURCE) private dataSource: DataSource,
-        private likesQueryRepository: LikesQueryRepositories,
-        // private likeService: LikeService,
     ){}
 
     async  findByIdWithCheck(

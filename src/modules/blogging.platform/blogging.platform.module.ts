@@ -12,7 +12,6 @@ import { UserQueryExternalRepository } from '../users-system/infrastucture/query
 import { CommandHandlers } from 'src/modules/blogging.platform/application/commands';
 import { CqrsModule } from '@nestjs/cqrs';
 import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.repository';
-import { LikesQueryRepositories } from '@modules/blogging.platform/infrastucture/query/likes.query.repositories';
 import { AuthModule } from '@core/auth.module';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { DatabaseModule } from '@core/database.module';
@@ -41,7 +40,6 @@ import { QueryHandlers } from '@modules/blogging.platform/application/queries';
         CommentQueryRepository,
         CommentRepository,
         LikeRepository,
-        LikesQueryRepositories,
         UserQueryExternalRepository,
     ],
 })
