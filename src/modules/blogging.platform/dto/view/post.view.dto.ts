@@ -1,5 +1,5 @@
 import { Rating } from '../enum/rating.enum';
-import { PostRowDto } from '@modules/blogging.platform/dto/view/row/post.row.view.dto';
+import { PostRowViewDto } from '@modules/blogging.platform/dto/view/row/post.row.view.dto';
 
 export class PostViewDto {
     id: string;

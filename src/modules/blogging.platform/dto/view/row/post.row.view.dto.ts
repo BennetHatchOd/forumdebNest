@@ -1,6 +1,4 @@
-import { Rating } from '../../enum/rating.enum';
-
-export class PostRowDto {
+export class PostRowViewDto {
     id: number;
     title: string;
     shortDescription: string;
@@ -11,9 +9,5 @@ export class PostRowDto {
     blogName: string;
     likesCount: number
     dislikesCount: number;
-    myStatus: Rating;
-    newestLikes: {
-        addedAt: string,
-        userId: string,
-        login: string}[];
+    myStatus: string | null;
 }
