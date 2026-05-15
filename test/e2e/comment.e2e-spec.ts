@@ -28,7 +28,7 @@ describe('CommentController (e2e)', () => {
                     factory: (userConfig: UserConfig) => {
                         return new JwtService({
                             secret: userConfig.accessTokenSecret,
-                            signOptions: { expiresIn: '2s' },
+                            signOptions: { expiresIn: '15s' },
                         });
                     },
                     inject: [UserConfig],
