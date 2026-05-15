@@ -81,7 +81,7 @@ export class TestDataBuilderByDb {
                 VALUES('${post.title}', '${post.content}', '${post.shortDescription}', '${this.blogs[0].id!}')
                 RETURNING id;`);
 
-            const postInstance: Post = Post.createInstance(post, this.blogs[0].name);
+            const postInstance: Post = Post.createInstance(post);
             postInstance.id = result[0].id;
             this.posts.push(postInstance);
         }
