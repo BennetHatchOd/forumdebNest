@@ -63,7 +63,7 @@ describe('LikeCommentController (e2e)', () => {
         it('should set likes/dislikes for a comment by one user and return likesInfo', async () => {
 
             let status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 1,
                     dislikesCount: 0,
@@ -71,7 +71,7 @@ describe('LikeCommentController (e2e)', () => {
                 })
 
             status = Rating.Dislike
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 0,
                     dislikesCount: 1,
@@ -79,7 +79,7 @@ describe('LikeCommentController (e2e)', () => {
                 })
 
             status = Rating.None
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 0,
                     dislikesCount: 0,
@@ -87,21 +87,21 @@ describe('LikeCommentController (e2e)', () => {
                 })
 
             status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 1,
                     dislikesCount: 0,
                     myStatus: status
                 })
             status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 1,
                     dislikesCount: 0,
                     myStatus: status
                 })
             status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 1,
                     dislikesCount: 0,
@@ -113,7 +113,7 @@ describe('LikeCommentController (e2e)', () => {
         it('should return the like status for an unauthorized user', async () => {
 
             const commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments, testData.comments[0]._id.toString()))
+                .get(join(URL_PATH.comments, testData.comments[0].id.toString()))
                 .expect(HttpStatus.OK);
             expect(commentResponce.body.likesInfo).toEqual({
                 likesCount: 1,
@@ -139,38 +139,38 @@ describe('LikeCommentController (e2e)', () => {
 
         it('should set likes/dislikes for a comment by many users and return likesInfo', async() => {
             let status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[1], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[1], status))
                 .toEqual({
                     likesCount: 1,
                     dislikesCount: 0,
                     myStatus: status })
             status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[0], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[0], status))
                 .toEqual({ likesCount: 2,
                     dislikesCount: 0,
                     myStatus: status })
             status = Rating.Like
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[2], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[2], status))
                 .toEqual({ likesCount: 3,
                     dislikesCount: 0,
                     myStatus: status })
             status = Rating.Dislike
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[3], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[3], status))
                 .toEqual({ likesCount: 3,
                     dislikesCount: 1,
                     myStatus: status })
             status = Rating.Dislike
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[4], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[4], status))
                 .toEqual({ likesCount: 3,
                     dislikesCount: 2,
                     myStatus: status })
             status = Rating.Dislike
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[5], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[5], status))
                 .toEqual({ likesCount: 3,
                     dislikesCount: 3,
                     myStatus: status })
             status = Rating.Dislike
-            expect(await setCheckLikeComment(app, testData.comments[0]._id.toString(), testData.accessTokens[6], status))
+            expect(await setCheckLikeComment(app, testData.comments[0].id.toString(), testData.accessTokens[6], status))
                 .toEqual({ likesCount: 3,
                     dislikesCount: 4,
                     myStatus: status })
@@ -204,7 +204,7 @@ describe('LikeCommentController (e2e)', () => {
                         ]
             for(let i = 0; i < testData.numberComments; i++){
                 for (let user of users[i]){
-                    await setCheckLikeComment(app, testData.comments[i]._id.toString(), testData.accessTokens[user], status)
+                    await setCheckLikeComment(app, testData.comments[i].id.toString(), testData.accessTokens[user], status)
                 }
             }
             status = Rating.Dislike
@@ -217,7 +217,7 @@ describe('LikeCommentController (e2e)', () => {
                     ]
             for(let i = 0; i < testData.numberComments; i++){
                 for (let user of users[i]){
-                    await setCheckLikeComment(app, testData.comments[i]._id.toString(), testData.accessTokens[user], status)
+                    await setCheckLikeComment(app, testData.comments[i].id.toString(), testData.accessTokens[user], status)
                 }
             }
 
@@ -230,33 +230,33 @@ describe('LikeCommentController (e2e)', () => {
                     ]
             for(let i = 0; i < testData.numberComments; i++){
                 for (let user of users[i]){
-                    await setCheckLikeComment(app, testData.comments[i]._id.toString(), testData.accessTokens[user], status)
+                    await setCheckLikeComment(app, testData.comments[i].id.toString(), testData.accessTokens[user], status)
                 }
             }
 
             let commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments,testData.comments[0]._id.toString()))
+                .get(join(URL_PATH.comments,testData.comments[0].id.toString()))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[3])
             expect(commentResponce.body.likesInfo).toEqual({ likesCount: 2,
                                                             dislikesCount: 4,
                                                             myStatus: Rating.None })
 
             commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments,testData.comments[1]._id.toString()))
+                .get(join(URL_PATH.comments,testData.comments[1].id.toString()))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[4])
             expect(commentResponce.body.likesInfo).toEqual({ likesCount: 6,
                                                             dislikesCount: 1,
                                                             myStatus: Rating.Like })
 
             commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments,testData.comments[2]._id.toString()))
+                .get(join(URL_PATH.comments,testData.comments[2].id.toString()))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[4])
             expect(commentResponce.body.likesInfo).toEqual({ likesCount: 3,
                                                             dislikesCount: 2,
                                                             myStatus: Rating.Like })
 
             commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments,testData.comments[3]._id.toString()))
+                .get(join(URL_PATH.comments,testData.comments[3].id.toString()))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[5])
             expect(commentResponce.body.likesInfo).toEqual({ likesCount: 0,
                                                             dislikesCount: 6,
@@ -264,7 +264,7 @@ describe('LikeCommentController (e2e)', () => {
 
             // check for non authorization user
             commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.comments,testData.comments[2]._id.toString()))
+                .get(join(URL_PATH.comments,testData.comments[2].id.toString()))
             expect(commentResponce.body.likesInfo).toEqual({ likesCount: 3,
                                                             dislikesCount: 2,
                                                             myStatus: Rating.None })
@@ -272,7 +272,7 @@ describe('LikeCommentController (e2e)', () => {
         it('Get all comments', async() => {
 
             const commentResponce = await request(app.getHttpServer())
-                .get(join(URL_PATH.posts, testData.posts[0]._id.toString(), "comments"))
+                .get(join(URL_PATH.posts, testData.posts[0].id.toString(), "comments"))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[2])
                 .expect(HttpStatus.OK)
 
@@ -307,7 +307,7 @@ describe('LikeCommentController (e2e)', () => {
 
         it('should return 401 if user is not logged in', async() => {
             const response = await request(app.getHttpServer())
-                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .put(join(URL_PATH.comments, testData.comments[0].id.toString(), 'like-status'))
                 .set("Authorization", 'Bearer ' + "ghfgg")
                 .send({likeStatus: Rating.Like })
                 .expect(HttpStatus.UNAUTHORIZED);
@@ -322,7 +322,7 @@ describe('LikeCommentController (e2e)', () => {
 
         it('should return 400 if send not {likesStatus:Rating}', async() => {
             let response = await request(app.getHttpServer())
-                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .put(join(URL_PATH.comments, testData.comments[0].id.toString(), 'like-status'))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[0])
                 .send({likeStatus: 'like' })
                 .expect(HttpStatus.BAD_REQUEST);
@@ -334,7 +334,7 @@ describe('LikeCommentController (e2e)', () => {
                                                     })
 
             response = await request(app.getHttpServer())
-                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .put(join(URL_PATH.comments, testData.comments[0].id.toString(), 'like-status'))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[0])
                 .send({likesStatus: Rating.Like })
                 .expect(HttpStatus.BAD_REQUEST);
@@ -344,7 +344,7 @@ describe('LikeCommentController (e2e)', () => {
                 field: "likeStatus"})
 
             response = await request(app.getHttpServer())
-                .put(join(URL_PATH.comments, testData.comments[0]._id.toString(), 'like-status'))
+                .put(join(URL_PATH.comments, testData.comments[0].id.toString(), 'like-status'))
                 .set("Authorization", 'Bearer ' + testData.accessTokens[0])
                 .send({likes: "Like" })
                 .expect(HttpStatus.BAD_REQUEST);
