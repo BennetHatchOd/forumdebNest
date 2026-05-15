@@ -25,9 +25,9 @@ export class MakeLikeHandler implements ICommandHandler<MakeLikeCommand> {
             await this.likeRepository.saveLike(newLike, likeDto.targetType);
             return;
         }
-        if (foundLike.rating === likeDto.rating) return;
+        if (foundLike.status === likeDto.status) return;
 
-        foundLike.rating = likeDto.rating;
+        foundLike.status = likeDto.status;
         await this.likeRepository.saveLike(foundLike, likeDto.targetType);
         return;
     }

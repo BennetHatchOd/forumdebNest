@@ -6,14 +6,14 @@ export class Like {
     id: number;
     targetId: number;
     userId: number;
-    rating: Rating;
+    status: Rating;
     createdAt: Date;
 
     static createInstance(dto: LikeCreateDto): Like {
         const like = new this();
         like.targetId = +dto.targetId;
         like.userId = +dto.userId;
-        like.rating = dto.rating;
+        like.status = dto.status;
         return like;
     }
 }

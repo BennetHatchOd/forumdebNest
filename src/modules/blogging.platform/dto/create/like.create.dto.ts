@@ -13,7 +13,7 @@ export class LikeCreateDto {
 
     @IsNotEmpty()
     @IsEnum(Rating)
-    rating: Rating;
+    status: Rating;
 
     @IsNotEmpty()
     @IsEnum(LikeTarget)

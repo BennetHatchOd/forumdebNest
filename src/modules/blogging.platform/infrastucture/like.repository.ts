@@ -44,12 +44,12 @@ export class LikeRepository {
         if(!like.id){
             const result = await this.dataSource.query(`
                 INSERT INTO public.${table}(
-                    "targetId", "userId", rating)
+                    "targetId", "userId", status)
                 VALUES($1, $2, $3)
                 RETURNING id, "createdAt";`,
                 [   like.targetId,
                     like.userId,
-                    like.rating,
+                    like.status,
                 ])
             like.id = result[0].id;
             like.createdAt = result[0].createdAt;
@@ -58,9 +58,9 @@ export class LikeRepository {
 
         await this.dataSource.query(`UPDATE public.${table}
         SET
-            rating = $1
+            status = $1
         WHERE id = $2;`,
-            [   like.rating,
+            [   like.status,
                 like.id,
             ]);
 

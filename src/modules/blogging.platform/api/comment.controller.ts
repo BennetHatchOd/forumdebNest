@@ -44,7 +44,7 @@ export class CommentController {
         const createLike: LikeCreateDto = {
             targetId: id,
             userId: user,
-            rating: likeStatus.likeStatus,
+            status: likeStatus.likeStatus,
             targetType: LikeTarget.Comment,
         };
 
