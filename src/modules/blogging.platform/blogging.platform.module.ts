@@ -8,7 +8,6 @@ import { CommentController } from './api/comment.controller';
 import { CommentQueryRepository } from './infrastucture/query/comment.query.repository';
 import { CommentRepository } from './infrastucture/comment.repository';
 import { PostController } from './api/post.controler';
-import { UserQueryExternalRepository } from '../users-system/infrastucture/query/user.query.external.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { LikeRepository } from '@modules/blogging.platform/infrastucture/like.repository';
 import { AuthModule } from '@core/auth.module';
@@ -40,7 +39,6 @@ import { CommandHandlers } from '@modules/blogging.platform/application/commands
         CommentQueryRepository,
         CommentRepository,
         LikeRepository,
-        UserQueryExternalRepository,
     ],
 })
 export class BloggingPlatformModule {}

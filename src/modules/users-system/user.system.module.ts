@@ -12,7 +12,6 @@ import { JwtStrategy } from '@src/core/strategy/jwt.strategy';
 import { myBasicStrategy } from '@src/core/strategy/basic.strategy';
 import { UserConfig } from './config/user.config';
 import { EmailService } from '../notifications/application/email.service';
-import { UserQueryExternalRepository } from './infrastucture/query/user.query.external.repository';
 import { ConfigService } from '@nestjs/config';
 import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -54,11 +53,9 @@ import { Session, SessionSchema } from '@modules/users-system/domain/session.ent
     ],
     providers: [
         ...CommandHandlers,
-//        UserSQLRepository,
         UserService,
         UserConfig,
         UserQueryRepository,
-        UserQueryExternalRepository,
         UserRepository,
         PasswordHashService,
         EmailService,
@@ -90,7 +87,7 @@ import { Session, SessionSchema } from '@modules/users-system/domain/session.ent
         },
     ],
     exports:[
-        UserQueryExternalRepository,UserConfig,
+        UserConfig,
     ]
 })
 export class UserSystemModule {}
