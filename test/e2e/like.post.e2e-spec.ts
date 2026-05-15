@@ -298,7 +298,7 @@ describe('LikePostController (e2e)', () => {
 
 		 it('should return a paginator', async() => {
 
-		 let postResponce = await request(app.getHttpServer()).get(join(URL_PATH.blogsAdmin,testData.posts[0].blogId,'posts'))
+		 let postResponce = await request(app.getHttpServer()).get(join(URL_PATH.blogs,testData.posts[0].blogId.toString(),'posts'))
 												 .set("Authorization", 'Bearer ' + testData.accessTokens[2])
 
 
@@ -347,6 +347,7 @@ describe('LikePostController (e2e)', () => {
 				.send({likeStatus: Rating.Like })
 				.expect(HttpStatus.UNAUTHORIZED);
 		})
+
 		it('should return 404 if post not exist', async() => {
 			const response = await request(app.getHttpServer())
 				.put(join(URL_PATH.posts, '5346345', 'like-status'))
