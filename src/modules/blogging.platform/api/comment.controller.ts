@@ -21,7 +21,7 @@ import { LikeTarget } from '@modules/blogging.platform/dto/enum/like.target.enum
 import { LikeInputDto } from '@modules/blogging.platform/dto/input/like.input.dto';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { DeleteCommentCommand } from '@modules/blogging.platform/application/commands/delete.comment.usecase';
-import { DeleteEntityDto } from '@modules/blogging.platform/dto/delete.entity.dto';
+import { ModifyCommentDto } from '@modules/blogging.platform/dto/modify.comment.dto';
 import { CommentInputDto } from '@modules/blogging.platform/dto/input/comment.input.dto';
 import { EditCommentDto } from '@modules/blogging.platform/dto/edit.comment.dto';
 import { EditCommentCommand } from '@modules/blogging.platform/application/commands/edit.comment.usecase';
@@ -75,7 +75,7 @@ export class CommentController {
         @CurrentUserId() user: string,
         @Param() { id }: IdInputDto,
     ): Promise<void> {
-        const deleteDto: DeleteEntityDto = {
+        const deleteDto: ModifyCommentDto = {
             userId: user,
             targetId: id,
         };

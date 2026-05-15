@@ -1,6 +1,6 @@
-import { IsString } from 'class-validator';
+import { IsNumberString } from 'class-validator';
 
 export class IdInputDto {
-    @IsString()
+    @IsNumberString()
     id: string;
 }

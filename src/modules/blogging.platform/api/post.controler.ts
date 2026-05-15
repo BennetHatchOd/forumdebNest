@@ -26,6 +26,7 @@ import { MakeLikeCommand } from '@modules/blogging.platform/application/commands
 import { GetCommentsByPostQuery } from '@modules/blogging.platform/application/queries/get.comments.by.post';
 import { GetCommentQueryParams } from '../dto/input/get.comment.query.params.input.dto';
 import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
+import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 
 @Controller(URL_PATH.posts)
 export class PostController {

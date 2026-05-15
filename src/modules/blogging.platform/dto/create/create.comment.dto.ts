@@ -1,7 +1,7 @@
 export class CreateCommentDto{
     constructor(
-        public postId: number,
+        public postId: string,
         public content: string,
-        public userId: number,
+        public userId: string,
     ){}
 }

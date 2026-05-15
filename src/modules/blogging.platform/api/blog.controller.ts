@@ -8,7 +8,6 @@ import { BlogQueryRepository } from '../infrastucture/query/blog.query.repositor
 import { BlogViewDto } from '../dto/view/blog.view.dto';
 import { PaginatedViewDto } from '@core/dto/base.paginated.view.dto';
 import { GetBlogQueryParams } from '../dto/input/get.blog.query.params.input.dto';
-import { PostQueryRepository } from '../infrastucture/query/post.query.repository';
 import { PostViewDto } from '../dto/view/post.view.dto';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
@@ -23,7 +22,6 @@ import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.pos
 export class BlogController {
     constructor(
         private blogQueryRepository: BlogQueryRepository,
-        private postQueryRepository: PostQueryRepository,
         private queryBus: QueryBus,
     ) {}
 

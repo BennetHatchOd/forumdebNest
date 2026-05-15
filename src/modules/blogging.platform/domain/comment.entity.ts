@@ -22,8 +22,8 @@ export class Comment {
     static createInstance(createDto: CreateCommentDto): Comment {
         const comment = new this();
         comment.content = createDto.content;
-        comment.postId = createDto.postId;
-        comment.userId = createDto.userId;
+        comment.postId = +createDto.postId;
+        comment.userId = +createDto.userId;
         return comment;
     }
 
