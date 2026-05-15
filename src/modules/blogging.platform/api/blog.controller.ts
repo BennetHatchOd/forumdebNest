@@ -16,7 +16,7 @@ import { CurrentUserId } from '@core/decorators/current.user';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetPostsByBlogQuery } from '@modules/blogging.platform/application/queries/get.posts.by.blog';
-import { GetCommentQueryParams } from '@modules/blogging.platform/dto/input/get.comment.query.params.input.dto';
+import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
 
 @Controller(URL_PATH.blogsQuery)
@@ -42,7 +42,7 @@ export class BlogController {
     async getPostByBlog(
         @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
-        @Query() query: GetCommentQueryParams,
+        @Query() query: GetPostQueryParams,
     ): Promise<PaginatedViewDto<PostViewDto>> {
 
         return await this.queryBus.execute(new GetPostsByBlogQuery(user, id, query));
