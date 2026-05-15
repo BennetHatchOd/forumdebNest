@@ -1,14 +1,14 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentRepository } from '@modules/blogging.platform/infrastucture/comment.repository';
-import { CommentInputDto } from '@modules/blogging.platform/dto/input/comment.input.dto';
 import { CreateCommentDto } from '@modules/blogging.platform/dto/create/create.comment.dto';
 import { Comment } from '@modules/blogging.platform/domain/comment.entity';
+import { PostRepository } from '@modules/blogging.platform/infrastucture/post.repository';
+import { DomainException } from '@core/exceptions/domain.exception';
+import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 
 export class CreateCommentCommand extends Command<string> {
     constructor(
-        public postId: string,
-        public comment: CommentInputDto,
-        public userId: string,
+        public createDto: CreateCommentDto,
     ){ super()}
 }
 
@@ -16,15 +16,17 @@ export class CreateCommentCommand extends Command<string> {
 export class CreateCommentHandler implements ICommandHandler<CreateCommentCommand, string> {
     constructor(
         private commentRepository: CommentRepository,
+        private postRepository: PostRepository,
     ) {
     }
 
-    async execute({ postId, comment, userId }: CreateCommentCommand): Promise<string> {
+    async execute({ createDto}: CreateCommentCommand): Promise<string> {
 
-        const createDto: CreateCommentDto = {
-            postId: +postId,
-            content: comment.content,
-            userId: +userId};
+        if(!await this.postRepository.existsById(createDto.postId))
+            throw  new DomainException({
+                message: 'post not found',
+                code: DomainExceptionCode.NotFound,
+            });
         const newComment: Comment = Comment.createInstance(createDto);
         await this.commentRepository.saveComment(newComment);
         return newComment.id.toString();

@@ -79,10 +79,12 @@ export class PostController {
         // Create comment for specified post, if the post isn't found,
         // throw the exception "not found"
 
-        await this.postQueryRepository.findByIdWithCheck(id, user)
-        // check the existence of the post
-
-        const createdComment: string = await this.commandBus.execute(new CreateCommentCommand(id, comment, user));
+        const create: CreateCommentDto ={
+            postId: id,
+            content: comment.content,
+            userId: user,
+        }
+        const createdComment: string = await this.commandBus.execute(new CreateCommentCommand(create));
         return this.commentQueryRepository.findByIdWithCheck(createdComment, user);
 
     }
