@@ -1,10 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Comment } from '../domain/comment.entity';
-import { Types } from 'mongoose';
-import { DomainException } from '@core/exceptions/domain.exception';
-import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { Post } from '@modules/blogging.platform/domain/post.entity';
 import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
 
@@ -54,7 +49,8 @@ export class CommentRepository {
             return;
         }
 
-        await this.dataSource.query(`UPDATE public.comments
+        await this.dataSource.query(`
+        UPDATE public.comments
         SET
             content = $1,
             "deletedAt" = $2
