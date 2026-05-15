@@ -29,10 +29,12 @@ export class Comment {
 
     static copyInstance(dto: Comment): Comment {
         const comment = new this();
-        comment.id = comment.id;
+        comment.id = dto.id;
         comment.content = dto.content;
         comment.postId = dto.postId;
         comment.userId = dto.userId;
+        comment.createdAt = dto.createdAt;
+        comment.deletedAt = dto.deletedAt;
         return comment;
     }
 }
