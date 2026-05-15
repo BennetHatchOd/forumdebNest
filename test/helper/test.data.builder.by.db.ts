@@ -109,10 +109,10 @@ export class TestDataBuilderByDb {
                 RETURNING id;`)
             newUser.id = result[0].id;
             this.users.push(newUser);
-            // this.usersLikes.push({
-            //     addedAt: expect.any(String),
-            //     userId: newUser.id!,
-            //     login: user.login,})
+            this.usersLikes.push({
+                addedAt: expect.any(String),
+                userId: newUser.id!,
+                login: user.login,})
         }
     }
 
@@ -131,29 +131,30 @@ export class TestDataBuilderByDb {
             this.accessTokens.push(token.body.accessToken)
         }
     }
-    //async createManyComment(){
-    //     this.isCreate.comment = true;
-    //     await this.checkPost()
-    //     await this.checkUser();
-    //
-    //     for(let i =0; i < this.numberComments; i++){
-    //         const comment: CreateCommentDto =
-    //             {content: `This is the comment number ${i}`,
-    //              postId: this.posts[0].id!,
-    //              userId: this.users[0].id!,
-    //              login: this.users[0].login};
-    //
-    //         const result = await this.dataSource.query(`
-    //             INSERT INTO public.comments(
-    //                 content, "postId", "userId")
-    //             VALUES('${comment.content}', '${comment.postId}', '${comment.userId}')
-    //             RETURNING id;`);
-    //
-    //         const commentInstance: Comment = Comment.createInstance(comment);
-    //         commentInstance.id = result[0].id;
-    //         this.comments.push(commentInstance);
-    //     }
-   // }
+
+    async createManyComment(){
+        this.isCreate.comment = true;
+        await this.checkPost()
+        await this.checkUser();
+
+        for(let i =0; i < this.numberComments; i++){
+            const comment: CreateCommentDto =
+                {content: `This is the comment number ${i}`,
+                 postId: this.posts[0].id!,
+                 userId: this.users[0].id!,
+                 };
+
+            const result = await this.dataSource.query(`
+                INSERT INTO public.comments(
+                    content, "postId", "userId")
+                VALUES('${comment.content}', '${comment.postId}', '${comment.userId}')
+                RETURNING id;`);
+
+            const commentInstance: Comment = Comment.createInstance(comment);
+            commentInstance.id = result[0].id;
+            this.comments.push(commentInstance);
+        }
+   }
 
     async writeToDB<T extends object>(
         entities: T[],
@@ -204,12 +205,14 @@ export class TestDataBuilderByDb {
             this.isCreate.blog = true;
         }
     }
-    // private async checkPost(){
-    //     if(!this.isCreate.post){
-    //         await this.createManyPosts();
-    //         this.isCreate.post = true;
-    //     }
-    // }
+
+    private async checkPost(){
+        if(!this.isCreate.post){
+            await this.createManyPosts();
+            this.isCreate.post = true;
+        }
+    }
+
     private async checkUser(){
         if(!this.isCreate.user) {
             await this.createManyAccessTokens();
