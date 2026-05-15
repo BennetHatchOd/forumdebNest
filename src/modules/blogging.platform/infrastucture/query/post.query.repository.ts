@@ -45,8 +45,8 @@ export class PostQueryRepository {
                     JOIN public.blogs b ON p."blogId" = b.id
                     LEFT JOIN LATERAL (
                         SELECT
-                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
-                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                            COUNT(*) FILTER (WHERE l.status = 'Like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'Dislike')::int AS dislikes_count
                         FROM public.like_post l
                         WHERE l."targetId" = p.id
                         ) counts ON true
@@ -76,7 +76,7 @@ export class PostQueryRepository {
               FROM public.like_post l
               JOIN public."Users" u ON u.id = l."userId"
               WHERE l."targetId" = $1
-                AND l.status = 'like'
+                AND l.status = 'Like'
               ORDER BY l."createdAt" DESC
               LIMIT 3;`,
               [numericId]);
@@ -140,8 +140,8 @@ export class PostQueryRepository {
                     JOIN public.blogs b ON p."blogId" = b.id
                     LEFT JOIN LATERAL (
                         SELECT
-                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
-                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                            COUNT(*) FILTER (WHERE l.status = 'Like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'Dislike')::int AS dislikes_count
                         FROM public.like_post l
                         WHERE l."targetId" = p.id
                         ) counts ON true
@@ -182,7 +182,7 @@ export class PostQueryRepository {
                         FROM public.like_post l
                                  JOIN public."Users" u ON u.id = l."userId"
                         WHERE l."targetId" = p.id
-                          AND l.status = 'like'
+                          AND l.status = 'Like'
                         ORDER BY l."createdAt" DESC
                         LIMIT 3
                         ) nl ON true

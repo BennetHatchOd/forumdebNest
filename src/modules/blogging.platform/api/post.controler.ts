@@ -48,7 +48,7 @@ export class PostController {
         const createLike: LikeCreateDto = {
             targetId: id,
             userId: user,
-            rating: likeStatus.likeStatus,
+            status: likeStatus.likeStatus,
             targetType: LikeTarget.Post,
         };
 

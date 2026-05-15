@@ -39,8 +39,8 @@ export class CommentQueryRepository {
                     JOIN public."Users" u ON c."userId" = u.id
                     LEFT JOIN LATERAL (
                         SELECT
-                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
-                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                            COUNT(*) FILTER (WHERE l.status = 'Like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'Dislike')::int AS dislikes_count
                         FROM public.like_comment l
                         WHERE l."targetId" = c.id
                         ) counts ON true
@@ -116,8 +116,8 @@ export class CommentQueryRepository {
                     JOIN public."Users" u ON c."userId" = u.id
                     LEFT JOIN LATERAL (
                         SELECT
-                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
-                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                            COUNT(*) FILTER (WHERE l.status = 'Like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'Dislike')::int AS dislikes_count
                         FROM public.like_comment l
                         WHERE l."targetId" = c.id
                         ) counts ON true

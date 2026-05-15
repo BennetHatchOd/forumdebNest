@@ -26,9 +26,9 @@ export class PostViewDto {
          likes: NewestLikesViewDto[]
      ): PostViewDto {
          let  myStatus = Rating.None;
-         if(post.myStatus == "like")
+         if(post.myStatus == "Like")
              myStatus = Rating.Like;
-         if(post.myStatus == "dislike")
+         if(post.myStatus == "Dislike")
              myStatus = Rating.Dislike;
         const view = new PostViewDto();
 
