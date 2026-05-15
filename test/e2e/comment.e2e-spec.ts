@@ -50,6 +50,7 @@ describe('CommentController (e2e)', () => {
 
     describe('Testing create comments. Paginator. Edit and delete comments', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             testData.numberPosts = 2;
@@ -131,6 +132,7 @@ describe('CommentController (e2e)', () => {
 
     describe('Testing paginator fot comments', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             testData.numberPosts = 2;
@@ -186,6 +188,7 @@ describe('CommentController (e2e)', () => {
 
     describe('Testing create, edit and delete comments with some wrongs', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             testData.numberPosts = 2;

@@ -48,6 +48,7 @@ describe('LikeCommentController (e2e)', () => {
 
     describe('Send likes and dislikes for a comment', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 2;
             testData.numberComments = 1;
@@ -124,6 +125,7 @@ describe('LikeCommentController (e2e)', () => {
 
     describe('Send likes and dislikes for a comment by many users', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 8;
             testData.numberComments = 1;
@@ -179,6 +181,7 @@ describe('LikeCommentController (e2e)', () => {
 
     describe('Send likes and dislikes for many comment by many users', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 8;
             testData.numberComments = 4;
@@ -290,6 +293,7 @@ describe('LikeCommentController (e2e)', () => {
 
     describe('Send likes and dislikes comment with errors', () => {
         beforeAll(async () => {
+            await deleteAllData(app, globalPrefix);
             testData.clearData();
             testData.numberUsers = 1;
             testData.numberComments = 1;

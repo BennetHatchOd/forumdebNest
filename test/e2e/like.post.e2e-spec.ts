@@ -56,12 +56,13 @@ describe('LikePostController (e2e)', () => {
 
 	describe('Send likes and dislikes for a post', () => {
 		beforeAll(async () => {
-			  testData.clearData();
-			  testData.numberUsers = 8;
-			  testData.numberPosts = 1;
-			  await testData.createManyPosts();
-			  await testData.createManyAccessTokens();
-		 })
+			await deleteAllData(app, globalPrefix);
+		    testData.clearData();
+			testData.numberUsers = 8;
+			testData.numberPosts = 1;
+			await testData.createManyPosts();
+			await testData.createManyAccessTokens();
+		})
 
 		afterAll(async () => {
 		  await deleteAllData(app, globalPrefix);
@@ -212,6 +213,7 @@ describe('LikePostController (e2e)', () => {
 
 	describe('Send likes and dislikes for many post', () => {
 	  beforeAll(async () => {
+	   await deleteAllData(app, globalPrefix);
 	   testData.clearData();
 	   testData.numberUsers = 8;
 	   testData.numberPosts = 4;
@@ -333,6 +335,7 @@ describe('LikePostController (e2e)', () => {
 
 	describe('Send likes and dislikes post with errors', () => {
 		beforeAll(async () => {
+			await deleteAllData(app, globalPrefix);
 			testData.clearData();
 			testData.numberUsers = 1;
 			testData.numberPosts = 1;
