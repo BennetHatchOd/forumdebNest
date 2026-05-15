@@ -1,5 +1,6 @@
 import { Rating } from '../enum/rating.enum';
 import { PostRowViewDto } from '@modules/blogging.platform/dto/view/row/post.row.view.dto';
+import { NewestLikesViewDto } from '@modules/blogging.platform/dto/view/newest.likes.view.dto';
 
 export class PostViewDto {
     id: string;
@@ -22,12 +23,12 @@ export class PostViewDto {
 
      public static mapToView(
          post: PostRowViewDto,
-         likes: { addedAt: string; userId: string; login: string }[]
+         likes: NewestLikesViewDto[]
      ): PostViewDto {
          let  myStatus = Rating.None;
-         if(post.myStatus == "Like")
+         if(post.myStatus == "like")
              myStatus = Rating.Like;
-         if(post.myStatus == "Dislike")
+         if(post.myStatus == "dislike")
              myStatus = Rating.Dislike;
         const view = new PostViewDto();
 
