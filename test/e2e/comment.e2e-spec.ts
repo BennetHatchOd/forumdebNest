@@ -91,7 +91,7 @@ describe('CommentController (e2e)', () => {
                 .get(join(URL_PATH.comments, commentIds[0]))
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
-                id: expect.any(String),
+                id: commentIds[0],
                 content: content[0],
                 commentatorInfo: {
                     userId: testData.users[1].id.toString(),
