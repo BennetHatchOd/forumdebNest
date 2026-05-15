@@ -31,6 +31,21 @@ export class CommentRepository {
         return Comment.copyInstance(searchItem[0]);
     }
 
+    async existsById(id: string): Promise<boolean> {
+        const numericId = Number(id);
+        if (!Number.isInteger(numericId) || numericId < 1)
+            return false;
+        const result = await this.dataSource.query(
+            `SELECT EXISTS(
+                SELECT 1 
+                FROM public.comments 
+                WHERE id = $1 AND "deletedAt" IS NULL)`,
+            [id],
+        );
+
+        return result[0].exists;
+    }
+
     async saveComment(saved: Comment): Promise<void> {
 
         if(!saved.id){
