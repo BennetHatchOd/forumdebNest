@@ -11,6 +11,10 @@ import { DATA_SOURCE } from '@core/constans/data.source';
 import { DataSource } from 'typeorm';
 import { Rating } from '@modules/blogging.platform/dto/enum/rating.enum';
 import console from 'node:console';
+import { CommentRowViewDto } from '@modules/blogging.platform/dto/view/row/comment.row.view.dto';
+import { PostRowViewDto } from '@modules/blogging.platform/dto/view/row/post.row.view.dto';
+import { NewestLikesRowViewDto } from '@modules/blogging.platform/dto/view/newest.likes.row.view.dto';
+import { NewestLikesViewDto } from '@modules/blogging.platform/dto/view/newest.likes.view.dto';
 
 @Injectable()
 export class PostQueryRepository {
@@ -30,52 +34,70 @@ export class PostQueryRepository {
                 code: DomainExceptionCode.NotFound,
             });
 
-        const searchItem: Post[] = await this.dataSource.query(`
-                    SELECT p.*, b.name AS "blogName"
+        const post: PostRowViewDto[] = await this.dataSource.query(`
+                    SELECT
+                        p.*, 
+                        b.name AS "blogName",
+                        counts.likes_count AS "likesCount",
+                        counts.dislikes_count AS "dislikesCount",
+                        me.my_status AS "myStatus"
                     FROM public.posts p
-                    JOIN public.blogs b on b.id = p."blogId"
-                    WHERE p.id = $1 AND p."deletedAt" IS NULL 
-                      AND b."deletedAt" IS NULL 
-                    LIMIT 1`,
-            [numericId]
+                    JOIN public.blogs b ON p."blogId" = b.id
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                        FROM public.like_post l
+                        WHERE l."targetId" = p.id
+                        ) counts ON true
+                    LEFT JOIN LATERAL (
+                        SELECT l2.status AS my_status
+                        FROM public.like_post l2
+                        WHERE l2."targetId" = p.id
+                          AND l2."userId" = $2
+                        LIMIT 1
+                        ) me ON true
+                    WHERE p.id = $1
+                      AND p."deletedAt" IS NULL;`,
+            [numericId, userId]
         );
-        if (searchItem.length == 0)
+
+        if (post.length == 0)
             throw new DomainException({
                 message: 'post not found',
                 code: DomainExceptionCode.NotFound,
             });
 
-        // const likeDescriptionDto = {
-        //     targetId: id,
-        //     ownerId: userId,
-        //     targetType: LikeTarget.Post};
-        //
-        // const likeInfo: LikesInfoViewDto
-        //     = await this.likesQueryRepository.findOneLikeInfo(likeDescriptionDto)
-        // // базовая информация о посте - counts, status
-        //
-        // const extendedInfo:NewestLikesDto
-        //     = await this.likesQueryRepository.findOneExtendedLikes(likeDescriptionDto)
+        const likes: NewestLikesRowViewDto[] = await this.dataSource.query(`
+              SELECT
+                  l."createdAt" AS "addedAt",
+                  l."userId"::text AS "userId",
+                  u.login AS "login"
+              FROM public.like_post l
+              JOIN public."Users" u ON u.id = l."userId"
+              WHERE l."targetId" = $1
+                AND l.status = 'like'
+              ORDER BY l."createdAt" DESC
+              LIMIT 3;`,
+              [numericId]);
 
-        const likeInfo: LikesInfoViewDto = {
-                likesCount: 0,
-                dislikesCount: 0,
-                myStatus: Rating.None
-            };
-        const likes: NewestLikesDto ={ newestLikes:  []};
-
-        return PostViewDto.mapToView(searchItem[0], likeInfo, likes);
+        const likesViewDto = likes.map(l => NewestLikesViewDto.mapToView(l))
+        return PostViewDto.mapToView(post[0], likesViewDto);
     }
 
     async find(queryReq: GetPostQueryParams, userId: string|null = null): Promise<PaginatedViewDto<PostViewDto>> {
 
         let whereSql: string = `p."deletedAt" IS NULL AND b."deletedAt" IS NULL`;
         const queryParams: any[] = [];
+        const countParams: any[] = [];
 
         if (queryReq.searchBlogId) {
             whereSql += ` AND b.id = $1`;
             queryParams.push(`${queryReq.searchBlogId}`);
+            countParams.push(`${queryReq.searchBlogId}`);
         }
+        const userIdParam = queryReq.searchBlogId ? '$2' : '$1';
+        queryParams.push(userId);
 
         let orderBy: string;
         switch (queryReq.sortBy) {
@@ -94,79 +116,99 @@ export class PostQueryRepository {
                     `p."${queryReq.sortBy}" ${queryReq.sortDirection}`
         }
 
-        // const orderBy =
-        //     queryReq.sortBy === 'title' || queryReq.sortBy === 'shortDescription'
-        //     || queryReq.sortBy === 'content' || queryReq.sortBy === 'blogName'
-        //         ? `p."${queryReq.sortBy}" COLLATE "C" ${queryReq.sortDirection}`
-        //         : `"${queryReq.sortBy}" ${queryReq.sortDirection}`;
+        const sqlCount = `
+            SELECT COUNT(*)::int AS count 
+            FROM public.posts p 
+            JOIN public.blogs b ON b.id = p."blogId" 
+            WHERE ${whereSql};`;
 
-        const sqlRequest = `FROM public.posts p 
-            JOIN public.blogs b on b.id = p."blogId" 
-            WHERE ${whereSql}`;
-        const sqlCount = `SELECT COUNT(*) AS count ${sqlRequest};`;
-
-        const totalCount: number = +(await this.dataSource.query(sqlCount, queryParams))[0].count;
-        queryReq.calculateSkip(totalCount);
-
-        const sqlQuery = ` SELECT p.*, b.name AS "blogName" ${sqlRequest}
-            ORDER BY ${orderBy} 
-            LIMIT ${queryReq.pageSize} OFFSET ${queryReq.skip};`;
-
-
+        const totalCount: number =
+            +(await this.dataSource.query(sqlCount, countParams))[0].count;
         if(totalCount === 0)
             return new EmptyPaginator<PostViewDto>();
 
-        const posts: Post[] = await this.dataSource.query(sqlQuery, queryParams);
+        queryReq.calculateSkip(totalCount);
 
+        const posts: PostRowViewDto[] = await this.dataSource.query(`
+                    SELECT
+                        p.*, 
+                        b.name AS "blogName",
+                        counts.likes_count AS "likesCount",
+                        counts.dislikes_count AS "dislikesCount",
+                        me.my_status AS "myStatus"
+                    FROM public.posts p
+                    JOIN public.blogs b ON p."blogId" = b.id
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            COUNT(*) FILTER (WHERE l.status = 'like')::int AS likes_count,
+                            COUNT(*) FILTER (WHERE l.status = 'dislike')::int AS dislikes_count
+                        FROM public.like_post l
+                        WHERE l."targetId" = p.id
+                        ) counts ON true
+                    LEFT JOIN LATERAL (
+                        SELECT l2.status AS my_status
+                        FROM public.like_post l2
+                        WHERE l2."targetId" = p.id
+                          AND l2."userId" = ${userIdParam}
+                        LIMIT 1
+                        ) me ON true
+                    WHERE ${whereSql}
+                    ORDER BY ${orderBy}
+                    LIMIT ${queryReq.pageSize} OFFSET ${queryReq.skip};`,
+            queryParams);
 
-        // const likesDescription: LikesDescriptionManyDto ={
-        //     targetIds: targetIds,
-        //     ownerId: userId,
-        //     targetType: LikeTarget.Post,
-        // }
-        // // const likesInfo: LikesInfoViewDto[]
-        //     = await this.likesQueryRepository.findManyLikesInfo(likesDescription);
-        //
-        // const extendedPart: ExtendedPartInfo[] = await this.likesQueryRepository.findManyExtendedLikes(likesDescription)
+        const postsId: number[] = posts.map(p => p.id );
+
+        const newestLikes = await this.dataSource.query(`
+                    SELECT
+                        p.id AS "postId",
+                        COALESCE(
+                                json_agg(
+                                json_build_object(
+                                        'addedAt', nl."createdAt",
+                                        'userId', nl."userId",
+                                        'login', nl."login"
+                                )
+                                ORDER BY nl."createdAt" DESC
+                                        ) FILTER (WHERE nl."userId" IS NOT NULL),
+                                '[]'::json
+                        ) AS "newestLikes"
+                    FROM public.posts p
+                             LEFT JOIN LATERAL (
+                        SELECT
+                            l."createdAt",
+                            l."userId"::text AS "userId",
+                            u.login
+                        FROM public.like_post l
+                                 JOIN public."Users" u ON u.id = l."userId"
+                        WHERE l."targetId" = p.id
+                          AND l.status = 'like'
+                        ORDER BY l."createdAt" DESC
+                        LIMIT 3
+                        ) nl ON true
+                    WHERE p.id = ANY($1)
+                    GROUP BY p.id;`,
+            [postsId]);
 
         return PaginatedViewDto.mapToView({
-            items: this.mapPostsView(posts),// likesInfo, extendedPart),
+            items: this.mapPostsView(posts, newestLikes),
             page: queryReq.pageNumber,
             size: queryReq.pageSize,
             totalCount: totalCount,
         });
     }
-    private mapPostsView(posts: Post[],){
-                         // likeInfos: LikesInfoViewDto[],
-                         // newestLikes: ExtendedPartInfo[]){
+    private mapPostsView(posts: PostRowViewDto[],
+                         newestLikes: any[]) {
 
-        const likeInfo: LikesInfoViewDto = {
-            likesCount: 0,
-            dislikesCount: 0,
-            myStatus: Rating.None
-        };
-        const likes: NewestLikesDto ={ newestLikes:  []};
 
-        const postView: PostViewDto[] = posts.map((value: Post) =>
-            (PostViewDto.mapToView(
-                value,
-                likeInfo,
-                likes
-            )))
+        const postView: PostViewDto[] = posts.map((post: PostRowViewDto) =>{
+            const likes
+                = newestLikes.find(l=> l.postId == post.id )
+                                                                ?.newestLikes
+                                                                ?? [];
+            return PostViewDto.mapToView( post, likes)})
 
         return postView;
-
-
-        // const postView: PostViewDto[] = posts.map((value: Post, index: number) =>
-        //     (PostViewDto.mapToView(
-        //         value,
-        //         likeInfos[index],
-        //         {newestLikes:
-        //                 newestLikes.find(extended => extended.targetId === value._id.toString())?.newestLikes ?? []
-        //         }
-        //     )))
-        //
-        // return postView;
     }
 
 }
