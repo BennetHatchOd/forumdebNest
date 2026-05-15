@@ -1,7 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Connection } from 'mongoose';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
-import { EmailServiceMock } from '../mock/email.service.mock';
 import { initSettings } from '../helper/init.settings';
 import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@modules/users-system/config/user.config';
@@ -12,15 +10,12 @@ import { deleteAllData } from '../helper/delete.all.data';
 import request from 'supertest';
 import { URL_PATH } from '@core/url.path.setting';
 import { join } from 'path';
-import console from 'node:console';
 import { defaultUserConfig } from '../helper/default.user.config';
 
 describe('LikePostController (e2e)', () => {
 	 let app: INestApplication;
-	 let connection: Connection;
 	 let testData: TestDataBuilderByDb;
 	 let globalPrefix;
-	 let emailServiceMock: EmailServiceMock;
 
 	 beforeAll(async () => {
 	  const result
@@ -43,10 +38,8 @@ describe('LikePostController (e2e)', () => {
 		  })
 	  );
 	  app = result.app;
-	  connection = result.databaseConnection;
 	  testData = result.testData;
 	  globalPrefix = result.globalPrefix;
-	  emailServiceMock = result.emailServiceMock;
 	 });
 
 	 afterAll(async () => {
