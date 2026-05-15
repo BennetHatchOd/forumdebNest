@@ -95,7 +95,7 @@ describe('PostController (e2e)', () => {
 
         it('should return 200 and the found posts', async () => {
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.postsQuery, postId))
+                .get(join(URL_PATH.posts, postId))
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 id: postId,
@@ -123,7 +123,7 @@ describe('PostController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
 
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.postsQuery, postId))
+                .get(join(URL_PATH.posts, postId))
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 id: postId,
@@ -207,7 +207,7 @@ describe('PostController (e2e)', () => {
 
         it('should return 200 and a default paginator', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.postsQuery)
+                .get(URL_PATH.posts)
                 .expect(HttpStatus.OK)
 
             expect(response.body).toEqual({
@@ -232,7 +232,7 @@ describe('PostController (e2e)', () => {
 
         it('should return 200 and a paginator with pageSize, pageNumber ', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.postsQuery)
+                .get(URL_PATH.posts)
                 .query({
                     pageSize: 4,
                     pageNumber: 11
@@ -250,7 +250,7 @@ describe('PostController (e2e)', () => {
 
         it('should return 200 and a paginator with sort by title', async () => {
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.blogsQuery,testData.blogs[1].id!.toString(), 'posts'))
+                .get(join(URL_PATH.blogs,testData.blogs[1].id!.toString(), 'posts'))
                 .query({
                     pageSize: 11,
                     pageNumber: 6,

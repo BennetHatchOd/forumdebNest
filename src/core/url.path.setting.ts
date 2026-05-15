@@ -1,13 +1,12 @@
 export const URL_PATH = {
     base: '/',
-    blogsQuery: '/blogs',
-    postsQuery: '/posts',
+    blogs: '/blogs',
+    posts: '/posts',
     auth: '/auth',
     devices: '/security/devices',
     comments: '/comments',
     testing: '/testing/all-data',
     blogsAdmin: '/sa/blogs',
-   // postsAdmin: '/sa/posts',
     usersAdmin: '/sa/users',
 };
 

@@ -83,7 +83,7 @@ describe('BlogController (e2e)', () => {
 
         it('should return 200 and the found blog', async () => {
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.blogsQuery, blogId))
+                .get(join(URL_PATH.blogs, blogId))
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 id: blogId,
@@ -108,7 +108,7 @@ describe('BlogController (e2e)', () => {
                 .expect(HttpStatus.NO_CONTENT)
 
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.blogsQuery, blogId))
+                .get(join(URL_PATH.blogs, blogId))
                 .expect(HttpStatus.OK)
             expect(response.body).toEqual({
                 id: blogId,
@@ -127,7 +127,7 @@ describe('BlogController (e2e)', () => {
                 .send(blog)
                 .expect(HttpStatus.NO_CONTENT)
             const response = await request(app.getHttpServer())
-                .get(join(URL_PATH.blogsQuery, blogId))
+                .get(join(URL_PATH.blogs, blogId))
                 .expect(HttpStatus.NOT_FOUND)
         })
 
@@ -178,7 +178,7 @@ describe('BlogController (e2e)', () => {
 
         it('should return 200 and a list of blogs with default paginator', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.blogsQuery)
+                .get(URL_PATH.blogs)
                 .expect(HttpStatus.OK)
 
             expect(response.body).toEqual({
@@ -201,7 +201,7 @@ describe('BlogController (e2e)', () => {
 
         it('should return 200 and a paginator with pageSize, pageNumber ', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.blogsQuery)
+                .get(URL_PATH.blogs)
                 .query({
                     pageSize: 4,
                     pageNumber: 15
@@ -219,7 +219,7 @@ describe('BlogController (e2e)', () => {
 
         it('should return 200 and a paginator with searchNameTerm', async () => {
             const response = await request(app.getHttpServer())
-                .get(URL_PATH.blogsQuery)
+                .get(URL_PATH.blogs)
                 .query({
                     pageSize: 11,
                     pageNumber: 15,
@@ -305,7 +305,7 @@ describe('Testing create, edit and delete blogs with some wrongs', () => {
 
         it('should return 404 if blog not exist', async () => {
             await request(app.getHttpServer())
-                .put(join(URL_PATH.blogsQuery, "245"))
+                .put(join(URL_PATH.blogs, "245"))
                 .set("Authorization", testData.authLoginPassword)
                 .send(blog)
                 .expect(HttpStatus.NOT_FOUND)

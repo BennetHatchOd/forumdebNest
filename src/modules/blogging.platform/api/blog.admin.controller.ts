@@ -21,7 +21,6 @@ import { PostInputDto } from '../dto/input/post.input.dto';
 import { PostByBlogInputDto } from '../dto/input/post.by.blog.input.dto';
 import { URL_PATH } from '@core/url.path.setting';
 import { IdInputDto } from '@core/dto/input/id.Input.Dto';
-import { CurrentUserId } from '@core/decorators/current.user';
 import { AuthGuard } from '@nestjs/passport';
 import { ReadUserIdGuard } from '@core/guards/read.userid';
 import { PostParamsIdInputDto } from '@core/dto/input/post.params.id.input.dto';
@@ -91,7 +90,6 @@ export class BlogAdminController {
     @Post(':id/posts')
     @HttpCode(HttpStatus.CREATED)
     async createPostByBlog(
-        @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
         @Body() dto: PostByBlogInputDto,
     ): Promise<PostViewDto> {
@@ -99,14 +97,13 @@ export class BlogAdminController {
         const createDto: PostInputDto = { ...dto, blogId: id };
         const createId: string = await this.commandBus.execute(new CreatePostCommand(createDto));
         const postView: PostViewDto =
-            await this.postQueryRepository.findByIdWithCheck(createId, user);
+            await this.postQueryRepository.findByIdWithCheck(createId, null);
         return postView;
     }
 
     @Get(':id/posts')
     @UseGuards(ReadUserIdGuard)
     async getPostByBlog(
-        @CurrentUserId() user: string,
         @Param() {id}: IdInputDto,
         @Query() query: GetPostQueryParams,
     ): Promise<PaginatedViewDto<PostViewDto>> {
@@ -115,7 +112,7 @@ export class BlogAdminController {
         query.setBlogIdSearchParams(id);
 
         const postPaginator: PaginatedViewDto<PostViewDto> =
-            await this.postQueryRepository.find(query, user);
+            await this.postQueryRepository.find(query, null);
         return postPaginator;
     }
 

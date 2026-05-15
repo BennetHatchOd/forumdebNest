@@ -19,7 +19,7 @@ import { GetPostsByBlogQuery } from '@modules/blogging.platform/application/quer
 import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
 
-@Controller(URL_PATH.blogsQuery)
+@Controller(URL_PATH.blogs)
 export class BlogController {
     constructor(
         private blogQueryRepository: BlogQueryRepository,

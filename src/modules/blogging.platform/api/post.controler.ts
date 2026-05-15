@@ -27,7 +27,7 @@ import { GetCommentsByPostQuery } from '@modules/blogging.platform/application/q
 import { GetCommentQueryParams } from '../dto/input/get.comment.query.params.input.dto';
 import { GetPostQueryParams } from '@modules/blogging.platform/dto/input/get.post.query.params.input.dto';
 
-@Controller(URL_PATH.postsQuery)
+@Controller(URL_PATH.posts)
 export class PostController {
     constructor(
         private postQueryRepository: PostQueryRepository,
