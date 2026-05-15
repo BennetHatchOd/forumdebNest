@@ -58,9 +58,10 @@ export class CommentRepository {
         SET
             content = $1,
             "deletedAt" = $2
-        WHERE id = $5;`,
+        WHERE id = $3;`,
             [   saved.content,
                 saved.deletedAt,
+                saved.id
             ]);
         return;
     }
