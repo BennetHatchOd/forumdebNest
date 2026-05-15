@@ -1,6 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { Connection } from 'mongoose';
 import {  URL_PATH } from '@core/url.path.setting';
 import { initSettings } from '../helper/init.settings';
 import { TestDataBuilderByDb } from '../helper/test.data.builder.by.db';
@@ -9,15 +8,12 @@ import { deleteAllData } from '../helper/delete.all.data';
 import { INJECT_TOKEN } from '@core/constans/jwt.tokens';
 import { UserConfig } from '@src/modules/users-system/config/user.config';
 import { JwtService } from '@nestjs/jwt';
-import { EmailServiceMock } from '../mock/email.service.mock';
 import { defaultUserConfig } from '../helper/default.user.config';
 
 describe('CommentController (e2e)', () => {
     let app: INestApplication;
-    let connection: Connection;
     let testData: TestDataBuilderByDb;
     let globalPrefix;
-    let emailServiceMock: EmailServiceMock;
     const content: string[] = [
         "comment for post number 1",
         "comment for post number 2",
@@ -44,10 +40,8 @@ describe('CommentController (e2e)', () => {
             })
         );
         app = result.app;
-        connection = result.databaseConnection;
         testData = result.testData;
         globalPrefix = result.globalPrefix;
-        emailServiceMock = result.emailServiceMock;
     });
 
     afterAll(async () => {
