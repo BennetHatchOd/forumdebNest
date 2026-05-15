@@ -23,7 +23,7 @@ export class TestDataBuilderByDb {
     posts: Post[] = [];
     authLoginPassword: string = '';
     usersLikes: {addedAt: string,
-                userId: number,
+                userId: string,
                 login: string}[] = []
     private isCreate = {
         blog: false,
@@ -111,7 +111,7 @@ export class TestDataBuilderByDb {
             this.users.push(newUser);
             this.usersLikes.push({
                 addedAt: expect.any(String),
-                userId: newUser.id!,
+                userId: newUser.id!.toString(),
                 login: user.login,})
         }
     }
