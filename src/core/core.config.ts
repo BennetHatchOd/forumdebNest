@@ -20,20 +20,9 @@ export class CoreConfig {
 
     @IsNotEmpty()
     @IsString({
-        message: 'Set Env variable DB_NAME, must be a string, example: appDB',
-    })
-    dbName: string;
-
-    @IsNotEmpty()
-    @IsString({
         message: 'Set Env variable PASSWORD_MAIL',
     })
     passwordEmail: string;
-
-    @IsNotEmpty({
-        message: 'Set Env variable MONGO_URI, example: mongodb://localhost:27017/my-app-local-db',
-    })
-    mongoURI: string;
 
     @IsBoolean({
         message: 'Set Env variable INCLUDE_TESTING_MODULE, to enable the module the value must be {true, 1 or enabled}'
@@ -59,9 +48,7 @@ export class CoreConfig {
 
     constructor(private configService: ConfigService<any, true>) {
         this.port = Number(this.configService.get('PORT'));
-        this.mongoURI = this.configService.get('MONGO_URI');
         this.env = this.configService.get('NODE_ENV');
-        this.dbName = this.configService.get('DB_NAME');
         this.includeTestingModule = configValidationUtility.convertToBoolean(this.configService.get('INCLUDE_TESTING_MODULE')) as boolean;
         this.globalPrefix = this.configService.get('GLOBAL_PREFIX');
         this.versionApp = this.configService.get('VERSION_APP');

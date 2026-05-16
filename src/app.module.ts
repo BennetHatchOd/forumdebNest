@@ -1,7 +1,6 @@
 import { configModule } from './setup/config.module';
 import { DynamicModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AppService } from './app.service';
 import { BloggingPlatformModule } from '@modules/blogging.platform/blogging.platform.module';
 import { UserSystemModule } from '@modules/users-system/user.system.module';
@@ -15,14 +14,6 @@ import { DatabaseModule } from '@core/database.module';
     imports: [
         configModule,
         DatabaseModule,
-        MongooseModule.forRootAsync({
-            useFactory: (coreConfig:CoreConfig) =>{
-                const  url = new URL(coreConfig.mongoURI)
-                url.pathname = '/' + coreConfig.dbName
-                return { uri: url.toString()}
-            },
-            inject:[CoreConfig],
-         }),
         BloggingPlatformModule,
         UserSystemModule,
         TestingModule,
