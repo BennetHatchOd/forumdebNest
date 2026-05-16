@@ -1,8 +1,7 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Session } from '@modules/users-system/domain/session.entity';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
-
-import { FilterQuery } from 'mongoose';
+import { SessionQueryFilterDto } from '@modules/users-system/dto/session.query.filter.dto';
 
 export class DeleteMySessionCommand extends Command<void> {
     constructor(
@@ -20,7 +19,7 @@ export class DeleteMySessionHandler implements ICommandHandler<DeleteMySessionCo
 
     async execute({userId, deviceId}: DeleteMySessionCommand):Promise<void> {
 
-        const deleteQueryFilter: FilterQuery<Session> ={
+        const deleteQueryFilter: SessionQueryFilterDto ={
             userId: userId,
             deviceId: deviceId
         }

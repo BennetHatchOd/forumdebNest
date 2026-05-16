@@ -140,8 +140,8 @@ export class TestDataBuilderByDb {
         for(let i =0; i < this.numberComments; i++){
             const comment: CreateCommentDto =
                 {content: `This is the comment number ${i}`,
-                 postId: this.posts[0].id!,
-                 userId: this.users[0].id!,
+                 postId: this.posts[0].id!.toString(),
+                 userId: this.users[0].id!.toString(),
                  };
 
             const result = await this.dataSource.query(`

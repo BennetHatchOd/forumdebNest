@@ -8,6 +8,7 @@ import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
 import { Session } from '@modules/users-system/domain/session.entity';
 import { FilterQuery } from 'mongoose';
+import { SessionQueryFilterDto } from '@modules/users-system/dto/session.query.filter.dto';
 
 export class UpdateSessionCommand extends Command<string> {
     constructor(
@@ -26,7 +27,7 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
 
     async execute({payload}: UpdateSessionCommand):Promise<string> {
 
-        const queryFilter: FilterQuery<Session> ={
+        const queryFilter: SessionQueryFilterDto ={
             userId: payload.userId,
             version: payload.version,
             deviceId: payload.deviceId

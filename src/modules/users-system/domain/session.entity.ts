@@ -1,42 +1,28 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
 import ShortUniqueId from 'short-unique-id';
 import { SessionInputDto } from '@modules/users-system/dto/input/session.input.dto';
 
-@Schema({ timestamps: true })
 export class Session {
-    @Prop({ required: true, })
-    userId:     string;
-
-    @Prop({ required: true, })
+    id: number;
+    userId:     number;
     version:    string;
-
-    @Prop({
-        unique: true,
-        required: true,
-    })
     deviceId:   string;
-
-    @Prop({ required: true, })
     deviceName: string;
-
-    @Prop({ required: true, })
     ip:         string;
-
     updatedAt:  Date;
 
     update(){
         const uid = new ShortUniqueId({ length: 7 });
 
         this.version = uid.rnd();
+        this.updatedAt = new Date();
     }
 
     static createInstance(dto: SessionInputDto,
-    ): SessionDocument {
+    ): Session {
         const uid = new ShortUniqueId({ length: 7 });
         const session = new this();
 
-        session.userId = dto.userId;
+        session.userId = +dto.userId;
         session.deviceName = dto.deviceName;
         session.ip = dto.ip;
 
@@ -48,25 +34,14 @@ export class Session {
     static copyInstance(dto: Session): Session {
         const session = new this();
 
-        return session as SessionDocument;
         session.id = dto.id;
         session.userId = dto.userId;
         session.version = dto.version;
         session.deviceId = dto.deviceId;
         session.deviceName = dto.deviceName;
         session.ip = dto.ip;
+        session.updatedAt = dto.updatedAt;
 
         return session;
     }
 }
-
-export const SessionSchema = SchemaFactory.createForClass(Session);
-
-//регистрирует методы сущности в схеме
-SessionSchema.loadClass(Session);
-
-//Типизация документа
-export type SessionDocument = HydratedDocument<Session>;
-
-//Типизация модели + статические методы
-export type SessionModelType = Model<SessionDocument> & typeof Session;

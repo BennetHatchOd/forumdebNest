@@ -23,17 +23,12 @@ import { DeviceController } from '@modules/users-system/api/device.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from '@core/database.module';
 import { ThrottlerOptions } from '@nestjs/throttler/dist/throttler-module-options.interface';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Session, SessionSchema } from '@modules/users-system/domain/session.entity';
 
 @Module({
     imports: [
         CqrsModule,
         AuthModule,
         DatabaseModule,
-        MongooseModule.forFeature([
-            { name: Session.name, schema: SessionSchema },
-        ]),
         ThrottlerModule.forRootAsync({
             imports:[UserSystemModule],
             inject: [UserConfig],

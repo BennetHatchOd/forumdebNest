@@ -1,9 +1,9 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Session, SessionDocument } from '@modules/users-system/domain/session.entity';
+import { Session } from '@modules/users-system/domain/session.entity';
 import { SessionRepository } from '@modules/users-system/infrastucture/session.repository';
 import { DomainException } from '@core/exceptions/domain.exception';
 import { DomainExceptionCode } from '@core/exceptions/domain.exception.code';
-import { FilterQuery } from 'mongoose';
+import { SessionQueryFilterDto } from '@modules/users-system/dto/session.query.filter.dto';
 
 export class DeleteOneSessionCommand extends Command<void> {
     constructor(
@@ -21,9 +21,9 @@ export class DeleteOneSessionHandler implements ICommandHandler<DeleteOneSession
 
     async execute({userId, deviceId}: DeleteOneSessionCommand):Promise<void> {
 
-        const findQueryFilter: FilterQuery<Session> = { deviceId: deviceId }
+        const findQueryFilter: SessionQueryFilterDto = { deviceId: deviceId }
 
-        const sessionToClose: SessionDocument | null
+        const sessionToClose: Session | null
             = await this.sessionRepository.getByFilter(findQueryFilter);
 
         if(!sessionToClose)
@@ -32,13 +32,13 @@ export class DeleteOneSessionHandler implements ICommandHandler<DeleteOneSession
                 code: DomainExceptionCode.NotFound
             })
 
-        if(sessionToClose.userId !== userId )
+        if(sessionToClose.userId !== +userId )
             throw new DomainException({
                 message: 'this is not your device',
                 code: DomainExceptionCode.Forbidden
             })
 
-        const deleteQueryFilter: FilterQuery<Session> ={
+        const deleteQueryFilter: SessionQueryFilterDto ={
             userId: userId,
             deviceId: deviceId
         }

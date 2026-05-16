@@ -27,7 +27,6 @@ export class DeviceController {
     async getAllSessions(@CurrentUserId() user: TokenPayloadDto
     ):Promise<SessionViewDto[]>{
 
-        await this.sessionRepository.clearExpired(user.userId);
         const sessions: SessionViewDto[]
             = await this.sessionQueryRepository.findByUserId(user.userId);
         return sessions;
