@@ -42,8 +42,21 @@ export class Session {
 
         session.deviceId = uid.rnd();
         session.version = uid.rnd();
+        session.updatedAt = new Date();
+        return session;
+    }
+    static copyInstance(dto: Session): Session {
+        const session = new this();
 
         return session as SessionDocument;
+        session.id = dto.id;
+        session.userId = dto.userId;
+        session.version = dto.version;
+        session.deviceId = dto.deviceId;
+        session.deviceName = dto.deviceName;
+        session.ip = dto.ip;
+
+        return session;
     }
 }
 
